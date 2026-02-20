@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Totalitarisme — Vue Professeur</title>
+<title>quiz Totalitarisme — Vue Professeur</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -107,7 +107,7 @@
       <div class="join-url">gsimard4.github.io/quiz-histoire/totalitarisme/eleve.html</div>
       <div class="qr-wrapper"><div id="qrcode"></div></div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);">Joueurs connectés : <strong id="lobby-count" style="color:var(--text);font-size:1.3rem;">0</strong></div>
-      <button class="btn btn-primary start-big" onclick="startQuiz()">▶ LANCER LE QUIZ</button>
+      <button class="btn btn-primary start-big" onclick="startquiz()">▶ LANCER LE QUIZ</button>
       <button class="btn btn-muted" onclick="resetAll()" style="font-size:0.9rem;margin-top:4px;">🗑 Réinitialiser tout</button>
     </div>
 
@@ -207,7 +207,7 @@ function updateAnsweredCount(){
   document.getElementById('answered-count').textContent=`${count} réponse${count>1?'s':''} reçue${count>1?'s':''}`;
 }
 
-function startQuiz(){
+function startquiz(){
   if(totalPlayers===0){alert("Attendez qu'au moins un élève rejoigne !");return;}
   phase='question';
   document.getElementById('lobby').style.display='none';
