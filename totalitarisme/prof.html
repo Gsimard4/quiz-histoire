@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Totalitarisme — Vue Professeur</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+  :root{--red:#c0392b;--gold:#f39c12;--dark:#0d0d0d;--mid:#1a1a1a;--card:#222;--border:#333;--text:#f0ece4;--muted:#888;--green:#27ae60;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--mid);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:100;}
+  .topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;}
+  .topbar-title span{color:var(--red);}
+  .topbar-right{display:flex;gap:12px;align-items:center;}
+  .badge{background:var(--card);border:1px solid var(--border);padding:6px 14px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:1px;}
+  .badge strong{color:var(--gold);}
+  .btn-home{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;color:var(--muted);text-decoration:none;padding:6px 12px;border:1px solid var(--border);border-radius:4px;transition:color 0.2s;}
+  .btn-home:hover{color:var(--text);}
+
+  .main{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 60px);}
+  .left-panel{padding:24px;border-right:2px solid var(--border);}
+  .right-panel{background:var(--mid);padding:20px;display:flex;flex-direction:column;gap:16px;}
+
+  #lobby{display:flex;flex-direction:column;align-items:center;gap:24px;padding:20px 0;}
+  .lobby-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;text-align:center;}
+  .lobby-title span{color:var(--red);}
+  .qr-wrapper{background:white;padding:16px;border-radius:8px;box-shadow:0 0 40px rgba(192,57,43,0.4);}
+  .join-url{background:var(--card);border:1px solid var(--border);padding:10px 20px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;color:var(--gold);text-align:center;word-break:break-all;max-width:420px;}
+
+  #question-view{display:none;}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .q-number{font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);}
+  .phase-label{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .q-timer{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);width:80px;height:80px;background:var(--card);border:3px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color 0.3s,border-color 0.3s;}
+  .q-timer.urgent{color:var(--red);border-color:var(--red);animation:pulse 0.5s infinite alternate;}
+  @keyframes pulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+  .progress-outer{width:100%;height:6px;background:var(--border);border-radius:3px;margin-bottom:12px;}
+  .progress-inner{height:100%;background:var(--red);border-radius:3px;transition:width 0.3s;}
+  .q-text{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:24px;background:var(--card);border-left:5px solid var(--red);padding:16px 20px;border-radius:0 8px 8px 0;}
+  .answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .answer-btn{padding:16px;border-radius:8px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;color:white;text-align:left;display:flex;align-items:center;gap:10px;transition:all 0.4s;}
+  .answer-btn.A{background:#e74c3c;}.answer-btn.B{background:#3498db;}.answer-btn.C{background:#2ecc71;}.answer-btn.D{background:#f39c12;}
+  .answer-btn .letter{min-width:30px;height:30px;background:rgba(0,0,0,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+  .answer-btn.correct-reveal{box-shadow:0 0 0 4px #2ecc71,0 0 30px rgba(46,204,113,0.6);transform:scale(1.03);}
+  .answer-btn.wrong-reveal{opacity:0.35;filter:grayscale(0.6);}
+  .answered-count{font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);text-align:center;margin-top:6px;}
+
+  #charts-section{display:none;margin-top:14px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .bar-lbl{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;width:22px;color:white;}
+  .bar-outer{flex:1;height:28px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .bar-inner{height:100%;transition:width 0.5s;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:0.8rem;font-weight:700;color:white;min-width:32px;}
+  .bar-inner.A{background:#e74c3c;}.bar-inner.B{background:#3498db;}.bar-inner.C{background:#2ecc71;}.bar-inner.D{background:#f39c12;}
+
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+  .btn{padding:12px 22px;border:none;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--red);color:white;}.btn-gold{background:var(--gold);color:#000;}
+  .btn-green{background:var(--green);color:white;}.btn-muted{background:var(--border);color:var(--text);}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+  .start-big{padding:18px 48px;font-size:1.5rem;border-radius:6px;box-shadow:0 0 30px rgba(192,57,43,0.5);}
+
+  .panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:8px;}
+  .leaderboard{display:flex;flex-direction:column;gap:6px;}
+  .lb-entry{display:flex;align-items:center;gap:10px;background:var(--card);padding:8px 12px;border-radius:4px;border-left:3px solid transparent;animation:slideIn 0.3s ease;}
+  @keyframes slideIn{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  .lb-entry.rank-1{border-left-color:gold;}.lb-entry.rank-2{border-left-color:silver;}.lb-entry.rank-3{border-left-color:#cd7f32;}
+  .lb-rank{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;width:24px;text-align:center;color:var(--muted);}
+  .lb-name{flex:1;font-weight:600;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .lb-score{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--gold);}
+  .players-list{display:flex;flex-direction:column;gap:4px;max-height:500px;overflow-y:auto;}
+  .player-chip{background:var(--card);border:1px solid var(--border);padding:6px 12px;border-radius:4px;font-size:0.9rem;animation:slideIn 0.3s ease;}
+
+  #podium-view{display:none;text-align:center;}
+  .podium-title{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:5px;color:var(--gold);margin-bottom:32px;text-shadow:0 0 30px rgba(243,156,18,0.5);}
+  .podium-wrap{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin-bottom:40px;}
+  .podium-block{display:flex;flex-direction:column;align-items:center;gap:8px;width:180px;}
+  .podium-emoji{font-size:3rem;}
+  .podium-name{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;}
+  .podium-pts{font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);}
+  .podium-bar{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--dark);}
+  .podium-bar.p1{height:160px;background:gold;}.podium-bar.p2{height:120px;background:silver;}.podium-bar.p3{height:90px;background:#cd7f32;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--border);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-title">QUIZ <span>TOTALITARISME</span> — PROF</div>
+  <div class="topbar-right">
+    <a class="btn-home" href="../index.html">← Tous les quiz</a>
+    <div class="badge">Joueurs : <strong id="player-count">0</strong></div>
+    <div class="badge" id="q-badge" style="display:none">Q <strong id="q-num-badge">0</strong>/12</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div id="lobby">
+      <div class="lobby-title">REJOIGNEZ LE QUIZ<br><span>TOTALITARISME</span></div>
+      <div class="join-url">gsimard4.github.io/quiz-histoire/totalitarisme/eleve.html</div>
+      <div class="qr-wrapper"><div id="qrcode"></div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);">Joueurs connectés : <strong id="lobby-count" style="color:var(--text);font-size:1.3rem;">0</strong></div>
+      <button class="btn btn-primary start-big" onclick="startQuiz()">▶ LANCER LE QUIZ</button>
+      <button class="btn btn-muted" onclick="resetAll()" style="font-size:0.9rem;margin-top:4px;">🗑 Réinitialiser tout</button>
+    </div>
+
+    <div id="question-view">
+      <div class="q-header">
+        <div>
+          <div class="phase-label" id="phase-label">EN ATTENTE</div>
+          <div class="q-number" id="q-number-display">QUESTION 1 / 12</div>
+        </div>
+        <div class="q-timer" id="timer-display">30</div>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progress-bar"></div></div>
+      <div class="q-text" id="q-text-display">...</div>
+      <div class="answers-grid" id="answers-grid"></div>
+      <div class="answered-count" id="answered-count">0 réponse reçue</div>
+      <div id="charts-section"><div id="charts-bars"></div></div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="btn-results" onclick="showResults()" disabled>📊 Voir résultats</button>
+        <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()" disabled>✅ Révéler réponse</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>➡ Question suivante</button>
+      </div>
+    </div>
+
+    <div id="podium-view">
+      <div class="podium-title">🏆 RÉSULTATS FINAUX</div>
+      <div class="podium-wrap" id="podium-wrap"></div>
+      <button class="btn btn-primary start-big" onclick="resetAll()">🔄 Nouveau Quiz</button>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="panel-title" id="right-panel-title">JOUEURS CONNECTÉS</div>
+    <div id="players-list-wrap" class="players-list"></div>
+    <div id="leaderboard-wrap" class="leaderboard" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+const ELEVE_URL = "https://gsimard4.github.io/quiz-histoire/totalitarisme/eleve.html";
+const firebaseConfig = { databaseURL:"https://quiz-totalitarisme-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const QUESTIONS = [
+  {q:"Quelle est la devise du fascisme ?",opts:["Liberté, Égalité, Fraternité","Croire, Obéir, Combattre","Travail, Famille, Patrie","Un peuple, Un Reich, Un Führer"],correct:1},
+  {q:"Quelle caractéristique N'appartient PAS au totalitarisme ?",opts:["Parti unique et culte de la personnalité","Pluralisme politique et liberté de presse","Terreur et violence organisées","Embrigadement idéologique et propagande"],correct:1},
+  {q:"Selon le cours, quelle est la cause principale de la montée du fascisme ?",opts:["La Révolution française","La Première Guerre mondiale","La crise de 1929 uniquement","La Révolution industrielle"],correct:1},
+  {q:"En quelle année Mussolini devient-il Premier ministre d'Italie ?",opts:["1919","1924","1922","1926"],correct:2},
+  {q:"Qu'est-ce que les 'lois fascistissimes' de 1926 instituent en Italie ?",opts:["Le suffrage universel féminin","La liberté syndicale","Le parti unique et la suppression de la liberté de presse","La séparation de l'Église et de l'État"],correct:2},
+  {q:"Pourquoi le fascisme italien est-il qualifié de totalitarisme 'inachevé' ?",opts:["Mussolini n'a jamais eu le pouvoir absolu","Influence de l'Église, monarchie en place, moins d'emprise sur la population","L'Italie n'avait pas de police politique","Les élections continuaient librement"],correct:1},
+  {q:"En janvier 1933, qui nomme Hitler chancelier ?",opts:["Kaiser Wilhelm II","Göring","Hindenburg","Goebbels"],correct:2},
+  {q:"Quel événement de février 1933 permet à Hitler de suspendre les libertés civiles ?",opts:["L'assassinat de Matteotti","L'incendie du Reichstag","La nuit des longs couteaux","Le putsch de Munich"],correct:1},
+  {q:"Quelle est la principale politique du 1er plan quinquennal de Staline ?",opts:["Privatisation des terres agricoles","Collectivisation forcée et industrialisation accélérée","Libéralisation du commerce extérieur","Réduction de la production industrielle"],correct:1},
+  {q:"Qu'est-ce que le 'Goulag' dans le régime stalinien ?",opts:["La police secrète de Staline","Le parti communiste soviétique","Les camps de travail pour les opposants","Le système de planification économique"],correct:2},
+  {q:"Qui sont principalement les membres du Parti nazi selon les données de 1930 ?",opts:["Surtout des ouvriers industriels","Surtout des paysans pauvres","Surtout des employés, indépendants et classe moyenne","Surtout des intellectuels universitaires"],correct:2},
+  {q:"Qu'ont en commun le nazisme et le stalinisme selon le cours ?",opts:["La même idéologie économique","Tous deux sont qualifiés de 'totalitarisme achevé'","Tous deux rejettent le nationalisme","Tous deux maintiennent des élections libres"],correct:1}
+];
+
+const LETTERS=['A','B','C','D'];
+let currentQ=-1,timerInterval=null,timeLeft=30,phase='lobby',totalPlayers=0,answersData={};
+
+function initQR(){
+  new QRCode(document.getElementById('qrcode'),{
+    text:ELEVE_URL,width:200,height:200,
+    colorDark:"#000000",colorLight:"#ffffff",
+    correctLevel:QRCode.CorrectLevel.H
+  });
+}
+
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function listenPlayers(){
+  db.ref('players').on('value',snap=>{
+    const players=snap.val()||{};
+    const names=Object.values(players).map(p=>p.name).filter(Boolean);
+    totalPlayers=names.length;
+    document.getElementById('player-count').textContent=totalPlayers;
+    document.getElementById('lobby-count').textContent=totalPlayers;
+    if(phase==='lobby'){
+      document.getElementById('players-list-wrap').innerHTML=names.map(n=>`<div class="player-chip">👤 ${escHtml(n)}</div>`).join('');
+    }
+    updateAnsweredCount();
+  });
+}
+
+function listenAnswers(){
+  db.ref('answers').on('value',snap=>{
+    answersData=snap.val()||{};
+    updateAnsweredCount();
+    if(phase==='question')updateChartsLive();
+  });
+}
+
+function updateAnsweredCount(){
+  if(currentQ<0)return;
+  const count=Object.values(answersData).filter(a=>a.question===currentQ).length;
+  document.getElementById('answered-count').textContent=`${count} réponse${count>1?'s':''} reçue${count>1?'s':''}`;
+}
+
+function startQuiz(){
+  if(totalPlayers===0){alert("Attendez qu'au moins un élève rejoigne !");return;}
+  phase='question';
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('question-view').style.display='block';
+  document.getElementById('q-badge').style.display='flex';
+  document.getElementById('right-panel-title').textContent='CLASSEMENT EN DIRECT';
+  document.getElementById('players-list-wrap').style.display='none';
+  document.getElementById('leaderboard-wrap').style.display='flex';
+  loadQuestion(0);
+}
+
+function loadQuestion(index){
+  currentQ=index;phase='question';answersData={};timeLeft=30;
+  const q=QUESTIONS[index];
+  document.getElementById('q-number-display').textContent=`QUESTION ${index+1} / ${QUESTIONS.length}`;
+  document.getElementById('q-num-badge').textContent=index+1;
+  document.getElementById('q-text-display').textContent=q.q;
+  document.getElementById('phase-label').textContent='EN COURS';
+  document.getElementById('progress-bar').style.width=`${(index/QUESTIONS.length)*100}%`;
+  const grid=document.getElementById('answers-grid');
+  grid.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className=`answer-btn ${LETTERS[i]}`;btn.id=`ans-${i}`;
+    btn.innerHTML=`<span class="letter">${LETTERS[i]}</span>${escHtml(opt)}`;
+    grid.appendChild(btn);
+  });
+  document.getElementById('charts-section').style.display='none';
+  document.getElementById('charts-bars').innerHTML='';
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('answered-count').textContent='0 réponse reçue';
+  db.ref('gameState').set({phase:'question',questionIndex:index,question:q.q,options:q.opts,timeLeft:30});
+  db.ref('answers').remove();
+  clearInterval(timerInterval);
+  updateTimer();
+  timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);timerEnd();}},1000);
+}
+
+function updateTimer(){
+  const el=document.getElementById('timer-display');
+  el.textContent=timeLeft;
+  el.className='q-timer'+(timeLeft<=5?' urgent':'');
+  db.ref('gameState/timeLeft').set(timeLeft);
+}
+
+function timerEnd(){
+  phase='results';
+  document.getElementById('phase-label').textContent='TEMPS ÉCOULÉ';
+  db.ref('gameState/phase').set('closed');
+  document.getElementById('btn-results').disabled=false;
+}
+
+function showResults(){
+  document.getElementById('charts-section').style.display='block';
+  buildCharts();
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=false;
+}
+
+function buildCharts(){
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  const counts=[0,0,0,0];
+  qAnswers.forEach(a=>{if(a.answer>=0&&a.answer<4)counts[a.answer]++;});
+  const total=qAnswers.length||1;
+  const container=document.getElementById('charts-bars');
+  container.innerHTML='';
+  counts.forEach((c,i)=>{
+    const pct=Math.round((c/total)*100);
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<div class="bar-lbl">${LETTERS[i]}</div><div class="bar-outer"><div class="bar-inner ${LETTERS[i]}" style="width:${pct}%">${c} (${pct}%)</div></div>`;
+    container.appendChild(row);
+  });
+}
+
+function updateChartsLive(){if(document.getElementById('charts-section').style.display==='block')buildCharts();}
+
+function revealAnswer(){
+  const correct=QUESTIONS[currentQ].correct;
+  LETTERS.forEach((_,i)=>{
+    const btn=document.getElementById(`ans-${i}`);
+    if(btn)btn.classList.add(i===correct?'correct-reveal':'wrong-reveal');
+  });
+  computeAndUpdateScores();
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=false;
+  db.ref('gameState/phase').set('revealed');
+  db.ref('gameState/correctAnswer').set(correct);
+  updateLeaderboard();
+}
+
+function computeAndUpdateScores(){
+  const correct=QUESTIONS[currentQ].correct;
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  qAnswers.sort((a,b)=>(a.time||9999)-(b.time||9999));
+  let rank=0;
+  qAnswers.forEach(ans=>{
+    if(ans.answer===correct){rank++;const pts=1000+Math.max(0,100-rank*5);db.ref(`players/${ans.uid}/score`).transaction(s=>(s||0)+pts);}
+  });
+}
+
+function updateLeaderboard(){
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score).slice(0,10);
+    document.getElementById('leaderboard-wrap').innerHTML=sorted.map((p,i)=>
+      `<div class="lb-entry rank-${i+1}"><div class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="lb-name">${escHtml(p.name)}</div><div class="lb-score">${p.score}</div></div>`
+    ).join('');
+  });
+}
+
+function nextQuestion(){
+  if(currentQ+1>=QUESTIONS.length)showPodium();
+  else{loadQuestion(currentQ+1);updateLeaderboard();}
+}
+
+function showPodium(){
+  clearInterval(timerInterval);phase='podium';
+  document.getElementById('question-view').style.display='none';
+  document.getElementById('podium-view').style.display='block';
+  document.getElementById('progress-bar').style.width='100%';
+  db.ref('gameState/phase').set('podium');
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const order=[sorted[1],sorted[0],sorted[2]];
+    const classes=['p2','p1','p3'],emojis=['🥈','🥇','🥉'];
+    document.getElementById('podium-wrap').innerHTML=order.map((p,i)=>p?`
+      <div class="podium-block">
+        <div class="podium-emoji">${emojis[i]}</div>
+        <div class="podium-name">${escHtml(p.name)}</div>
+        <div class="podium-pts">${p.score} pts</div>
+        <div class="podium-bar ${classes[i]}">${i===1?'1':i===0?'2':'3'}</div>
+      </div>`:'').join('');
+  });
+}
+
+function resetAll(){
+  clearInterval(timerInterval);
+  db.ref('/').remove().then(()=>location.reload());
+}
+
+window.onload=()=>{
+  initQR();
+  listenPlayers();
+  listenAnswers();
+  db.ref('gameState').set({phase:'lobby'});
+};
+</script>
+</body>
+</html>
