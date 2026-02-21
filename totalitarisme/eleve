@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quiz Totalitarisme — Élève</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+  :root{--red:#c0392b;--gold:#f39c12;--dark:#0d0d0d;--mid:#1a1a1a;--card:#222;--border:#333;--text:#f0ece4;--muted:#888;--green:#27ae60;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .header{background:var(--mid);border-bottom:3px solid var(--red);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+  .header-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;}
+  .header-title span{color:var(--red);}
+  .header-score{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;color:var(--gold);font-weight:700;}
+  .player-name-tag{font-size:0.8rem;color:var(--muted);}
+  .progress-outer{width:100%;height:4px;background:var(--border);}
+  .progress-inner{height:100%;background:var(--red);transition:width 0.5s;}
+  .screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:20px;}
+  .join-logo{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;line-height:1;text-align:center;}
+  .join-logo span{color:var(--red);}
+  .join-sub{font-size:0.95rem;color:var(--muted);text-align:center;max-width:280px;}
+  .input-group{width:100%;max-width:320px;display:flex;flex-direction:column;gap:8px;}
+  .input-label{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+  .name-input{width:100%;padding:14px 16px;background:var(--card);border:2px solid var(--border);border-radius:6px;color:var(--text);font-family:'Barlow',sans-serif;font-size:1.2rem;outline:none;transition:border-color 0.2s;}
+  .name-input:focus{border-color:var(--red);}
+  .btn-join{width:100%;max-width:320px;padding:16px;border:none;border-radius:6px;background:var(--red);color:white;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(192,57,43,0.4);}
+  .btn-join:active{transform:scale(0.97);}
+  .error-msg{color:#e74c3c;font-size:0.9rem;}
+  .waiting-icon{font-size:4rem;animation:bounce 1s infinite alternate;}
+  @keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}
+  .waiting-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;text-align:center;}
+  .waiting-name{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;color:var(--gold);background:var(--card);padding:8px 20px;border-radius:4px;}
+  .waiting-sub{font-size:0.9rem;color:var(--muted);}
+  #question-screen{flex:1;display:none;flex-direction:column;width:100%;}
+  .q-top{width:100%;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:var(--mid);border-bottom:1px solid var(--border);}
+  .q-num-label{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;color:var(--muted);letter-spacing:1px;}
+  .q-timer-sm{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);width:48px;height:48px;background:var(--card);border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color 0.3s,border-color 0.3s;}
+  .q-timer-sm.urgent{color:var(--red);border-color:var(--red);animation:pulse 0.5s infinite alternate;}
+  @keyframes pulse{from{transform:scale(1);}to{transform:scale(1.1);}}
+  .q-body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;}
+  .q-text-el{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;line-height:1.3;background:var(--card);border-left:4px solid var(--red);padding:14px;border-radius:0 6px 6px 0;}
+  .answer-buttons{display:flex;flex-direction:column;gap:10px;}
+  .ans-btn{width:100%;padding:16px 14px;border:none;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;color:white;text-align:left;display:flex;align-items:center;gap:12px;transition:all 0.2s;}
+  .ans-btn.A{background:#e74c3c;}.ans-btn.B{background:#3498db;}.ans-btn.C{background:#2ecc71;}.ans-btn.D{background:#f39c12;}
+  .ans-btn:active{transform:scale(0.97);}
+  .ans-btn .letter-badge{min-width:32px;height:32px;background:rgba(0,0,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+  .ans-btn.selected{box-shadow:0 0 0 4px white,0 0 20px rgba(255,255,255,0.3);transform:scale(1.02);}
+  .ans-btn.correct-reveal{box-shadow:0 0 0 4px #2ecc71,0 0 20px rgba(46,204,113,0.5);}
+  .ans-btn.wrong-reveal{opacity:0.4;filter:grayscale(0.5);}
+  .ans-btn:disabled{cursor:default;}
+  .status-panel{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:20px;}
+  .status-icon{font-size:3.5rem;}
+  .status-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;}
+  .status-sub{font-size:0.9rem;color:var(--muted);}
+  .pts-gained{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+  @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .reveal-msg{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;}
+  .reveal-msg.correct{color:var(--green);}.reveal-msg.wrong{color:var(--red);}
+  .results-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:4px;color:var(--gold);}
+  .results-score{font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;}
+  .results-pts{font-size:1rem;color:var(--muted);margin-top:-8px;}
+  .results-rank{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;background:var(--card);padding:10px 24px;border-radius:6px;}
+  .results-rank span{color:var(--gold);font-size:2rem;}
+  .closed-icon{font-size:3rem;}
+  .closed-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-title">QUIZ <span>TOTALITARISME</span></div>
+    <div class="player-name-tag" id="header-name"></div>
+  </div>
+  <div class="header-score" id="header-score" style="display:none">🏅 <span id="score-display">0</span> pts</div>
+</div>
+<div class="progress-outer"><div class="progress-inner" id="progress-bar" style="width:0%"></div></div>
+
+<div class="screen" id="join-screen">
+  <div class="join-logo">QUIZ<br><span>TOTALITARISME</span></div>
+  <div class="join-sub">Entre ton prénom pour rejoindre !</div>
+  <div class="input-group">
+    <div class="input-label">Ton prénom</div>
+    <input class="name-input" id="name-input" type="text" maxlength="20" placeholder="Ex: Marie"
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      onkeydown="if(event.key==='Enter')joinGame()">
+  </div>
+  <button class="btn-join" onclick="joinGame()">REJOINDRE</button>
+  <div class="error-msg" id="join-error" style="display:none"></div>
+</div>
+
+<div class="screen" id="waiting-screen" style="display:none">
+  <div class="waiting-icon">⏳</div>
+  <div class="waiting-title">EN ATTENTE<br>DU PROF</div>
+  <div class="waiting-name" id="waiting-name"></div>
+  <div class="waiting-sub">Le quiz commencera bientôt…</div>
+</div>
+
+<div id="question-screen">
+  <div class="q-top">
+    <div class="q-num-label" id="q-num-label">QUESTION 1 / 12</div>
+    <div class="q-timer-sm" id="timer-el">30</div>
+  </div>
+  <div class="q-body">
+    <div class="q-text-el" id="q-text-el"></div>
+    <div class="answer-buttons" id="answer-buttons"></div>
+  </div>
+  <div class="status-panel" id="answered-panel">
+    <div class="status-icon" id="answered-icon">✅</div>
+    <div class="status-title" id="answered-title">RÉPONSE ENREGISTRÉE !</div>
+    <div class="status-sub">Attend la correction du professeur…</div>
+  </div>
+  <div class="status-panel" id="reveal-panel">
+    <div class="status-icon" id="reveal-icon"></div>
+    <div class="reveal-msg" id="reveal-msg"></div>
+    <div class="pts-gained" id="pts-gained" style="display:none"></div>
+    <div class="status-sub" id="reveal-sub"></div>
+  </div>
+</div>
+
+<div class="screen" id="results-screen" style="display:none">
+  <div class="results-title">🏆 FIN DU QUIZ</div>
+  <div class="results-score" id="final-score">0</div>
+  <div class="results-pts">points</div>
+  <div class="results-rank">Classement : <span id="rank-display">?</span></div>
+  <div style="font-size:0.85rem;color:var(--muted);text-align:center;max-width:260px;">Bravo pour ta participation ! 🎉</div>
+</div>
+
+<div class="screen" id="closed-screen" style="display:none">
+  <div class="closed-icon">🔒</div>
+  <div class="closed-title">QUIZ TERMINÉ</div>
+  <div style="font-size:0.9rem;color:var(--muted);text-align:center;">Le professeur a fermé ce quiz.</div>
+</div>
+
+<script>
+const firebaseConfig={databaseURL:"https://quiz-totalitarisme-default-rtdb.firebaseio.com/"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const LETTERS=['A','B','C','D'];
+let myUid=null,myName='',myScore=0;
+let currentQuestion=-1,myAnswer=null,hasAnswered=false;
+let questionStartTime=null,timerInterval=null;
+
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function showScreen(id){
+  ['join-screen','waiting-screen','results-screen','closed-screen'].forEach(s=>{
+    document.getElementById(s).style.display=s===id?'flex':'none';
+  });
+  document.getElementById('question-screen').style.display=id==='question-screen'?'flex':'none';
+}
+
+function joinGame(){
+  const name=document.getElementById('name-input').value.trim();
+  if(!name||name.length<2){showErr("Entre un prénom d'au moins 2 lettres !");return;}
+  db.ref('gameState/phase').once('value',snap=>{
+    if(snap.val()==='podium'){showErr("Le quiz est déjà terminé !");return;}
+    registerPlayer(name);
+  });
+}
+
+function showErr(msg){
+  const el=document.getElementById('join-error');
+  el.textContent=msg;el.style.display='block';
+}
+
+function registerPlayer(name){
+  myName=name;
+  const ref=db.ref('players').push();
+  myUid=ref.key;
+  ref.set({name:name,score:0,joinedAt:Date.now()}).then(()=>{
+    document.getElementById('header-name').textContent=name;
+    document.getElementById('header-score').style.display='block';
+    document.getElementById('waiting-name').textContent='👤 '+name;
+    showScreen('waiting-screen');
+    listenGameState();
+  });
+}
+
+function listenGameState(){
+  db.ref('gameState').on('value',snap=>{
+    const state=snap.val();
+    if(!state)return;
+    handleState(state);
+  });
+}
+
+function handleState(state){
+  const phase=state.phase;
+  if(phase==='lobby'){showScreen('waiting-screen');return;}
+  if(phase==='podium'){showFinalResults();return;}
+  if(phase==='question'){
+    const idx=state.questionIndex;
+    if(idx!==currentQuestion){
+      currentQuestion=idx;myAnswer=null;hasAnswered=false;
+      renderQuestion(state);
+      showScreen('question-screen');
+      document.getElementById('answer-buttons').style.display='flex';
+      document.getElementById('answered-panel').style.display='none';
+      document.getElementById('reveal-panel').style.display='none';
+      startClientTimer(state.timeLeft||30);
+    }
+    return;
+  }
+  if(phase==='closed'){
+    if(!hasAnswered){
+      document.getElementById('answer-buttons').style.display='none';
+      document.getElementById('answered-panel').style.display='flex';
+      document.getElementById('answered-icon').textContent='⏱';
+      document.getElementById('answered-title').textContent='TEMPS ÉCOULÉ !';
+    }
+    return;
+  }
+  if(phase==='revealed'){showReveal(state.correctAnswer);return;}
+}
+
+function renderQuestion(state){
+  document.getElementById('q-num-label').textContent=`QUESTION ${state.questionIndex+1} / 12`;
+  document.getElementById('progress-bar').style.width=`${(state.questionIndex/12)*100}%`;
+  document.getElementById('q-text-el').textContent=state.question;
+  const container=document.getElementById('answer-buttons');
+  container.innerHTML='';
+  state.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className=`ans-btn ${LETTERS[i]}`;btn.id=`opt-${i}`;
+    btn.innerHTML=`<span class="letter-badge">${LETTERS[i]}</span>${escHtml(opt)}`;
+    btn.onclick=()=>submitAnswer(i);
+    container.appendChild(btn);
+  });
+  container.style.flexDirection='column';
+  questionStartTime=Date.now();
+}
+
+function startClientTimer(seconds){
+  clearInterval(timerInterval);
+  let t=seconds;
+  updateTimerEl(t);
+  timerInterval=setInterval(()=>{t--;updateTimerEl(t);if(t<=0)clearInterval(timerInterval);},1000);
+}
+
+function updateTimerEl(t){
+  const el=document.getElementById('timer-el');
+  el.textContent=Math.max(0,t);
+  el.className='q-timer-sm'+(t<=5?' urgent':'');
+}
+
+function submitAnswer(idx){
+  if(hasAnswered)return;
+  hasAnswered=true;myAnswer=idx;
+  const elapsed=(Date.now()-questionStartTime)/1000;
+  LETTERS.forEach((_,i)=>{
+    const btn=document.getElementById(`opt-${i}`);
+    if(!btn)return;
+    btn.disabled=true;
+    if(i===idx)btn.classList.add('selected');
+    else btn.style.opacity='0.5';
+  });
+  db.ref(`answers/${myUid}`).set({uid:myUid,name:myName,question:currentQuestion,answer:idx,time:elapsed});
+  setTimeout(()=>{
+    document.getElementById('answer-buttons').style.display='none';
+    document.getElementById('answered-panel').style.display='flex';
+    document.getElementById('answered-icon').textContent='✅';
+    document.getElementById('answered-title').textContent='RÉPONSE ENREGISTRÉE !';
+  },300);
+}
+
+function showReveal(correct){
+  clearInterval(timerInterval);
+  document.getElementById('answer-buttons').style.display='none';
+  document.getElementById('answered-panel').style.display='none';
+  document.getElementById('reveal-panel').style.display='flex';
+  const wasCorrect=hasAnswered&&myAnswer===correct;
+  const icon=document.getElementById('reveal-icon');
+  const msg=document.getElementById('reveal-msg');
+  const pts=document.getElementById('pts-gained');
+  const sub=document.getElementById('reveal-sub');
+  if(!hasAnswered){
+    icon.textContent='⏱';msg.textContent='PAS DE RÉPONSE';msg.className='reveal-msg wrong';
+    pts.style.display='none';sub.textContent=`La bonne réponse était : ${LETTERS[correct]}`;
+  } else if(wasCorrect){
+    icon.textContent='🎉';msg.textContent='BONNE RÉPONSE !';msg.className='reveal-msg correct';
+    pts.textContent='+1000 pts';pts.style.display='block';sub.textContent='';
+    myScore+=1000;document.getElementById('score-display').textContent=myScore;
+  } else {
+    icon.textContent='❌';msg.textContent='RATÉ…';msg.className='reveal-msg wrong';
+    pts.style.display='none';sub.textContent=`La bonne réponse était : ${LETTERS[correct]}`;
+  }
+}
+
+function showFinalResults(){
+  clearInterval(timerInterval);
+  document.getElementById('progress-bar').style.width='100%';
+  showScreen('results-screen');
+  if(myUid){
+    db.ref(`players/${myUid}/score`).once('value',snap=>{
+      const score=snap.val()||0;
+      document.getElementById('final-score').textContent=score;
+      document.getElementById('score-display').textContent=score;
+    });
+  }
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({uid,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const rank=sorted.findIndex(p=>p.uid===myUid)+1;
+    const total=sorted.length;
+    const el=document.getElementById('rank-display');
+    if(rank===1)el.textContent='🥇 1er';
+    else if(rank===2)el.textContent='🥈 2e';
+    else if(rank===3)el.textContent='🥉 3e';
+    else el.textContent=`${rank}e / ${total}`;
+  });
+}
+
+window.onload=()=>{
+  db.ref('gameState/phase').once('value',snap=>{
+    if(snap.val()==='podium')showScreen('closed-screen');
+  });
+};
+</script>
+</body>
+</html>
