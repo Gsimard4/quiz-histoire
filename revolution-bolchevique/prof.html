@@ -3,659 +3,373 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Révolution bolchévique — Professeur</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<title>Quiz Révolution bolchévique — Vue Professeur</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root {
-  --red:#c0392b; --red2:#7b241c; --gold:#f39c12;
-  --dark:#0d0d0d; --mid:#161616; --panel:#1e1e1e;
-  --border:#2e2e2e; --text:#f0ece4; --muted:#777;
-  --green:#27ae60; --A:#e74c3c; --B:#2980b9; --C:#27ae60; --D:#f39c12;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
-
-/* ── TOP BAR ── */
-.topbar{
-  background:var(--mid); border-bottom:3px solid var(--red);
-  padding:12px 24px; display:flex; align-items:center; justify-content:space-between;
-  flex-shrink:0;
-}
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;}
-.topbar-title span{color:var(--red);}
-.topbar-right{display:flex;gap:12px;align-items:center;}
-.pill{
-  background:var(--panel); border:1px solid var(--border);
-  padding:6px 14px; border-radius:20px;
-  font-family:'Barlow Condensed',sans-serif; font-size:0.9rem; letter-spacing:1px;
-}
-.pill b{color:var(--gold);}
-#phase-pill{border-color:var(--red);color:var(--red);}
-
-/* ── SCREENS ── */
-.screen{display:none;flex:1;}
-.screen.active{display:flex;}
-
-/* ══════════ LOBBY ══════════ */
-#screen-lobby{
-  flex-direction:column; align-items:center; justify-content:center;
-  gap:28px; padding:40px 24px;
-}
-.lobby-title{
-  font-family:'Bebas Neue',sans-serif; font-size:2.8rem; letter-spacing:4px;
-  text-align:center; color:var(--text);
-}
-.lobby-title span{color:var(--red);}
-.lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:860px;}
-
-.box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;}
-.box h3{
-  font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:2px;
-  text-transform:uppercase;color:var(--muted);margin-bottom:16px;
-}
-#qr-img{background:#fff;padding:8px;border-radius:6px;width:190px;height:190px;display:block;margin:0 auto 10px;}
-.qr-url{font-size:0.65rem;color:var(--muted);text-align:center;word-break:break-all;}
-
-#student-list{display:flex;flex-wrap:wrap;gap:8px;max-height:200px;overflow-y:auto;}
-.chip{
-  background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.35);
-  padding:5px 12px;border-radius:20px;font-size:0.82rem;
-  animation:pop .25s ease;
-}
-@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-
-.start-btn{
-  background:var(--red);border:none;color:#fff;
-  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;
-  padding:16px 60px;border-radius:6px;cursor:pointer;transition:.2s;
-  box-shadow:0 6px 24px rgba(192,57,43,0.4);
-}
-.start-btn:hover{background:var(--red2);transform:translateY(-2px);}
-.start-btn:active{transform:translateY(0);}
-
-/* ══════════ QUESTION ══════════ */
-#screen-question{flex-direction:column;padding:20px;gap:16px;}
-
-.q-top{display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.q-label{
-  font-family:'Barlow Condensed',sans-serif;font-size:1rem;
-  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
-}
-.timer-block{display:flex;align-items:center;gap:10px;}
-.timer-num{
-  font-family:'Bebas Neue',sans-serif;font-size:3rem;
-  line-height:1;min-width:48px;text-align:center;transition:color .3s;
-}
-.timer-num.warn{color:var(--gold);}
-.timer-num.danger{color:var(--red);}
-.stop-btn{
-  background:transparent;border:2px solid var(--red);color:var(--red);
-  font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:1px;
-  padding:8px 18px;border-radius:4px;cursor:pointer;transition:.2s;
-}
-.stop-btn:hover{background:var(--red);color:#fff;}
-
-/* Timer bar */
-.timer-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
-.timer-bar-fill{
-  height:100%;width:100%;border-radius:3px;
-  background:var(--gold);transition:width 1s linear,background .5s;
-}
-
-.q-text{
-  background:var(--panel);border-left:4px solid var(--red);
-  border-radius:8px;padding:20px 24px;
-  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;
-  line-height:1.3;
-}
-
-/* Answers grid */
-.answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.ans-card{
-  background:var(--panel);border:2px solid var(--border);
-  border-radius:8px;padding:14px 18px;
-  display:flex;align-items:center;gap:14px;
-  position:relative;overflow:hidden;transition:.3s;
-}
-.ans-card.A{border-color:var(--A);}
-.ans-card.B{border-color:var(--B);}
-.ans-card.C{border-color:var(--C);}
-.ans-card.D{border-color:var(--D);}
-.ans-lbl{
-  font-family:'Bebas Neue',sans-serif;font-size:1.5rem;
-  flex-shrink:0;width:28px;
-}
-.ans-card.A .ans-lbl{color:var(--A);}
-.ans-card.B .ans-lbl{color:var(--B);}
-.ans-card.C .ans-lbl{color:var(--C);}
-.ans-card.D .ans-lbl{color:var(--D);}
-.ans-txt{flex:1;font-size:0.95rem;}
-.ans-count{
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;
-  opacity:0;transition:.3s;margin-left:auto;flex-shrink:0;
-}
-
-/* Fill bar behind answer */
-.ans-fill{
-  position:absolute;left:0;top:0;bottom:0;width:0%;
-  opacity:0.12;transition:width .6s ease;
-}
-.ans-card.A .ans-fill{background:var(--A);}
-.ans-card.B .ans-fill{background:var(--B);}
-.ans-card.C .ans-fill{background:var(--C);}
-.ans-card.D .ans-fill{background:var(--D);}
-
-/* Correct highlight after reveal */
-.ans-card.correct{
-  border-color:var(--green) !important;
-  background:rgba(39,174,96,0.12);
-}
-.ans-card.correct .ans-lbl{color:var(--green) !important;}
-.ans-card.wrong{opacity:0.4;}
-
-/* Bottom bar */
-.q-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px;}
-.resp-info{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:6px;padding:8px 16px;
-  font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;letter-spacing:1px;color:var(--muted);
-}
-.resp-info b{color:var(--gold);font-size:1.1rem;}
-
-/* Mini leaderboard bars */
-.mini-bars{display:flex;align-items:flex-end;gap:6px;height:60px;}
-.mini-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.mini-bar{width:28px;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s ease;}
-.mini-name{font-size:0.55rem;color:var(--muted);max-width:32px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-.next-btn{
-  background:var(--red);border:none;color:#fff;
-  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;
-  padding:12px 32px;border-radius:6px;cursor:pointer;transition:.2s;
-  display:none;
-}
-.next-btn:hover{background:var(--red2);}
-
-/* ══════════ PODIUM ══════════ */
-#screen-podium{
-  flex-direction:column;align-items:center;justify-content:center;
-  gap:24px;padding:40px 24px;
-}
-#screen-podium h2{
-  font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:4px;color:var(--gold);
-}
-.podium-wrap{display:flex;align-items:flex-end;gap:12px;}
-.p-col{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:140px;}
-.p-name{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-align:center;}
-.p-score{font-size:0.8rem;color:var(--muted);}
-.p-block{
-  width:100%;display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:2.2rem;border-radius:6px 6px 0 0;
-}
-.p-col:nth-child(1) .p-block{height:140px;background:linear-gradient(180deg,#aaaaaa,#666);}
-.p-col:nth-child(2) .p-block{height:200px;background:linear-gradient(180deg,var(--gold),#b8860b);}
-.p-col:nth-child(3) .p-block{height:110px;background:linear-gradient(180deg,#c87533,#7a4520);}
-
-.full-board{
-  width:100%;max-width:500px;
-  background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;
-}
-.full-board h3{
-  background:rgba(192,57,43,0.2);padding:10px 18px;
-  font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:2px;
-  text-transform:uppercase;color:var(--muted);
-}
-.board-row{
-  display:flex;align-items:center;gap:12px;
-  padding:9px 18px;border-bottom:1px solid var(--border);
-}
-.board-rank{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--muted);width:24px;}
-.board-name{flex:1;font-size:0.9rem;}
-.board-pts{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);}
-
-.reset-btn{
-  background:transparent;border:2px solid var(--border);color:var(--muted);
-  font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;letter-spacing:1px;
-  padding:10px 28px;border-radius:6px;cursor:pointer;transition:.2s;margin-top:8px;
-}
-.reset-btn:hover{border-color:var(--red);color:var(--red);}
-
-/* Confetti */
-.confetti{
-  position:fixed;pointer-events:none;z-index:999;
-  width:8px;height:8px;border-radius:2px;
-  animation:fall linear forwards;
-}
-@keyframes fall{
-  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
-  100%{transform:translateY(105vh) rotate(720deg);opacity:0;}
-}
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+  :root{--red:#c0392b;--gold:#f39c12;--dark:#0d0d0d;--mid:#1a1a1a;--card:#222;--border:#333;--text:#f0ece4;--muted:#888;--green:#27ae60;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--mid);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:100;}
+  .topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;}
+  .topbar-title span{color:var(--red);}
+  .topbar-right{display:flex;gap:12px;align-items:center;}
+  .badge{background:var(--card);border:1px solid var(--border);padding:6px 14px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:1px;}
+  .badge strong{color:var(--gold);}
+  .btn-home{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;color:var(--muted);text-decoration:none;padding:6px 12px;border:1px solid var(--border);border-radius:4px;transition:color 0.2s;}
+  .btn-home:hover{color:var(--text);}
+  .main{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 60px);}
+  .left-panel{padding:24px;border-right:2px solid var(--border);}
+  .right-panel{background:var(--mid);padding:20px;display:flex;flex-direction:column;gap:16px;}
+  #lobby{display:flex;flex-direction:column;align-items:center;gap:24px;padding:20px 0;}
+  .lobby-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;text-align:center;}
+  .lobby-title span{color:var(--red);}
+  .qr-wrapper{background:white;padding:16px;border-radius:8px;box-shadow:0 0 40px rgba(192,57,43,0.4);}
+  .join-url{background:var(--card);border:1px solid var(--border);padding:10px 20px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;color:var(--gold);text-align:center;word-break:break-all;max-width:420px;}
+  #question-view{display:none;}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .q-number{font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);}
+  .phase-label{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .q-timer{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);width:80px;height:80px;background:var(--card);border:3px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color 0.3s,border-color 0.3s;}
+  .q-timer.urgent{color:var(--red);border-color:var(--red);animation:pulse 0.5s infinite alternate;}
+  @keyframes pulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+  .progress-outer{width:100%;height:6px;background:var(--border);border-radius:3px;margin-bottom:12px;}
+  .progress-inner{height:100%;background:var(--red);border-radius:3px;transition:width 0.3s;}
+  .q-text{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;line-height:1.2;margin-bottom:24px;background:var(--card);border-left:5px solid var(--red);padding:16px 20px;border-radius:0 8px 8px 0;}
+  .answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .answer-btn{padding:16px;border-radius:8px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;color:white;text-align:left;display:flex;align-items:center;gap:10px;transition:all 0.4s;}
+  .answer-btn.A{background:#e74c3c;}.answer-btn.B{background:#3498db;}.answer-btn.C{background:#2ecc71;}.answer-btn.D{background:#f39c12;}
+  .answer-btn .letter{min-width:30px;height:30px;background:rgba(0,0,0,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+  .answer-btn.correct-reveal{box-shadow:0 0 0 4px #2ecc71,0 0 30px rgba(46,204,113,0.6);transform:scale(1.03);}
+  .answer-btn.wrong-reveal{opacity:0.35;filter:grayscale(0.6);}
+  .answered-count{font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);text-align:center;margin-top:6px;}
+  #charts-section{display:none;margin-top:14px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .bar-lbl{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;width:22px;color:white;}
+  .bar-outer{flex:1;height:28px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .bar-inner{height:100%;transition:width 0.5s;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:0.8rem;font-weight:700;color:white;min-width:32px;}
+  .bar-inner.A{background:#e74c3c;}.bar-inner.B{background:#3498db;}.bar-inner.C{background:#2ecc71;}.bar-inner.D{background:#f39c12;}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+  .btn{padding:12px 22px;border:none;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--red);color:white;}.btn-gold{background:var(--gold);color:#000;}
+  .btn-green{background:var(--green);color:white;}.btn-muted{background:var(--border);color:var(--text);}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+  .start-big{padding:18px 48px;font-size:1.5rem;border-radius:6px;box-shadow:0 0 30px rgba(192,57,43,0.5);}
+  .panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:8px;}
+  .leaderboard{display:flex;flex-direction:column;gap:6px;}
+  .lb-entry{display:flex;align-items:center;gap:10px;background:var(--card);padding:8px 12px;border-radius:4px;border-left:3px solid transparent;animation:slideIn 0.3s ease;}
+  @keyframes slideIn{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  .lb-entry.rank-1{border-left-color:gold;}.lb-entry.rank-2{border-left-color:silver;}.lb-entry.rank-3{border-left-color:#cd7f32;}
+  .lb-rank{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;width:24px;text-align:center;color:var(--muted);}
+  .lb-name{flex:1;font-weight:600;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .lb-score{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--gold);}
+  .players-list{display:flex;flex-direction:column;gap:4px;max-height:500px;overflow-y:auto;}
+  .player-chip{background:var(--card);border:1px solid var(--border);padding:6px 12px;border-radius:4px;font-size:0.9rem;animation:slideIn 0.3s ease;}
+  #podium-view{display:none;text-align:center;}
+  .podium-title{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:5px;color:var(--gold);margin-bottom:32px;text-shadow:0 0 30px rgba(243,156,18,0.5);}
+  .podium-wrap{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin-bottom:40px;}
+  .podium-block{display:flex;flex-direction:column;align-items:center;gap:8px;width:180px;}
+  .podium-emoji{font-size:3rem;}
+  .podium-name{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;}
+  .podium-pts{font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);}
+  .podium-bar{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--dark);}
+  .podium-bar.p1{height:160px;background:gold;}.podium-bar.p2{height:120px;background:silver;}.podium-bar.p3{height:90px;background:#cd7f32;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--border);}
 </style>
 </head>
 <body>
-
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-title">RÉVOLUTION <span>BOLCHÉVIQUE</span> — PROF</div>
+  <div class="topbar-title">QUIZ <span>RÉVOLUTION BOLCHÉVIQUE</span> — PROF</div>
   <div class="topbar-right">
-    <div class="pill">Élèves : <b id="student-count">0</b></div>
-    <div class="pill" id="phase-pill">LOBBY</div>
+    <a class="btn-home" href="../index.html">← Tous les quiz</a>
+    <div class="badge">Joueurs : <strong id="player-count">0</strong></div>
+    <div class="badge" id="q-badge" style="display:none">Q <strong id="q-num-badge">0</strong>/10</div>
   </div>
 </div>
-
-<!-- ════ LOBBY ════ -->
-<div id="screen-lobby" class="screen active">
-  <div class="lobby-title">☭ QUIZ — <span>RÉVOLUTION BOLCHÉVIQUE</span></div>
-  <div class="lobby-grid">
-    <div class="box">
-      <h3>📱 QR Code — page élève</h3>
-      <img id="qr-img" alt="QR Code"/>
-      <div class="qr-url" id="qr-url"></div>
+<div class="main">
+  <div class="left-panel">
+    <div id="lobby">
+      <div class="lobby-title">REJOIGNEZ LE QUIZ<br><span>RÉVOLUTION BOLCHÉVIQUE</span></div>
+      <div class="join-url" id="join-url-text"></div>
+      <div class="qr-wrapper"><div id="qrcode"></div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);">Joueurs connectés : <strong id="lobby-count" style="color:var(--text);font-size:1.3rem;">0</strong></div>
+      <button class="btn btn-primary start-big" onclick="startQuiz()">▶ LANCER LE QUIZ</button>
+      <button class="btn btn-muted" onclick="resetAll()" style="font-size:0.9rem;margin-top:4px;">🗑 Réinitialiser tout</button>
     </div>
-    <div class="box">
-      <h3>👥 Élèves connectés (<span id="lobby-count">0</span>)</h3>
-      <div id="student-list"></div>
+    <div id="question-view">
+      <div class="q-header">
+        <div>
+          <div class="phase-label" id="phase-label">EN ATTENTE</div>
+          <div class="q-number" id="q-number-display">QUESTION 1 / 10</div>
+        </div>
+        <div class="q-timer" id="timer-display">20</div>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progress-bar"></div></div>
+      <div class="q-text" id="q-text-display">...</div>
+      <div class="answers-grid" id="answers-grid"></div>
+      <div class="answered-count" id="answered-count">0 réponse reçue</div>
+      <div id="charts-section"><div id="charts-bars"></div></div>
+      <div class="btn-row">
+        <button class="btn btn-muted" id="btn-stop" onclick="stopTimer()">⏹ Stop</button>
+        <button class="btn btn-gold" id="btn-results" onclick="showResults()" disabled>📊 Voir résultats</button>
+        <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()" disabled>✅ Révéler réponse</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>➡ Question suivante</button>
+      </div>
+    </div>
+    <div id="podium-view">
+      <div class="podium-title">🏆 RÉSULTATS FINAUX</div>
+      <div class="podium-wrap" id="podium-wrap"></div>
+      <button class="btn btn-primary start-big" onclick="resetAll()">🔄 Nouveau Quiz</button>
     </div>
   </div>
-  <button class="start-btn" onclick="startQuiz()">▶ DÉMARRER</button>
-</div>
-
-<!-- ════ QUESTION ════ -->
-<div id="screen-question" class="screen">
-  <div class="q-top">
-    <div class="q-label" id="q-label">QUESTION 1 / 10</div>
-    <div class="timer-block">
-      <div class="timer-num" id="timer-num">20</div>
-      <button class="stop-btn" id="stop-btn" onclick="stopTimer()">⏹ STOP</button>
-    </div>
+  <div class="right-panel">
+    <div class="panel-title" id="right-panel-title">JOUEURS CONNECTÉS</div>
+    <div id="players-list-wrap" class="players-list"></div>
+    <div id="leaderboard-wrap" class="leaderboard" style="display:none;"></div>
   </div>
-
-  <div class="timer-bar-wrap">
-    <div class="timer-bar-fill" id="timer-bar"></div>
-  </div>
-
-  <div class="q-text" id="q-text">…</div>
-
-  <div class="answers-grid">
-    <div class="ans-card A"><div class="ans-fill"></div><span class="ans-lbl">A</span><span class="ans-txt" id="txt-A"></span><span class="ans-count" id="cnt-A">0</span></div>
-    <div class="ans-card B"><div class="ans-fill"></div><span class="ans-lbl">B</span><span class="ans-txt" id="txt-B"></span><span class="ans-count" id="cnt-B">0</span></div>
-    <div class="ans-card C"><div class="ans-fill"></div><span class="ans-lbl">C</span><span class="ans-txt" id="txt-C"></span><span class="ans-count" id="cnt-C">0</span></div>
-    <div class="ans-card D"><div class="ans-fill"></div><span class="ans-lbl">D</span><span class="ans-txt" id="txt-D"></span><span class="ans-count" id="cnt-D">0</span></div>
-  </div>
-
-  <div class="q-bottom">
-    <div class="resp-info">Réponses : <b id="resp-now">0</b> / <b id="resp-total">0</b></div>
-    <div class="mini-bars" id="mini-bars"></div>
-    <button class="next-btn" id="next-btn" onclick="nextQuestion()">SUIVANT ▶</button>
-  </div>
-</div>
-
-<!-- ════ PODIUM ════ -->
-<div id="screen-podium" class="screen">
-  <h2>🏆 CLASSEMENT FINAL</h2>
-  <div class="podium-wrap" id="podium-wrap"></div>
-  <div class="full-board">
-    <h3>Scores complets</h3>
-    <div id="full-board"></div>
-  </div>
-  <button class="reset-btn" onclick="resetQuiz()">↺ Réinitialiser le quiz</button>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-//  FIREBASE
-// ══════════════════════════════════════════════
-firebase.initializeApp({ databaseURL:"https://quiz-totalitarisme-default-rtdb.firebaseio.com/" });
-const db = firebase.database();
-const PATH = "rev_bolchevique";   // chemin raccourci pour éviter les conflits
+// =====================================================
+// URL ÉLÈVE — générée automatiquement depuis l'URL actuelle
+// =====================================================
+const ELEVE_URL = (function() {
+  const url = window.location.href;
+  return url.replace('prof.html', 'eleve.html');
+})();
 
-// ══════════════════════════════════════════════
-//  QUESTIONS BRUTES  (bonne réponse = index 0)
-// ══════════════════════════════════════════════
-const RAW = [
-  { q:"Quel était le nom de la police secrète du régime tsariste ?",
-    a:["L'Okhrana","La Tchéka","Le Komintern","La Douma"] },
-  { q:"Quelle défaite militaire a déclenché l'exaspération menant à la Révolution de 1905 ?",
-    a:["La défaite contre le Japon","La défaite contre l'Allemagne","La défaite contre l'Autriche","La défaite contre la France"] },
-  { q:"Qu'est-ce que la « Douma » concédée par le Tsar en 1905 ?",
-    a:["Une assemblée élue","La police politique","Un traité de paix","Le parti communiste"] },
-  { q:"Qu'est-ce qu'un « Soviet » ?",
-    a:["Conseil d'ouvriers, soldats et paysans","Un parti révolutionnaire","Une milice armée","Un tribunal populaire"] },
-  { q:"Quelle est la principale différence entre bolchéviks et menchéviks ?",
-    a:["Les bolchéviks voulaient une dictature immédiate du prolétariat","Les bolchéviks voulaient une révolution graduelle","Les menchéviks refusaient tout État","Les menchéviks étaient majoritaires"] },
-  { q:"Quel événement déclenche la Révolution de février 1917 ?",
-    a:["Une émeute de la faim","Un coup d'État militaire","L'assassinat du Tsar","Une offensive allemande"] },
-  { q:"Comment Lénine est-il retourné en Russie depuis son exil ?",
-    a:["Avec l'aide de l'Allemagne, via un wagon plombé","Par bateau depuis les États-Unis","Clandestinement à pied","Grâce aux menchéviks"] },
-  { q:"Que réclament principalement les « Thèses d'avril » de Lénine ?",
-    a:["Tous les pouvoirs aux soviets","Continuer la guerre","S'allier au gouvernement provisoire","Rejoindre les menchéviks"] },
-  { q:"Que signifie l'acronyme NEP ?",
-    a:["Nouvelle Politique Économique","Nouveau Parti d'État","Nouvelle Ère Prolétarienne","Nouvel Empire Populaire"] },
-  { q:"Qui a remporté la lutte pour le pouvoir après la mort de Lénine en 1924 ?",
-    a:["Staline","Trotsky","Kerensky","Raspoutine"] }
+const firebaseConfig = { databaseURL:"https://quiz-totalitarisme-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// =====================================================
+// QUESTIONS — Révolution bolchévique
+// =====================================================
+const QUESTIONS = [
+  {q:"Quel était le nom de la police secrète du régime tsariste ?",opts:["L'Okhrana","La Tchéka","Le Komintern","La Douma"],correct:0},
+  {q:"Quelle défaite militaire a déclenché l'exaspération menant à la Révolution de 1905 ?",opts:["La défaite contre le Japon","La défaite contre l'Allemagne","La défaite contre l'Autriche","La défaite contre la France"],correct:0},
+  {q:"Qu'est-ce que la « Douma » concédée par le Tsar en 1905 ?",opts:["Une assemblée élue","La police politique","Un traité de paix","Le parti communiste"],correct:0},
+  {q:"Qu'est-ce qu'un « Soviet » ?",opts:["Conseil d'ouvriers, soldats et paysans","Un parti révolutionnaire","Une milice armée","Un tribunal populaire"],correct:0},
+  {q:"Quelle est la principale différence entre bolchéviks et menchéviks ?",opts:["Les bolchéviks voulaient une dictature immédiate du prolétariat","Les bolchéviks voulaient une révolution graduelle","Les menchéviks refusaient tout État","Les menchéviks étaient majoritaires"],correct:0},
+  {q:"Quel événement déclenche la Révolution de février 1917 ?",opts:["Une émeute de la faim","Un coup d'État militaire","L'assassinat du Tsar","Une offensive allemande"],correct:0},
+  {q:"Comment Lénine est-il retourné en Russie depuis son exil ?",opts:["Avec l'aide de l'Allemagne via un wagon plombé","Par bateau depuis les États-Unis","Clandestinement à pied","Grâce aux menchéviks"],correct:0},
+  {q:"Que réclament principalement les « Thèses d'avril » de Lénine ?",opts:["Tous les pouvoirs aux soviets","Continuer la guerre contre l'Allemagne","S'allier au gouvernement provisoire","Rejoindre les menchéviks"],correct:0},
+  {q:"Que signifie l'acronyme NEP ?",opts:["Nouvelle Politique Économique","Nouveau Parti d'État","Nouvelle Ère Prolétarienne","Nouvel Empire Populaire"],correct:0},
+  {q:"Qui a remporté la lutte pour le pouvoir après la mort de Lénine en 1924 ?",opts:["Staline","Trotsky","Kerensky","Raspoutine"],correct:0}
 ];
 
-// ══════════════════════════════════════════════
-//  ÉTAT
-// ══════════════════════════════════════════════
-let QUESTIONS = [];   // questions avec réponses mélangées
-let qIdx = -1;
-let timerSec = 20;
-let timerInterval = null;
-let timerRunning = false;
-let students = {};     // uid→{name,score}
-let liveAnswers = {};  // uid→answerIndex pour la question courante
-const DURATION = 20;
-const BAR_COLORS = ['#c0392b','#2980b9','#27ae60','#f39c12','#8e44ad','#e67e22'];
+const LETTERS=['A','B','C','D'];
+let currentQ=-1,timerInterval=null,timeLeft=20,phase='lobby',totalPlayers=0,answersData={};
+let shuffledQuestions=[];
 
-// ══════════════════════════════════════════════
-//  QR CODE
-// ══════════════════════════════════════════════
-function setupQR() {
-  const url = window.location.href.replace(/prof\.html.*$/, 'eleve.html');
-  document.getElementById('qr-img').src =
-    'https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=' + encodeURIComponent(url);
-  document.getElementById('qr-url').textContent = url;
-}
-
-// ══════════════════════════════════════════════
-//  FIREBASE LISTENERS
-// ══════════════════════════════════════════════
-function initListeners() {
-  db.ref(`${PATH}/students`).on('value', snap => {
-    students = snap.val() || {};
-    const n = Object.keys(students).length;
-    document.getElementById('student-count').textContent = n;
-    document.getElementById('lobby-count').textContent = n;
-    document.getElementById('resp-total').textContent = n;
-    renderStudentList();
-    renderMiniBoard();
-  });
-
-  db.ref(`${PATH}/answers`).on('value', snap => {
-    const all = snap.val() || {};
-    liveAnswers = (qIdx >= 0 && all[qIdx]) ? all[qIdx] : {};
-    const n = Object.keys(liveAnswers).length;
-    document.getElementById('resp-now').textContent = n;
-    if (timerRunning) updateLiveBars();
+function shuffleQuestions(){
+  shuffledQuestions=QUESTIONS.map(q=>{
+    const idx=[0,1,2,3];
+    for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+    const newOpts=idx.map(i=>q.opts[i]);
+    const newCorrect=idx.indexOf(q.correct);
+    return {q:q.q,opts:newOpts,correct:newCorrect};
   });
 }
 
-function renderStudentList() {
-  const list = document.getElementById('student-list');
-  list.innerHTML = '';
-  Object.values(students).forEach(s => {
-    const d = document.createElement('div');
-    d.className = 'chip';
-    d.textContent = s.name;
-    list.appendChild(d);
+function initQR(){
+  document.getElementById('join-url-text').textContent = ELEVE_URL;
+  new QRCode(document.getElementById('qrcode'),{
+    text:ELEVE_URL,width:200,height:200,
+    colorDark:"#000000",colorLight:"#ffffff",
+    correctLevel:QRCode.CorrectLevel.H
   });
 }
 
-// ══════════════════════════════════════════════
-//  SHUFFLE  (fisher-yates)
-// ══════════════════════════════════════════════
-function shuffle(q) {
-  const idx = [0,1,2,3];
-  for (let i=3;i>0;i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [idx[i],idx[j]] = [idx[j],idx[i]];
-  }
-  return {
-    q: q.q,
-    a: idx.map(i => q.a[i]),
-    correct: idx.indexOf(0)   // la bonne réponse était à l'index 0
-  };
-}
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ══════════════════════════════════════════════
-//  DÉMARRER LE QUIZ
-// ══════════════════════════════════════════════
-function startQuiz() {
-  QUESTIONS = RAW.map(shuffle);
-  // Écrire les questions dans Firebase (même ordre pour les élèves)
-  db.ref(`${PATH}/questions`).set(QUESTIONS);
-  // Réinitialiser les réponses et les scores
-  db.ref(`${PATH}/answers`).remove();
-  Object.keys(students).forEach(uid => {
-    db.ref(`${PATH}/students/${uid}/score`).set(0);
-  });
-  showQuestion(0);
-}
-
-// ══════════════════════════════════════════════
-//  AFFICHER UNE QUESTION
-// ══════════════════════════════════════════════
-function showQuestion(idx) {
-  qIdx = idx;
-  liveAnswers = {};
-
-  const q = QUESTIONS[idx];
-  document.getElementById('q-label').textContent = `QUESTION ${idx+1} / ${QUESTIONS.length}`;
-  document.getElementById('q-text').textContent = q.q;
-  document.getElementById('phase-pill').textContent = `Q${idx+1}/10`;
-
-  const labels = ['A','B','C','D'];
-  labels.forEach((l,i) => {
-    document.getElementById(`txt-${l}`).textContent = q.a[i];
-    document.getElementById(`cnt-${l}`).textContent = '0';
-    document.getElementById(`cnt-${l}`).style.opacity = '0';
-    const card = document.querySelectorAll('.ans-card')[i];
-    card.classList.remove('correct','wrong');
-    card.querySelector('.ans-fill').style.width = '0%';
-  });
-
-  document.getElementById('resp-now').textContent = '0';
-  document.getElementById('next-btn').style.display = 'none';
-  document.getElementById('stop-btn').style.display = '';
-
-  // Effacer les anciennes réponses pour cette question
-  db.ref(`${PATH}/answers/${idx}`).remove();
-
-  // Notifier les élèves
-  db.ref(`${PATH}/gameState`).set({
-    phase: 'question',
-    questionIndex: idx,
-    serverTime: firebase.database.ServerValue.TIMESTAMP
-  });
-
-  showScreen('screen-question');
-  startTimer();
-}
-
-// ══════════════════════════════════════════════
-//  TIMER
-// ══════════════════════════════════════════════
-function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerSec = DURATION;
-  timerRunning = true;
-  updateTimerUI();
-  timerInterval = setInterval(() => {
-    timerSec--;
-    updateTimerUI();
-    if (timerSec <= 0) stopTimer();
-  }, 1000);
-}
-
-function updateTimerUI() {
-  const el = document.getElementById('timer-num');
-  const bar = document.getElementById('timer-bar');
-  el.textContent = timerSec;
-  el.className = 'timer-num' +
-    (timerSec <= 5 ? ' danger' : timerSec <= 10 ? ' warn' : '');
-  const pct = (timerSec / DURATION) * 100;
-  bar.style.width = pct + '%';
-  bar.style.background = timerSec <= 5 ? '#c0392b' : timerSec <= 10 ? '#e67e22' : '#f39c12';
-}
-
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  timerRunning = false;
-  document.getElementById('stop-btn').style.display = 'none';
-  revealAnswers();
-}
-
-// ══════════════════════════════════════════════
-//  REVEAL
-// ══════════════════════════════════════════════
-function revealAnswers() {
-  db.ref(`${PATH}/gameState`).update({ phase: 'reveal' });
-
-  const q = QUESTIONS[qIdx];
-  const counts = [0,0,0,0];
-  Object.values(liveAnswers).forEach(a => { if (a>=0&&a<4) counts[a]++; });
-  const total = Math.max(1, counts.reduce((s,n)=>s+n,0));
-
-  const labels = ['A','B','C','D'];
-  labels.forEach((l,i) => {
-    const card = document.querySelectorAll('.ans-card')[i];
-    const pct = (counts[i]/total*100).toFixed(0);
-    card.querySelector('.ans-fill').style.width = pct + '%';
-    const cnt = document.getElementById(`cnt-${l}`);
-    cnt.textContent = counts[i];
-    cnt.style.opacity = '1';
-    if (i === q.correct) card.classList.add('correct');
-    else card.classList.add('wrong');
-  });
-
-  document.getElementById('next-btn').style.display = '';
-
-  // Attribuer les points
-  const updates = {};
-  Object.entries(liveAnswers).forEach(([uid, ans]) => {
-    if (parseInt(ans) === q.correct && students[uid]) {
-      const cur = students[uid].score || 0;
-      updates[`${PATH}/students/${uid}/score`] = cur + 100;
+function listenPlayers(){
+  db.ref('players').on('value',snap=>{
+    const players=snap.val()||{};
+    const names=Object.values(players).map(p=>p.name).filter(Boolean);
+    totalPlayers=names.length;
+    document.getElementById('player-count').textContent=totalPlayers;
+    document.getElementById('lobby-count').textContent=totalPlayers;
+    if(phase==='lobby'){
+      document.getElementById('players-list-wrap').innerHTML=names.map(n=>`<div class="player-chip">👤 ${escHtml(n)}</div>`).join('');
     }
-  });
-  if (Object.keys(updates).length) db.ref().update(updates);
-}
-
-// ══════════════════════════════════════════════
-//  BARRES EN DIRECT
-// ══════════════════════════════════════════════
-function updateLiveBars() {
-  const counts = [0,0,0,0];
-  Object.values(liveAnswers).forEach(a => { if(a>=0&&a<4) counts[a]++; });
-  const total = Math.max(1, Object.keys(liveAnswers).length);
-  document.querySelectorAll('.ans-card').forEach((card,i) => {
-    const pct = (counts[i]/total*100).toFixed(0);
-    card.querySelector('.ans-fill').style.width = pct + '%';
+    updateAnsweredCount();
   });
 }
 
-// ══════════════════════════════════════════════
-//  MINI BOARD
-// ══════════════════════════════════════════════
-function renderMiniBoard() {
-  const sorted = Object.values(students)
-    .sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,6);
-  const max = Math.max(1, sorted[0]?.score||1);
-  const mini = document.getElementById('mini-bars');
-  mini.innerHTML = '';
-  sorted.forEach((s,i) => {
-    const h = Math.max(3, ((s.score||0)/max)*54);
-    mini.innerHTML += `<div class="mini-col">
-      <div class="mini-bar" style="height:${h}px;background:${BAR_COLORS[i]}"></div>
-      <div class="mini-name">${s.name||'?'}</div>
-    </div>`;
+function listenAnswers(){
+  db.ref('answers').on('value',snap=>{
+    answersData=snap.val()||{};
+    updateAnsweredCount();
+    if(phase==='question')updateChartsLive();
   });
 }
 
-// ══════════════════════════════════════════════
-//  SUIVANT / PODIUM
-// ══════════════════════════════════════════════
-function nextQuestion() {
-  const next = qIdx + 1;
-  if (next >= QUESTIONS.length) showPodium();
-  else showQuestion(next);
+function updateAnsweredCount(){
+  if(currentQ<0)return;
+  const count=Object.values(answersData).filter(a=>a.question===currentQ).length;
+  document.getElementById('answered-count').textContent=`${count} réponse${count>1?'s':''} reçue${count>1?'s':''}`;
 }
 
-// ══════════════════════════════════════════════
-//  PODIUM
-// ══════════════════════════════════════════════
-function showPodium() {
-  db.ref(`${PATH}/gameState`).set({ phase:'podium' });
-  showScreen('screen-podium');
-  document.getElementById('phase-pill').textContent = 'FIN';
+function startQuiz(){
+  if(totalPlayers===0){alert("Attendez qu'au moins un élève rejoigne !");return;}
+  shuffleQuestions();
+  phase='question';
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('question-view').style.display='block';
+  document.getElementById('q-badge').style.display='flex';
+  document.getElementById('right-panel-title').textContent='CLASSEMENT EN DIRECT';
+  document.getElementById('players-list-wrap').style.display='none';
+  document.getElementById('leaderboard-wrap').style.display='flex';
+  loadQuestion(0);
+}
 
-  const sorted = Object.values(students)
-    .map(s=>({name:s.name||'?',score:s.score||0}))
-    .sort((a,b)=>b.score-a.score);
-
-  // Podium visuel : 2ème, 1er, 3ème
-  const order = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
-  const medals = ['🥈','🥇','🥉'];
-  const podium = document.getElementById('podium-wrap');
-  podium.innerHTML = '';
-  order.forEach((s,i) => {
-    podium.innerHTML += `<div class="p-col">
-      <div class="p-name">${s.name}</div>
-      <div class="p-score">${s.score} pts</div>
-      <div class="p-block">${medals[i]}</div>
-    </div>`;
+function loadQuestion(index){
+  currentQ=index;phase='question';answersData={};timeLeft=20;
+  const q=shuffledQuestions[index];
+  document.getElementById('q-number-display').textContent=`QUESTION ${index+1} / ${QUESTIONS.length}`;
+  document.getElementById('q-num-badge').textContent=index+1;
+  document.getElementById('q-text-display').textContent=q.q;
+  document.getElementById('phase-label').textContent='EN COURS';
+  document.getElementById('progress-bar').style.width=`${(index/QUESTIONS.length)*100}%`;
+  const grid=document.getElementById('answers-grid');
+  grid.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className=`answer-btn ${LETTERS[i]}`;btn.id=`ans-${i}`;
+    btn.innerHTML=`<span class="letter">${LETTERS[i]}</span>${escHtml(opt)}`;
+    grid.appendChild(btn);
   });
+  document.getElementById('charts-section').style.display='none';
+  document.getElementById('charts-bars').innerHTML='';
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('answered-count').textContent='0 réponse reçue';
+  db.ref('gameState').set({phase:'question',questionIndex:index,question:q.q,options:q.opts,timeLeft:20});
+  db.ref('answers').remove();
+  clearInterval(timerInterval);
+  updateTimer();
+  timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);timerEnd();}},1000);
+}
 
-  // Liste complète
-  const board = document.getElementById('full-board');
-  board.innerHTML = '';
-  sorted.forEach((s,i) => {
-    board.innerHTML += `<div class="board-row">
-      <div class="board-rank">${i+1}</div>
-      <div class="board-name">${s.name}</div>
-      <div class="board-pts">${s.score}</div>
-    </div>`;
+function updateTimer(){
+  const el=document.getElementById('timer-display');
+  el.textContent=timeLeft;
+  el.className='q-timer'+(timeLeft<=5?' urgent':'');
+  db.ref('gameState/timeLeft').set(timeLeft);
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerEnd();
+}
+
+function timerEnd(){
+  phase='results';
+  document.getElementById('phase-label').textContent='TEMPS ÉCOULÉ';
+  db.ref('gameState/phase').set('closed');
+  document.getElementById('btn-results').disabled=false;
+}
+
+function showResults(){
+  document.getElementById('charts-section').style.display='block';
+  buildCharts();
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=false;
+}
+
+function buildCharts(){
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  const counts=[0,0,0,0];
+  qAnswers.forEach(a=>{if(a.answer>=0&&a.answer<4)counts[a.answer]++;});
+  const total=qAnswers.length||1;
+  const container=document.getElementById('charts-bars');
+  container.innerHTML='';
+  counts.forEach((c,i)=>{
+    const pct=Math.round((c/total)*100);
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<div class="bar-lbl">${LETTERS[i]}</div><div class="bar-outer"><div class="bar-inner ${LETTERS[i]}" style="width:${pct}%">${c} (${pct}%)</div></div>`;
+    container.appendChild(row);
   });
-
-  launchConfetti();
 }
 
-// ══════════════════════════════════════════════
-//  RESET
-// ══════════════════════════════════════════════
-function resetQuiz() {
-  if (!confirm('Réinitialiser complètement le quiz ?')) return;
-  db.ref(PATH).set({ gameState:{ phase:'reset' } }).then(() => location.reload());
+function updateChartsLive(){if(document.getElementById('charts-section').style.display==='block')buildCharts();}
+
+function revealAnswer(){
+  const correct=shuffledQuestions[currentQ].correct;
+  LETTERS.forEach((_,i)=>{
+    const btn=document.getElementById(`ans-${i}`);
+    if(btn)btn.classList.add(i===correct?'correct-reveal':'wrong-reveal');
+  });
+  computeAndUpdateScores();
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=false;
+  db.ref('gameState/phase').set('revealed');
+  db.ref('gameState/correctAnswer').set(correct);
+  updateLeaderboard();
 }
 
-// ══════════════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function computeAndUpdateScores(){
+  const correct=shuffledQuestions[currentQ].correct;
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  qAnswers.sort((a,b)=>(a.time||9999)-(b.time||9999));
+  let rank=0;
+  qAnswers.forEach(ans=>{
+    if(ans.answer===correct){rank++;const pts=1000+Math.max(0,100-rank*5);db.ref(`players/${ans.uid}/score`).transaction(s=>(s||0)+pts);}
+  });
 }
 
-function launchConfetti() {
-  const colors=['#d4af37','#c0392b','#e74c3c','#f39c12','#27ae60','#2980b9'];
-  for(let i=0;i<90;i++){
-    const el=document.createElement('div');
-    el.className='confetti';
-    el.style.cssText=`left:${Math.random()*100}vw;top:0;
-      background:${colors[i%colors.length]};
-      animation-duration:${1.8+Math.random()*2}s;
-      animation-delay:${Math.random()*1.5}s;
-      width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;
-      transform:rotate(${Math.random()*360}deg);`;
-    document.body.appendChild(el);
-    el.addEventListener('animationend',()=>el.remove());
-  }
+function updateLeaderboard(){
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score).slice(0,10);
+    document.getElementById('leaderboard-wrap').innerHTML=sorted.map((p,i)=>
+      `<div class="lb-entry rank-${i+1}"><div class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="lb-name">${escHtml(p.name)}</div><div class="lb-score">${p.score}</div></div>`
+    ).join('');
+  });
 }
 
-// ══════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  setupQR();
-  initListeners();
-  // Nettoyer l'état précédent mais garder les élèves s'il y en a
-  db.ref(`${PATH}/gameState`).set({ phase:'lobby' });
-  db.ref(`${PATH}/answers`).remove();
-  db.ref(`${PATH}/questions`).remove();
-});
+function nextQuestion(){
+  if(currentQ+1>=shuffledQuestions.length)showPodium();
+  else{loadQuestion(currentQ+1);updateLeaderboard();}
+}
+
+function showPodium(){
+  clearInterval(timerInterval);phase='podium';
+  document.getElementById('question-view').style.display='none';
+  document.getElementById('podium-view').style.display='block';
+  document.getElementById('progress-bar').style.width='100%';
+  db.ref('gameState/phase').set('podium');
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const order=[sorted[1],sorted[0],sorted[2]];
+    const classes=['p2','p1','p3'],emojis=['🥈','🥇','🥉'];
+    document.getElementById('podium-wrap').innerHTML=order.map((p,i)=>p?`
+      <div class="podium-block">
+        <div class="podium-emoji">${emojis[i]}</div>
+        <div class="podium-name">${escHtml(p.name)}</div>
+        <div class="podium-pts">${p.score} pts</div>
+        <div class="podium-bar ${classes[i]}">${i===1?'1':i===0?'2':'3'}</div>
+      </div>`:'').join('');
+  });
+}
+
+function resetAll(){
+  clearInterval(timerInterval);
+  db.ref('/').remove().then(()=>location.reload());
+}
+
+window.onload=()=>{
+  initQR();
+  listenPlayers();
+  listenAnswers();
+  db.ref('gameState').set({phase:'lobby'});
+};
 </script>
 </body>
 </html>

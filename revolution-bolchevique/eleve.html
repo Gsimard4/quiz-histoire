@@ -3,162 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Quiz — Révolution bolchévique</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<title>Quiz Révolution bolchévique</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --red:#c0392b; --red2:#7b241c; --gold:#f39c12;
-  --dark:#0d0d0d; --mid:#161616; --panel:#1e1e1e;
-  --border:#2e2e2e; --text:#f0ece4; --muted:#777;
-  --green:#27ae60;
-  --A:#e74c3c; --B:#2980b9; --C:#27ae60; --D:#f39c12;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'Barlow',sans-serif;
-  background:var(--dark);color:var(--text);
-  display:flex;flex-direction:column;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;900&display=swap');
+  :root{--red:#c0392b;--gold:#f39c12;--dark:#0d0d0d;--mid:#1a1a1a;--card:#222;--border:#333;--text:#f0ece4;--muted:#888;--green:#27ae60;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);display:flex;flex-direction:column;}
 
-/* ── TOP BAR ── */
-.topbar{
-  background:var(--mid);border-bottom:2px solid var(--red);
-  padding:10px 16px;display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);}
-.score-pill{
-  background:var(--panel);border:1px solid var(--gold);
-  padding:4px 14px;border-radius:20px;
-  font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold);
-}
+  /* ── TOPBAR ── */
+  .topbar{background:var(--mid);border-bottom:3px solid var(--red);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--muted);}
+  .score-badge{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);background:var(--card);border:1px solid var(--border);padding:4px 14px;border-radius:4px;}
 
-/* ── SCREENS ── */
-.screen{display:none;flex:1;overflow:hidden;}
-.screen.active{display:flex;flex-direction:column;}
+  /* ── SCREENS ── */
+  .screen{display:none;flex:1;flex-direction:column;overflow:hidden;}
+  .screen.active{display:flex;}
 
-/* ══════════ JOIN ══════════ */
-#screen-join{
-  align-items:center;justify-content:center;
-  gap:20px;padding:30px 24px;
-}
-.join-logo{
-  font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:4px;
-  text-align:center;line-height:1.1;
-}
-.join-logo span{color:var(--red);}
-.join-sub{color:var(--muted);font-size:0.9rem;text-align:center;}
-.join-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;}
-.join-form input{
-  background:var(--panel);border:2px solid var(--border);
-  color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;
-  padding:14px 16px;border-radius:8px;outline:none;width:100%;
-  transition:.2s;
-}
-.join-form input:focus{border-color:var(--red);}
-.join-form input::placeholder{color:var(--muted);}
-.join-btn{
-  background:var(--red);border:none;color:#fff;
-  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;
-  padding:14px;border-radius:8px;cursor:pointer;transition:.2s;
-}
-.join-btn:active{transform:scale(.97);}
-.join-error{color:var(--red);font-size:0.85rem;text-align:center;display:none;}
+  /* ══ JOIN ══ */
+  #screen-join{align-items:center;justify-content:center;gap:20px;padding:28px 20px;}
+  .join-logo{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;text-align:center;line-height:1.1;}
+  .join-logo span{color:var(--red);}
+  .join-sub{color:var(--muted);font-size:0.9rem;text-align:center;}
+  .join-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;}
+  .join-form input{background:var(--card);border:2px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:1.1rem;padding:14px 16px;border-radius:6px;outline:none;width:100%;transition:.2s;}
+  .join-form input:focus{border-color:var(--red);}
+  .join-form input::placeholder{color:var(--muted);}
+  .join-btn{background:var(--red);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;padding:14px;border-radius:6px;cursor:pointer;transition:.15s;}
+  .join-btn:active{transform:scale(.97);}
+  .join-error{color:var(--red);font-size:0.85rem;text-align:center;display:none;}
 
-/* ══════════ WAITING ══════════ */
-#screen-waiting{
-  align-items:center;justify-content:center;
-  gap:16px;padding:30px;text-align:center;
-}
-.wait-icon{font-size:3.5rem;animation:pulse 1.5s ease infinite;}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.wait-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);}
-.wait-sub{color:var(--muted);font-size:0.9rem;}
+  /* ══ WAITING ══ */
+  #screen-waiting{align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;}
+  .wait-icon{font-size:3.5rem;animation:pulse 1.5s ease infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  .wait-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);}
+  .wait-sub{color:var(--muted);font-size:0.9rem;}
 
-/* ══════════ QUESTION ══════════ */
-#screen-question{padding:14px;gap:12px;}
+  /* ══ QUESTION ══ */
+  #screen-question{padding:14px;gap:10px;}
+  .q-top{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .q-num-lbl{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  .q-timer-lbl{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);transition:color .3s;}
+  .q-timer-lbl.warn{color:#e67e22;}.q-timer-lbl.danger{color:var(--red);}
+  .timer-bar-wrap{height:5px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;}
+  .timer-bar-fill{height:100%;width:100%;background:var(--gold);transition:width 1s linear,background .5s;}
+  .q-text-bubble{background:var(--card);border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:14px 16px;font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:700;line-height:1.3;flex-shrink:0;}
+  .btns-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;}
+  .choice-btn{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;border:none;border-radius:10px;padding:12px 14px;cursor:pointer;color:#fff;text-align:left;transition:.15s;position:relative;}
+  .choice-btn:active{transform:scale(.96);}
+  .choice-btn .lbl{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;opacity:.85;}
+  .choice-btn .txt{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;line-height:1.2;}
+  .choice-btn.A{background:linear-gradient(145deg,#a93226,#c0392b);}
+  .choice-btn.B{background:linear-gradient(145deg,#1a5f8a,#2980b9);}
+  .choice-btn.C{background:linear-gradient(145deg,#1a7a40,#27ae60);}
+  .choice-btn.D{background:linear-gradient(145deg,#9a6500,#f39c12);}
+  .choice-btn.disabled{pointer-events:none;}
+  .choice-btn.selected{outline:3px solid rgba(255,255,255,0.8);outline-offset:2px;}
+  .choice-btn.correct-reveal{outline:3px solid #2ecc71;box-shadow:0 0 20px rgba(46,204,113,0.5);opacity:1!important;}
+  .choice-btn.wrong-reveal{opacity:0.25;}
 
-.q-top{display:flex;align-items:center;justify-content:space-between;}
-.q-num{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.q-timer{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);transition:color .3s;}
-.q-timer.warn{color:var(--gold);}
-.q-timer.danger{color:var(--red);}
+  /* ══ RESULT ══ */
+  #screen-result{align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;}
+  .r-icon{font-size:4rem;animation:popIn .4s ease;}
+  @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .r-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:2px;}
+  .r-pts{font-family:'Bebas Neue',sans-serif;font-size:3rem;}
+  .r-sub{color:var(--muted);font-size:0.85rem;}
 
-.timer-bar-wrap{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
-.timer-bar-fill{height:100%;width:100%;border-radius:3px;background:var(--gold);transition:width 1s linear,background .5s;}
-
-.q-bubble{
-  background:var(--panel);border-left:3px solid var(--red);
-  border-radius:8px;padding:14px 16px;
-  font-family:'Barlow',sans-serif;font-size:1rem;font-weight:600;
-  line-height:1.4;flex-shrink:0;
-}
-
-/* Buttons — take remaining space */
-.btns-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;flex:1;
-}
-.choice-btn{
-  display:flex;flex-direction:column;
-  align-items:flex-start;justify-content:flex-start;
-  gap:4px;border:none;border-radius:10px;
-  padding:12px 14px;cursor:pointer;
-  font-family:'Barlow',sans-serif;font-size:0.88rem;
-  color:#fff;text-align:left;transition:.15s;
-  position:relative;overflow:hidden;
-}
-.choice-btn:active{transform:scale(.96);}
-.choice-btn .lbl{
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;
-  line-height:1;opacity:0.85;
-}
-.choice-btn.A{background:linear-gradient(145deg,#a93226,#c0392b);}
-.choice-btn.B{background:linear-gradient(145deg,#1a6fa6,#2980b9);}
-.choice-btn.C{background:linear-gradient(145deg,#1d8348,#27ae60);}
-.choice-btn.D{background:linear-gradient(145deg,#b7770d,#f39c12);}
-
-/* After answering */
-.choice-btn.disabled{pointer-events:none;}
-.choice-btn.selected{outline:3px solid #fff;outline-offset:2px;}
-.choice-btn.correct{outline:3px solid #fff;box-shadow:0 0 16px rgba(255,255,255,0.4);}
-.choice-btn.wrong{opacity:0.25;}
-
-/* ══════════ RESULT ══════════ */
-#screen-result{
-  align-items:center;justify-content:center;
-  gap:14px;padding:30px;text-align:center;
-}
-.r-icon{font-size:4rem;animation:pop .4s ease;}
-@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.r-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;}
-.r-pts{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--gold);}
-.r-sub{color:var(--muted);font-size:0.85rem;}
-
-/* ══════════ PODIUM ══════════ */
-#screen-podium{
-  align-items:center;justify-content:center;
-  gap:16px;padding:30px;text-align:center;
-}
-#screen-podium h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:var(--gold);}
-.my-result{
-  background:var(--panel);border:2px solid var(--gold);
-  border-radius:10px;padding:20px 32px;width:100%;max-width:300px;
-}
-.my-rank{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;}
-.my-pts{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);}
-.my-name-disp{font-size:0.9rem;color:var(--muted);}
+  /* ══ PODIUM ══ */
+  #screen-podium{align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;}
+  #screen-podium h2{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;color:var(--gold);}
+  .my-result{background:var(--card);border:2px solid var(--gold);border-radius:10px;padding:24px 36px;width:100%;max-width:300px;}
+  .my-rank{font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;}
+  .my-pts{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);}
+  .my-name-txt{font-size:0.9rem;color:var(--muted);margin-top:4px;}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-title">☭ RÉVOLUTION BOLCHÉVIQUE</div>
-  <div class="score-pill" id="score-pill">0 pts</div>
+  <div class="score-badge" id="score-badge">0 pts</div>
 </div>
 
 <!-- ════ JOIN ════ -->
@@ -166,7 +94,7 @@ body{
   <div class="join-logo">QUIZ<br><span>HISTOIRE</span></div>
   <div class="join-sub">Révolution bolchévique · G. Simard</div>
   <div class="join-form">
-    <input id="name-input" type="text" placeholder="Ton prénom…" maxlength="20" autocomplete="off" autocorrect="off"/>
+    <input id="name-input" type="text" placeholder="Ton prénom…" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="words"/>
     <div class="join-error" id="join-error">Entre ton prénom pour continuer.</div>
     <button class="join-btn" onclick="joinQuiz()">REJOINDRE ▶</button>
   </div>
@@ -175,23 +103,23 @@ body{
 <!-- ════ WAITING ════ -->
 <div id="screen-waiting" class="screen">
   <div class="wait-icon">⏳</div>
-  <div class="wait-name" id="wait-name"></div>
+  <div class="wait-name" id="wait-name">…</div>
   <div class="wait-sub">En attente du professeur…</div>
 </div>
 
 <!-- ════ QUESTION ════ -->
 <div id="screen-question" class="screen">
   <div class="q-top">
-    <div class="q-num" id="q-num">Q 1 / 10</div>
-    <div class="q-timer" id="q-timer">20</div>
+    <div class="q-num-lbl" id="q-num-lbl">Q 1 / 10</div>
+    <div class="q-timer-lbl" id="q-timer-lbl">20</div>
   </div>
   <div class="timer-bar-wrap"><div class="timer-bar-fill" id="timer-bar"></div></div>
-  <div class="q-bubble" id="q-bubble">…</div>
+  <div class="q-text-bubble" id="q-text-bubble">…</div>
   <div class="btns-grid">
-    <button class="choice-btn A" id="btn-0" onclick="submitAnswer(0)"><span class="lbl">A</span><span id="txt-0"></span></button>
-    <button class="choice-btn B" id="btn-1" onclick="submitAnswer(1)"><span class="lbl">B</span><span id="txt-1"></span></button>
-    <button class="choice-btn C" id="btn-2" onclick="submitAnswer(2)"><span class="lbl">C</span><span id="txt-2"></span></button>
-    <button class="choice-btn D" id="btn-3" onclick="submitAnswer(3)"><span class="lbl">D</span><span id="txt-3"></span></button>
+    <button class="choice-btn A" id="btn-0" onclick="submitAnswer(0)"><span class="lbl">A</span><span class="txt" id="opt-0"></span></button>
+    <button class="choice-btn B" id="btn-1" onclick="submitAnswer(1)"><span class="lbl">B</span><span class="txt" id="opt-1"></span></button>
+    <button class="choice-btn C" id="btn-2" onclick="submitAnswer(2)"><span class="lbl">C</span><span class="txt" id="opt-2"></span></button>
+    <button class="choice-btn D" id="btn-3" onclick="submitAnswer(3)"><span class="lbl">D</span><span class="txt" id="opt-3"></span></button>
   </div>
 </div>
 
@@ -199,7 +127,7 @@ body{
 <div id="screen-result" class="screen">
   <div class="r-icon" id="r-icon">🎯</div>
   <div class="r-title" id="r-title">BONNE RÉPONSE !</div>
-  <div class="r-pts" id="r-pts">+100</div>
+  <div class="r-pts" id="r-pts" style="color:var(--gold)">+1000 pts</div>
   <div class="r-sub">Attends la prochaine question…</div>
 </div>
 
@@ -209,39 +137,39 @@ body{
   <div class="my-result">
     <div class="my-rank" id="my-rank">—</div>
     <div class="my-pts" id="my-pts">0 pts</div>
-    <div class="my-name-disp" id="my-name-disp"></div>
+    <div class="my-name-txt" id="my-name-txt"></div>
   </div>
 </div>
 
 <script>
 // ══════════════════════════════════════════════
-//  FIREBASE
+//  FIREBASE — mêmes chemins que totalitarisme
 // ══════════════════════════════════════════════
 firebase.initializeApp({ databaseURL:"https://quiz-totalitarisme-default-rtdb.firebaseio.com/" });
 const db = firebase.database();
-const PATH = "rev_bolchevique";
-const DURATION = 20;
 
 // ══════════════════════════════════════════════
-//  ÉTAT LOCAL  (persiste pendant la session)
+//  ÉTAT  (sessionStorage pour survivre aux rechargements)
 // ══════════════════════════════════════════════
-let myUID   = sessionStorage.getItem('quiz_uid')   || null;
-let myName  = sessionStorage.getItem('quiz_name')  || '';
+let myUID   = sessionStorage.getItem('bolch_uid')  || null;
+let myName  = sessionStorage.getItem('bolch_name') || '';
 let myScore = 0;
-let currentQIdx = -1;
+let currentQ = -1;
 let answered = false;
 let myAnswer = -1;
 let timerInterval = null;
-let currentQuestion = null;  // {q, a, correct}
+let currentOptions = [];
+let currentCorrect = -1;
 
-// Si l'élève avait déjà rejoint (ex: rafraîchissement de page)
+// Si déjà connecté (rechargement de page) → passer directement à l'attente
 if (myUID && myName) {
-  document.getElementById('wait-name').textContent = 'Content de te revoir, ' + myName + ' !';
+  document.getElementById('wait-name').textContent = myName;
   showScreen('screen-waiting');
-  listenToGame();
-  // Se réenregistrer au cas où Firebase aurait perdu la connexion
-  db.ref(`${PATH}/students/${myUID}`).set({ name: myName, score: 0 });
-  db.ref(`${PATH}/students/${myUID}`).onDisconnect().remove();
+  // Re-enregistrer au cas où Firebase aurait supprimé l'entrée
+  db.ref(`players/${myUID}`).set({ name: myName, score: 0 });
+  db.ref(`players/${myUID}`).onDisconnect().remove();
+  listenScore();
+  listenGame();
 }
 
 // ══════════════════════════════════════════════
@@ -255,119 +183,122 @@ function joinQuiz() {
     return;
   }
   document.getElementById('join-error').style.display = 'none';
-
   myName = name;
-  myUID  = 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  myUID  = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  sessionStorage.setItem('bolch_uid',  myUID);
+  sessionStorage.setItem('bolch_name', myName);
 
-  // Sauvegarder dans sessionStorage → survit aux rechargements de page
-  sessionStorage.setItem('quiz_uid',  myUID);
-  sessionStorage.setItem('quiz_name', myName);
+  db.ref(`players/${myUID}`).set({ name: myName, score: 0 });
+  db.ref(`players/${myUID}`).onDisconnect().remove();
 
-  db.ref(`${PATH}/students/${myUID}`).set({ name: myName, score: 0 });
-  db.ref(`${PATH}/students/${myUID}`).onDisconnect().remove();
-
-  document.getElementById('wait-name').textContent = 'Bienvenue, ' + myName + ' !';
+  document.getElementById('wait-name').textContent = myName;
   showScreen('screen-waiting');
-  listenToGame();
+  listenScore();
+  listenGame();
 }
 
 // ══════════════════════════════════════════════
-//  ÉCOUTER LE JEU
+//  ÉCOUTER LE SCORE
 // ══════════════════════════════════════════════
-function listenToGame() {
-  // Score en direct
-  db.ref(`${PATH}/students/${myUID}/score`).on('value', snap => {
+function listenScore() {
+  db.ref(`players/${myUID}/score`).on('value', snap => {
     myScore = snap.val() || 0;
-    document.getElementById('score-pill').textContent = myScore + ' pts';
+    document.getElementById('score-badge').textContent = myScore + ' pts';
   });
+}
 
-  // État du jeu
-  db.ref(`${PATH}/gameState`).on('value', snap => {
+// ══════════════════════════════════════════════
+//  ÉCOUTER L'ÉTAT DU JEU
+// ══════════════════════════════════════════════
+function listenGame() {
+  db.ref('gameState').on('value', snap => {
     const state = snap.val();
     if (!state) return;
 
-    if (state.phase === 'question') {
-      const idx = state.questionIndex;
-      if (idx !== currentQIdx) {
-        currentQIdx = idx;
-        answered = false;
-        myAnswer = -1;
-        loadQuestion(idx, state.serverTime);
-      }
+    // Nouvelle question
+    if (state.phase === 'question' && state.questionIndex !== currentQ) {
+      currentQ = state.questionIndex;
+      answered = false;
+      myAnswer = -1;
+      currentOptions = state.options || [];
+      currentCorrect = -1;
+      displayQuestion(state.questionIndex, state.question, state.options, state.timeLeft);
     }
 
-    if (state.phase === 'reveal') {
-      if (currentQuestion) showReveal();
+    // Mise à jour du timer
+    if (state.phase === 'question' && state.questionIndex === currentQ) {
+      updateTimerDisplay(state.timeLeft);
     }
 
+    // Timer fermé (plus de nouvelles réponses) — on attend la révélation
+    if (state.phase === 'closed') {
+      stopLocalTimer();
+    }
+
+    // Révélation de la bonne réponse
+    if (state.phase === 'revealed' && state.questionIndex === currentQ) {
+      currentCorrect = state.correctAnswer;
+      showReveal(state.correctAnswer);
+    }
+
+    // Podium
     if (state.phase === 'podium') {
       showFinalPodium();
     }
 
-    if (state.phase === 'reset') {
-      sessionStorage.removeItem('quiz_uid');
-      sessionStorage.removeItem('quiz_name');
+    // Reset
+    if (state.phase === 'lobby' && currentQ >= 0) {
+      // Le prof a réinitialisé — vider la session et recharger
+      sessionStorage.removeItem('bolch_uid');
+      sessionStorage.removeItem('bolch_name');
       location.reload();
     }
   });
 }
 
 // ══════════════════════════════════════════════
-//  CHARGER UNE QUESTION
+//  AFFICHER UNE QUESTION
 // ══════════════════════════════════════════════
-function loadQuestion(idx, serverTime) {
-  db.ref(`${PATH}/questions/${idx}`).once('value').then(snap => {
-    const q = snap.val();
-    if (!q) return;
-    currentQuestion = q;
-
-    document.getElementById('q-num').textContent = `Q ${idx+1} / 10`;
-    document.getElementById('q-bubble').textContent = q.q;
-    for (let i=0;i<4;i++) {
-      document.getElementById(`txt-${i}`).textContent = q.a[i];
-      const btn = document.getElementById(`btn-${i}`);
-      btn.classList.remove('disabled','selected','correct','wrong');
-      btn.style.opacity = '';
-    }
-
-    showScreen('screen-question');
-    startTimerBar(serverTime);
+function displayQuestion(idx, question, options, timeLeftInit) {
+  document.getElementById('q-num-lbl').textContent = `Q ${idx + 1} / 10`;
+  document.getElementById('q-text-bubble').textContent = question;
+  options.forEach((opt, i) => {
+    document.getElementById(`opt-${i}`).textContent = opt;
+    const btn = document.getElementById(`btn-${i}`);
+    btn.classList.remove('disabled','selected','correct-reveal','wrong-reveal');
+    btn.style.opacity = '';
   });
+  showScreen('screen-question');
+  startLocalTimer(timeLeftInit || 20);
 }
 
 // ══════════════════════════════════════════════
-//  TIMER BAR (synchronisée avec le serveur)
+//  TIMER LOCAL (synchronisé avec gameState.timeLeft)
 // ══════════════════════════════════════════════
-function startTimerBar(serverTime) {
-  if (timerInterval) clearInterval(timerInterval);
-  const bar = document.getElementById('timer-bar');
-  const num = document.getElementById('q-timer');
-  bar.style.transition = 'none';
-  bar.style.width = '100%';
-  bar.style.background = 'var(--gold)';
-
+function startLocalTimer(seconds) {
+  stopLocalTimer();
+  let t = seconds;
+  updateTimerDisplay(t);
   timerInterval = setInterval(() => {
-    const elapsed = (Date.now() - serverTime) / 1000;
-    const left = Math.max(0, DURATION - elapsed);
-    const pct = (left / DURATION) * 100;
-    bar.style.transition = 'width .9s linear, background .5s';
-    bar.style.width = pct + '%';
-    const secs = Math.ceil(left);
-    num.textContent = secs;
+    t--;
+    updateTimerDisplay(t);
+    if (t <= 0) stopLocalTimer();
+  }, 1000);
+}
 
-    if (left <= 5) {
-      bar.style.background = 'var(--red)';
-      num.className = 'q-timer danger';
-    } else if (left <= 10) {
-      bar.style.background = '#e67e22';
-      num.className = 'q-timer warn';
-    } else {
-      bar.style.background = 'var(--gold)';
-      num.className = 'q-timer';
-    }
+function stopLocalTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
 
-    if (left <= 0) { clearInterval(timerInterval); timerInterval = null; }
-  }, 500);
+function updateTimerDisplay(t) {
+  const num = document.getElementById('q-timer-lbl');
+  const bar = document.getElementById('timer-bar');
+  if (!num) return;
+  num.textContent = Math.max(0, t);
+  num.className = 'q-timer-lbl' + (t <= 5 ? ' danger' : t <= 10 ? ' warn' : '');
+  const pct = Math.max(0, (t / 20) * 100);
+  bar.style.width = pct + '%';
+  bar.style.background = t <= 5 ? 'var(--red)' : t <= 10 ? '#e67e22' : 'var(--gold)';
 }
 
 // ══════════════════════════════════════════════
@@ -378,10 +309,16 @@ function submitAnswer(idx) {
   answered = true;
   myAnswer = idx;
 
-  db.ref(`${PATH}/answers/${currentQIdx}/${myUID}`).set(idx);
+  // Enregistrer dans Firebase — même structure que totalitarisme
+  db.ref(`answers/${myUID}`).set({
+    uid:      myUID,
+    question: currentQ,
+    answer:   idx,
+    time:     Date.now()
+  });
 
-  // Griser tous les boutons, souligner le choix
-  for (let i=0;i<4;i++) {
+  // Feedback visuel
+  for (let i = 0; i < 4; i++) {
     const btn = document.getElementById(`btn-${i}`);
     btn.classList.add('disabled');
     if (i === idx) btn.classList.add('selected');
@@ -392,45 +329,42 @@ function submitAnswer(idx) {
 // ══════════════════════════════════════════════
 //  RÉVÉLATION
 // ══════════════════════════════════════════════
-function showReveal() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-
-  const q = currentQuestion;
-  // Montrer la bonne/mauvaise réponse visuellement sur les boutons
-  for (let i=0;i<4;i++) {
+function showReveal(correct) {
+  stopLocalTimer();
+  // Montrer visuellement la bonne/mauvaise réponse
+  for (let i = 0; i < 4; i++) {
     const btn = document.getElementById(`btn-${i}`);
     btn.classList.add('disabled');
     btn.style.opacity = '';
-    if (i === q.correct) btn.classList.add('correct');
-    else btn.classList.add('wrong');
+    btn.classList.remove('selected');
+    if (i === correct) btn.classList.add('correct-reveal');
+    else btn.classList.add('wrong-reveal');
   }
-
-  const correct = (myAnswer === q.correct);
+  // Passer à l'écran résultat après un court délai
   setTimeout(() => {
-    document.getElementById('r-icon').textContent = correct ? '🎯' : '❌';
-    document.getElementById('r-title').textContent = correct ? 'BONNE RÉPONSE !' : 'MAUVAISE RÉPONSE';
-    document.getElementById('r-pts').textContent = correct ? '+100 pts' : '+0 pt';
-    document.getElementById('r-pts').style.color = correct ? 'var(--gold)' : 'var(--muted)';
+    const isCorrect = (myAnswer === correct);
+    document.getElementById('r-icon').textContent  = isCorrect ? '🎯' : '❌';
+    document.getElementById('r-title').textContent = isCorrect ? 'BONNE RÉPONSE !' : 'MAUVAISE RÉPONSE';
+    document.getElementById('r-pts').textContent   = isCorrect ? '+1000 pts' : '+0 pt';
+    document.getElementById('r-pts').style.color   = isCorrect ? 'var(--gold)' : 'var(--muted)';
     showScreen('screen-result');
-  }, 800);
+  }, 1200);
 }
 
 // ══════════════════════════════════════════════
 //  PODIUM FINAL
 // ══════════════════════════════════════════════
 function showFinalPodium() {
-  db.ref(`${PATH}/students`).once('value').then(snap => {
+  db.ref('players').once('value').then(snap => {
     const all = snap.val() || {};
     const sorted = Object.entries(all)
-      .map(([uid,s])=>({uid, name:s.name||'?', score:s.score||0}))
-      .sort((a,b)=>b.score-a.score);
-
-    const rank = sorted.findIndex(s=>s.uid===myUID) + 1;
-    const medals = {1:'🥇',2:'🥈',3:'🥉'};
-
-    document.getElementById('my-rank').textContent = medals[rank] || '#' + rank;
-    document.getElementById('my-pts').textContent = myScore + ' pts';
-    document.getElementById('my-name-disp').textContent = myName;
+      .map(([uid, p]) => ({ uid, name: p.name || '?', score: p.score || 0 }))
+      .sort((a, b) => b.score - a.score);
+    const rank  = sorted.findIndex(p => p.uid === myUID) + 1;
+    const medals = { 1:'🥇', 2:'🥈', 3:'🥉' };
+    document.getElementById('my-rank').textContent    = medals[rank] || '#' + rank;
+    document.getElementById('my-pts').textContent     = myScore + ' pts';
+    document.getElementById('my-name-txt').textContent = myName;
     showScreen('screen-podium');
   });
 }
@@ -443,8 +377,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// Touche Entrée pour rejoindre
-document.getElementById('name-input')?.addEventListener('keypress', e => {
+document.getElementById('name-input').addEventListener('keypress', e => {
   if (e.key === 'Enter') joinQuiz();
 });
 </script>
