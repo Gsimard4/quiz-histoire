@@ -107,7 +107,7 @@
           <div class="phase-label" id="phase-label">EN ATTENTE</div>
           <div class="q-number" id="q-number-display">QUESTION 1 / 12</div>
         </div>
-        <div class="q-timer" id="timer-display">30</div>
+        <div class="q-timer" id="timer-display">20</div>
       </div>
       <div class="progress-outer"><div class="progress-inner" id="progress-bar"></div></div>
       <div class="q-text" id="q-text-display">...</div>
@@ -115,6 +115,7 @@
       <div class="answered-count" id="answered-count">0 réponse reçue</div>
       <div id="charts-section"><div id="charts-bars"></div></div>
       <div class="btn-row">
+        <button class="btn btn-muted" id="btn-stop" onclick="stopTimer()">⏹ Stop</button>
         <button class="btn btn-gold" id="btn-results" onclick="showResults()" disabled>📊 Voir résultats</button>
         <button class="btn btn-green" id="btn-reveal" onclick="revealAnswer()" disabled>✅ Révéler réponse</button>
         <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>➡ Question suivante</button>
@@ -162,7 +163,17 @@ const QUESTIONS = [
 ];
 
 const LETTERS=['A','B','C','D'];
-let currentQ=-1,timerInterval=null,timeLeft=30,phase='lobby',totalPlayers=0,answersData={};
+let currentQ=-1,timerInterval=null,timeLeft=20,phase='lobby',totalPlayers=0,answersData={};
+let shuffledQuestions=[];
+function shuffleQuestions(){
+  shuffledQuestions=QUESTIONS.map(q=>{
+    const idx=[0,1,2,3];
+    for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+    const newOpts=idx.map(i=>q.opts[i]);
+    const newCorrect=idx.indexOf(q.correct);
+    return {q:q.q,opts:newOpts,correct:newCorrect};
+  });
+}
 
 function initQR(){
   document.getElementById('join-url-text').textContent = ELEVE_URL;
@@ -205,6 +216,7 @@ function updateAnsweredCount(){
 
 function startQuiz(){
   if(totalPlayers===0){alert("Attendez qu'au moins un élève rejoigne !");return;}
+  shuffleQuestions();
   phase='question';
   document.getElementById('lobby').style.display='none';
   document.getElementById('question-view').style.display='block';
@@ -216,8 +228,8 @@ function startQuiz(){
 }
 
 function loadQuestion(index){
-  currentQ=index;phase='question';answersData={};timeLeft=30;
-  const q=QUESTIONS[index];
+  currentQ=index;phase='question';answersData={};timeLeft=20;
+  const q=shuffledQuestions[index];
   document.getElementById('q-number-display').textContent=`QUESTION ${index+1} / ${QUESTIONS.length}`;
   document.getElementById('q-num-badge').textContent=index+1;
   document.getElementById('q-text-display').textContent=q.q;
@@ -237,7 +249,7 @@ function loadQuestion(index){
   document.getElementById('btn-reveal').disabled=true;
   document.getElementById('btn-next').disabled=true;
   document.getElementById('answered-count').textContent='0 réponse reçue';
-  db.ref('gameState').set({phase:'question',questionIndex:index,question:q.q,options:q.opts,timeLeft:30});
+  db.ref('gameState').set({phase:'question',questionIndex:index,question:q.q,options:q.opts,timeLeft:20});
   db.ref('answers').remove();
   clearInterval(timerInterval);
   updateTimer();
@@ -249,6 +261,11 @@ function updateTimer(){
   el.textContent=timeLeft;
   el.className='q-timer'+(timeLeft<=5?' urgent':'');
   db.ref('gameState/timeLeft').set(timeLeft);
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerEnd();
 }
 
 function timerEnd(){
@@ -283,7 +300,7 @@ function buildCharts(){
 function updateChartsLive(){if(document.getElementById('charts-section').style.display==='block')buildCharts();}
 
 function revealAnswer(){
-  const correct=QUESTIONS[currentQ].correct;
+  const correct=shuffledQuestions[currentQ].correct;
   LETTERS.forEach((_,i)=>{
     const btn=document.getElementById(`ans-${i}`);
     if(btn)btn.classList.add(i===correct?'correct-reveal':'wrong-reveal');
@@ -297,7 +314,7 @@ function revealAnswer(){
 }
 
 function computeAndUpdateScores(){
-  const correct=QUESTIONS[currentQ].correct;
+  const correct=shuffledQuestions[currentQ].correct;
   const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
   qAnswers.sort((a,b)=>(a.time||9999)-(b.time||9999));
   let rank=0;
@@ -316,7 +333,7 @@ function updateLeaderboard(){
 }
 
 function nextQuestion(){
-  if(currentQ+1>=QUESTIONS.length)showPodium();
+  if(currentQ+1>=shuffledQuestions.length)showPodium();
   else{loadQuestion(currentQ+1);updateLeaderboard();}
 }
 
