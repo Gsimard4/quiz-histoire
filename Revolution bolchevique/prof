@@ -1,1 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz – La Révolution bolchévique | Vue Professeur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
+<!-- Firebase v8 compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+  :root {
+    --red:    #c0392b;
+    --red2:   #8b0000;
+    --gold:   #d4af37;
+    --dark:   #0d0404;
+    --dark2:  #1a0808;
+    --panel:  #1f0b0b;
+    --text:   #f0e6e6;
+    --muted:  #9e7070;
+    --green:  #27ae60;
+    --blue:   #2980b9;
+    --orange: #e67e22;
+    --purple: #8e44ad;
+    --A: #e74c3c; --B: #3498db; --C: #2ecc71; --D: #f39c12;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Star / grain overlay ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse at top left, rgba(139,0,0,.35) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom right, rgba(80,0,0,.25) 0%, transparent 60%);
+  }
+
+  .wrap { position:relative; z-index:1; }
+
+  /* ══════════════════════════ HEADER ══════════════════════════ */
+  header {
+    background: linear-gradient(135deg, var(--red2), var(--red));
+    padding: 12px 24px;
+    display: flex; align-items:center; justify-content:space-between;
+    border-bottom: 3px solid var(--gold);
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  }
+  header h1 {
+    font-family:'Oswald',sans-serif; font-size:1.4rem; letter-spacing:2px;
+    text-transform:uppercase; color:#fff;
+  }
+  header h1 span { color:var(--gold); }
+
+  .header-meta { display:flex; gap:16px; align-items:center; }
+  .badge {
+    background: rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.15);
+    padding:6px 14px; border-radius:4px; font-size:.82rem; letter-spacing:1px;
+  }
+  #student-count { font-size:1.1rem; font-weight:600; color:var(--gold); }
+
+  /* ══════════════════════════ LOBBY ══════════════════════════ */
+  #screen-lobby {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; min-height:calc(100vh - 60px);
+    padding:40px 20px; gap:32px;
+  }
+  #screen-lobby h2 {
+    font-family:'Oswald',sans-serif; font-size:2.6rem; letter-spacing:3px;
+    text-transform:uppercase; text-align:center;
+    background: linear-gradient(90deg, var(--red), var(--gold), var(--red));
+    -webkit-background-clip: text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .lobby-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:32px; width:100%; max-width:900px;
+  }
+  .qr-box {
+    background:var(--panel); border:2px solid var(--red);
+    border-radius:12px; padding:28px;
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+  .qr-box h3 { font-family:'Oswald',sans-serif; font-size:1.1rem; letter-spacing:2px; color:var(--gold); }
+  #qr-img { background:#fff; padding:10px; border-radius:8px; width:200px; height:200px; }
+  .qr-url { font-size:.7rem; color:var(--muted); word-break:break-all; text-align:center; }
+
+  .students-box {
+    background:var(--panel); border:2px solid rgba(192,57,43,.4);
+    border-radius:12px; padding:28px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .students-box h3 { font-family:'Oswald',sans-serif; font-size:1.1rem; letter-spacing:2px; color:var(--gold); }
+  #student-list {
+    display:flex; flex-wrap:wrap; gap:8px;
+    max-height:220px; overflow-y:auto;
+  }
+  .student-chip {
+    background: rgba(192,57,43,.2); border:1px solid rgba(192,57,43,.5);
+    padding:6px 12px; border-radius:20px; font-size:.82rem;
+    animation: popIn .3s ease;
+  }
+  @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .start-btn {
+    background: linear-gradient(135deg, var(--red), var(--red2));
+    border: 2px solid var(--gold); color:#fff;
+    font-family:'Oswald',sans-serif; font-size:1.4rem; letter-spacing:3px;
+    text-transform:uppercase; padding:18px 56px; border-radius:8px;
+    cursor:pointer; transition:.2s; box-shadow:0 8px 30px rgba(192,57,43,.4);
+  }
+  .start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(192,57,43,.6); }
+  .start-btn:active { transform:translateY(0); }
+
+  /* ══════════════════════════ QUESTION ══════════════════════════ */
+  #screen-question { display:none; padding:20px; }
+
+  .q-header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px;
+  }
+  .q-num {
+    font-family:'Oswald',sans-serif; font-size:1rem; letter-spacing:2px;
+    color:var(--muted); text-transform:uppercase;
+  }
+
+  /* Timer ring */
+  .timer-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .timer-ring { position:relative; width:80px; height:80px; }
+  .timer-ring svg { transform:rotate(-90deg); }
+  .timer-ring circle { fill:none; stroke-width:6; }
+  .timer-bg { stroke: rgba(255,255,255,.1); }
+  .timer-fg { stroke: var(--gold); stroke-dasharray:220; stroke-dashoffset:0;
+               stroke-linecap:round; transition:stroke-dashoffset .9s linear, stroke .5s; }
+  .timer-num {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald',sans-serif; font-size:1.6rem; font-weight:700;
+  }
+  .timer-stop-btn {
+    background: rgba(192,57,43,.3); border:1px solid var(--red);
+    color:var(--red); font-size:.7rem; letter-spacing:1px; padding:4px 10px;
+    border-radius:4px; cursor:pointer; font-family:'Barlow',sans-serif;
+    transition:.2s;
+  }
+  .timer-stop-btn:hover { background:var(--red); color:#fff; }
+
+  .q-text {
+    background:var(--panel); border-left:4px solid var(--red);
+    border-radius:8px; padding:24px 28px;
+    font-family:'Oswald',sans-serif; font-size:1.6rem; font-weight:600;
+    line-height:1.4; margin-bottom:20px; min-height:100px;
+    display:flex; align-items:center;
+  }
+
+  .answers-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:12px; margin-bottom:20px;
+  }
+  .ans-card {
+    background:var(--panel); border:2px solid transparent;
+    border-radius:10px; padding:16px 20px;
+    display:flex; align-items:center; gap:14px;
+    font-size:1rem; transition:.3s;
+    position:relative; overflow:hidden;
+  }
+  .ans-card.A { border-color:var(--A); }
+  .ans-card.B { border-color:var(--B); }
+  .ans-card.C { border-color:var(--C); }
+  .ans-card.D { border-color:var(--D); }
+
+  .ans-lbl {
+    font-family:'Oswald',sans-serif; font-size:1.3rem; font-weight:700;
+    width:32px; flex-shrink:0;
+  }
+  .ans-card.A .ans-lbl { color:var(--A); }
+  .ans-card.B .ans-lbl { color:var(--B); }
+  .ans-card.C .ans-lbl { color:var(--C); }
+  .ans-card.D .ans-lbl { color:var(--D); }
+
+  .ans-bar {
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    opacity:.15; transition:width .5s ease;
+  }
+  .ans-card.A .ans-bar { background:var(--A); }
+  .ans-card.B .ans-bar { background:var(--B); }
+  .ans-card.C .ans-bar { background:var(--C); }
+  .ans-card.D .ans-bar { background:var(--D); }
+
+  .ans-count {
+    margin-left:auto; font-family:'Oswald',sans-serif; font-size:1.1rem;
+    opacity:0; transition:.3s;
+  }
+
+  .ans-card.correct { background:rgba(39,174,96,.15); border-color:var(--green) !important; }
+  .ans-card.correct .ans-lbl { color:var(--green) !important; }
+
+  /* Bottom bar */
+  .q-bottom {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:12px;
+  }
+  .responses-live {
+    background:var(--panel); border:1px solid rgba(255,255,255,.1);
+    border-radius:8px; padding:10px 18px;
+    font-size:.9rem; color:var(--muted);
+  }
+  .responses-live span { color:var(--gold); font-family:'Oswald',sans-serif; font-size:1.2rem; }
+
+  /* ── Leaderboard mini ── */
+  .mini-board {
+    display:flex; gap:8px; align-items:flex-end; height:70px;
+  }
+  .mini-bar-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .mini-bar {
+    width:30px; border-radius:4px 4px 0 0; transition:height .4s ease;
+    min-height:4px;
+  }
+  .mini-name { font-size:.55rem; text-align:center; color:var(--muted); max-width:36px;
+               white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .next-btn {
+    background:var(--red); border:none; color:#fff;
+    font-family:'Oswald',sans-serif; font-size:1.1rem; letter-spacing:2px;
+    text-transform:uppercase; padding:12px 36px; border-radius:8px;
+    cursor:pointer; transition:.2s; display:none;
+  }
+  .next-btn:hover { background:var(--red2); transform:translateY(-1px); }
+
+  /* ══════════════════════════ REVEAL ══════════════════════════ */
+  .reveal-overlay {
+    position:fixed; inset:0; z-index:100;
+    background:rgba(0,0,0,.85);
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; gap:20px;
+  }
+  .reveal-correct {
+    font-family:'Oswald',sans-serif; font-size:3rem; letter-spacing:4px;
+    text-transform:uppercase; color:var(--green);
+    animation: zoomIn .5s ease;
+  }
+  .reveal-answer {
+    font-size:1.5rem; text-align:center; max-width:600px;
+    padding:20px 30px; background:rgba(39,174,96,.15);
+    border:2px solid var(--green); border-radius:12px;
+    animation: zoomIn .5s .1s ease both;
+  }
+  @keyframes zoomIn { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+
+  /* ══════════════════════════ PODIUM ══════════════════════════ */
+  #screen-podium {
+    display:none; min-height:calc(100vh - 60px);
+    align-items:center; justify-content:center;
+    flex-direction:column; gap:24px; padding:40px;
+  }
+  #screen-podium h2 {
+    font-family:'Oswald',sans-serif; font-size:2.4rem; letter-spacing:4px;
+    text-transform:uppercase; color:var(--gold);
+  }
+  .podium-wrap {
+    display:flex; align-items:flex-end; gap:16px; margin:20px 0;
+  }
+  .podium-col {
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    min-width:160px;
+  }
+  .podium-name {
+    font-family:'Oswald',sans-serif; font-size:1.3rem; font-weight:700;
+    text-align:center;
+  }
+  .podium-score { font-size:.9rem; color:var(--muted); }
+  .podium-block {
+    width:100%; border-radius:8px 8px 0 0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald',sans-serif; font-size:2rem; font-weight:700;
+  }
+  .podium-col:nth-child(1) .podium-block { height:180px; background:linear-gradient(180deg,#c0a000,#8b7400); }
+  .podium-col:nth-child(2) .podium-block { height:230px; background:linear-gradient(180deg,#d4af37,#b8960c); }
+  .podium-col:nth-child(3) .podium-block { height:140px; background:linear-gradient(180deg,#8a8a8a,#5a5a5a); }
+
+  .full-board {
+    width:100%; max-width:600px;
+    background:var(--panel); border:1px solid rgba(255,255,255,.1);
+    border-radius:12px; overflow:hidden;
+  }
+  .full-board h3 {
+    background:rgba(192,57,43,.3); padding:12px 20px;
+    font-family:'Oswald',sans-serif; letter-spacing:2px; text-transform:uppercase;
+    font-size:.95rem; color:var(--gold);
+  }
+  .board-row {
+    display:flex; align-items:center; gap:14px;
+    padding:10px 20px; border-bottom:1px solid rgba(255,255,255,.05);
+    transition:.3s;
+  }
+  .board-rank { font-family:'Oswald',sans-serif; font-size:1.2rem; color:var(--muted); width:28px; }
+  .board-name { flex:1; }
+  .board-pts {
+    font-family:'Oswald',sans-serif; font-size:1.1rem; color:var(--gold);
+    font-weight:700;
+  }
+
+  .restart-btn {
+    background:transparent; border:2px solid var(--red); color:var(--red);
+    font-family:'Oswald',sans-serif; font-size:1rem; letter-spacing:2px;
+    text-transform:uppercase; padding:12px 36px; border-radius:8px;
+    cursor:pointer; transition:.2s; margin-top:10px;
+  }
+  .restart-btn:hover { background:var(--red); color:#fff; }
+
+  /* Confetti */
+  .confetti-particle {
+    position:fixed; width:8px; height:8px; border-radius:2px;
+    pointer-events:none; z-index:200;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-10px) rotate(0deg); opacity:1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity:0; }
+  }
+
+  /* Utils */
+  .hidden { display:none !important; }
+  .screen { display:none; }
+  .screen.active { display:flex; }
+  #screen-question.active { display:block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ════════════ HEADER ════════════ -->
+<header>
+  <h1>🔴 La Révolution <span>Bolchévique</span> — Vue Professeur</h1>
+  <div class="header-meta">
+    <div class="badge">Élèves connectés : <span id="student-count">0</span></div>
+    <div class="badge" id="phase-badge">LOBBY</div>
+  </div>
+</header>
+
+<!-- ════════════ LOBBY ════════════ -->
+<div id="screen-lobby" class="screen active">
+  <h2>☭ Quiz Révolution Bolchévique</h2>
+  <div class="lobby-grid">
+
+    <div class="qr-box">
+      <h3>📱 QR CODE ÉLÈVES</h3>
+      <img id="qr-img" alt="QR Code" />
+      <div class="qr-url" id="qr-url-text"></div>
+    </div>
+
+    <div class="students-box">
+      <h3>👥 ÉLÈVES CONNECTÉS (<span id="lobby-count">0</span>)</h3>
+      <div id="student-list"></div>
+    </div>
+
+  </div>
+  <button class="start-btn" onclick="startQuiz()">⚡ DÉMARRER LE QUIZ</button>
+</div>
+
+<!-- ════════════ QUESTION ════════════ -->
+<div id="screen-question" class="screen">
+  <div class="q-header">
+    <div class="q-num" id="q-num">QUESTION 1 / 10</div>
+    <div class="timer-wrap">
+      <div class="timer-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle class="timer-bg" cx="40" cy="40" r="35"/>
+          <circle class="timer-fg" id="timer-circle" cx="40" cy="40" r="35"/>
+        </svg>
+        <div class="timer-num" id="timer-num">20</div>
+      </div>
+      <button class="timer-stop-btn" onclick="stopTimer()">STOP</button>
+    </div>
+  </div>
+
+  <div class="q-text" id="q-text">Chargement…</div>
+
+  <div class="answers-grid" id="answers-grid">
+    <div class="ans-card A">
+      <div class="ans-bar"></div>
+      <span class="ans-lbl">A</span>
+      <span class="ans-txt" id="ans-A"></span>
+      <span class="ans-count" id="cnt-A">0</span>
+    </div>
+    <div class="ans-card B">
+      <div class="ans-bar"></div>
+      <span class="ans-lbl">B</span>
+      <span class="ans-txt" id="ans-B"></span>
+      <span class="ans-count" id="cnt-B">0</span>
+    </div>
+    <div class="ans-card C">
+      <div class="ans-bar"></div>
+      <span class="ans-lbl">C</span>
+      <span class="ans-txt" id="ans-C"></span>
+      <span class="ans-count" id="cnt-C">0</span>
+    </div>
+    <div class="ans-card D">
+      <div class="ans-bar"></div>
+      <span class="ans-lbl">D</span>
+      <span class="ans-txt" id="ans-D"></span>
+      <span class="ans-count" id="cnt-D">0</span>
+    </div>
+  </div>
+
+  <div class="q-bottom">
+    <div class="responses-live">
+      Réponses reçues : <span id="resp-count">0</span> / <span id="resp-total">0</span>
+    </div>
+    <div class="mini-board" id="mini-board"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      SUIVANT ▶
+    </button>
+  </div>
+</div>
+
+<!-- ════════════ PODIUM ════════════ -->
+<div id="screen-podium" class="screen">
+  <h2>🏆 CLASSEMENT FINAL</h2>
+  <div class="podium-wrap" id="podium-wrap"></div>
+  <div class="full-board">
+    <h3>☭ Tableau des scores complet</h3>
+    <div id="full-board-list"></div>
+  </div>
+  <button class="restart-btn" onclick="resetQuiz()">↺ RÉINITIALISER</button>
+</div>
+
+<!-- Reveal overlay -->
+<div class="reveal-overlay" id="reveal-overlay">
+  <div class="reveal-correct">✓ BONNE RÉPONSE</div>
+  <div class="reveal-answer" id="reveal-answer-text"></div>
+</div>
+
+</div><!-- .wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ═══════════════════════════════════════════════════════
+const firebaseConfig = {
+  databaseURL: "https://quiz-totalitarisme-default-rtdb.firebaseio.com/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const QUIZ_PATH = "revolution_bolchevique";
+
+// ═══════════════════════════════════════════════════════
+//  QUESTIONS  (réponse correcte = index 0 AVANT mélange)
+// ═══════════════════════════════════════════════════════
+const RAW_QUESTIONS = [
+  {
+    q: "Quel était le nom de la police secrète du régime tsariste?",
+    answers: ["L'Okhrana","La Tchéka","Le Komintern","La Douma"],
+    correct: 0
+  },
+  {
+    q: "Quelle défaite militaire a déclenché l'exaspération menant à la Révolution de 1905?",
+    answers: ["La défaite contre le Japon","La défaite contre l'Allemagne","La défaite contre l'Autriche","La défaite contre la France"],
+    correct: 0
+  },
+  {
+    q: "Qu'est-ce que la «Douma» concédée par le Tsar en 1905?",
+    answers: ["Une assemblée élue","La police politique","Un traité de paix","Le parti communiste"],
+    correct: 0
+  },
+  {
+    q: "Qu'est-ce qu'un «Soviet»?",
+    answers: ["Conseil d'ouvriers, soldats et paysans","Un parti révolutionnaire","Une milice armée","Un tribunal populaire"],
+    correct: 0
+  },
+  {
+    q: "Quelle est la principale différence entre bolchéviks et menchéviks?",
+    answers: ["Les bolchéviks voulaient une dictature immédiate du prolétariat","Les bolchéviks voulaient une révolution graduelle","Les menchéviks refusaient toute forme d'État","Les menchéviks étaient majoritaires au sein du parti"],
+    correct: 0
+  },
+  {
+    q: "Quel événement déclenche la Révolution de février 1917?",
+    answers: ["Une émeute de la faim","Un coup d'État militaire","L'assassinat du Tsar","Une offensive allemande"],
+    correct: 0
+  },
+  {
+    q: "Comment Lénine est-il retourné en Russie depuis son exil?",
+    answers: ["Avec l'aide de l'Allemagne, via un wagon plombé","Par bateau depuis les États-Unis","Clandestinement en franchissant la frontière à pied","Grâce aux révolutionnaires menchéviks"],
+    correct: 0
+  },
+  {
+    q: "Que réclament principalement les «Thèses d'avril» de Lénine?",
+    answers: ["Tous les pouvoirs aux soviets","Continuer la guerre contre l'Allemagne","S'allier au gouvernement provisoire","Rejoindre la coalition des menchéviks"],
+    correct: 0
+  },
+  {
+    q: "Que signifie l'acronyme NEP?",
+    answers: ["Nouvelle Politique Économique","Nouveau Parti d'État","Nouvelle Ère Prolétarienne","Nouvel Empire Populaire"],
+    correct: 0
+  },
+  {
+    q: "Qui a remporté la lutte pour le pouvoir après la mort de Lénine en 1924?",
+    answers: ["Staline","Trotsky","Kerensky","Raspoutine"],
+    correct: 0
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+//  SHUFFLE answers (store shuffled version per session)
+// ═══════════════════════════════════════════════════════
+function shuffleAnswers(q) {
+  const indices = [0,1,2,3];
+  for (let i=indices.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const newAnswers = indices.map(i => q.answers[i]);
+  const newCorrect = indices.indexOf(q.correct);
+  return { q: q.q, answers: newAnswers, correct: newCorrect };
+}
+
+let QUESTIONS = [];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let currentQIdx = -1;
+let timerInterval = null;
+let timeLeft = 20;
+let students = {};      // uid → {name, score}
+let currentAnswers = {}; // uid → answerIndex
+let timerRunning = false;
+const TIMER_DURATION = 20;
+
+// ═══════════════════════════════════════════════════════
+//  QR CODE  (auto URL)
+// ═══════════════════════════════════════════════════════
+function setupQR() {
+  const eleveURL = window.location.href.replace('prof.html','eleve.html');
+  const encoded = encodeURIComponent(eleveURL);
+  document.getElementById('qr-img').src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}`;
+  document.getElementById('qr-url-text').textContent = eleveURL;
+}
+
+// ═══════════════════════════════════════════════════════
+//  FIREBASE LISTENERS
+// ═══════════════════════════════════════════════════════
+function initListeners() {
+  // Students
+  db.ref(`${QUIZ_PATH}/students`).on('value', snap => {
+    students = snap.val() || {};
+    updateStudentCount();
+    updateStudentList();
+    updateLeaderboard();
+  });
+
+  // Answers for current question
+  db.ref(`${QUIZ_PATH}/answers`).on('value', snap => {
+    const all = snap.val() || {};
+    currentAnswers = (currentQIdx >= 0 && all[currentQIdx]) ? all[currentQIdx] : {};
+    updateAnswerBars();
+    updateResponseCount();
+  });
+
+  // Game state (for sync / restart)
+  db.ref(`${QUIZ_PATH}/gameState`).on('value', snap => {
+    const state = snap.val();
+    if (!state) return;
+    if (state.phase === 'reset') location.reload();
+  });
+}
+
+function updateStudentCount() {
+  const n = Object.keys(students).length;
+  document.getElementById('student-count').textContent = n;
+  document.getElementById('lobby-count').textContent = n;
+  document.getElementById('resp-total').textContent = n;
+}
+function updateStudentList() {
+  const list = document.getElementById('student-list');
+  list.innerHTML = '';
+  Object.values(students).forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'student-chip';
+    chip.textContent = s.name;
+    list.appendChild(chip);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  QUIZ FLOW
+// ═══════════════════════════════════════════════════════
+function startQuiz() {
+  QUESTIONS = RAW_QUESTIONS.map(shuffleAnswers);
+  // Write shuffled questions to Firebase so eleve.html can read them
+  db.ref(`${QUIZ_PATH}/questions`).set(QUESTIONS);
+  db.ref(`${QUIZ_PATH}/gameState`).set({ phase:'question', questionIndex:0 });
+  showQuestion(0);
+}
+
+function showQuestion(idx) {
+  currentQIdx = idx;
+  currentAnswers = {};
+  const q = QUESTIONS[idx];
+
+  showScreen('screen-question');
+  document.getElementById('phase-badge').textContent = `Q ${idx+1}/10`;
+  document.getElementById('q-num').textContent = `QUESTION ${idx+1} / ${QUESTIONS.length}`;
+  document.getElementById('q-text').textContent = q.q;
+
+  const labels = ['A','B','C','D'];
+  labels.forEach((l,i) => {
+    document.getElementById(`ans-${l}`).textContent = q.answers[i];
+    document.getElementById(`cnt-${l}`).style.opacity = '0';
+    document.getElementById(`cnt-${l}`).textContent = '0';
+    const card = document.querySelectorAll('.ans-card')[i];
+    card.classList.remove('correct');
+    card.querySelector('.ans-bar').style.width = '0%';
+  });
+
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('resp-count').textContent = '0';
+
+  // Push to Firebase
+  db.ref(`${QUIZ_PATH}/gameState`).set({
+    phase: 'question',
+    questionIndex: idx,
+    timerStart: firebase.database.ServerValue.TIMESTAMP
+  });
+  db.ref(`${QUIZ_PATH}/answers/${idx}`).remove();
+
+  startTimer();
+}
+
+// ═══════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════
+const CIRCUMFERENCE = 2 * Math.PI * 35; // ≈ 220
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timeLeft = TIMER_DURATION;
+  timerRunning = true;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) stopTimer();
+  }, 1000);
+}
+function updateTimerDisplay() {
+  document.getElementById('timer-num').textContent = timeLeft;
+  const offset = CIRCUMFERENCE * (1 - timeLeft / TIMER_DURATION);
+  const circle = document.getElementById('timer-circle');
+  circle.style.strokeDashoffset = offset;
+  // Color warning
+  if (timeLeft <= 5) circle.style.stroke = '#e74c3c';
+  else if (timeLeft <= 10) circle.style.stroke = '#e67e22';
+  else circle.style.stroke = 'var(--gold)';
+}
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  timerRunning = false;
+  revealAnswer();
+}
+
+// ═══════════════════════════════════════════════════════
+//  REVEAL + BARS
+// ═══════════════════════════════════════════════════════
+function revealAnswer() {
+  db.ref(`${QUIZ_PATH}/gameState`).update({ phase:'reveal' });
+
+  const q = QUESTIONS[currentQIdx];
+  const labels = ['A','B','C','D'];
+  const counts = [0,0,0,0];
+
+  Object.values(currentAnswers).forEach(a => { if (a >= 0 && a < 4) counts[a]++; });
+  const total = Math.max(1, counts.reduce((s,n)=>s+n,0));
+
+  labels.forEach((l,i) => {
+    const card = document.querySelectorAll('.ans-card')[i];
+    const bar = card.querySelector('.ans-bar');
+    const cnt = document.getElementById(`cnt-${l}`);
+    const pct = (counts[i]/total*100).toFixed(0);
+    bar.style.width = pct + '%';
+    cnt.textContent = counts[i];
+    cnt.style.opacity = '1';
+    if (i === q.correct) card.classList.add('correct');
+  });
+
+  document.getElementById('next-btn').style.display = 'block';
+
+  // Brief reveal flash
+  const overlay = document.getElementById('reveal-overlay');
+  document.getElementById('reveal-answer-text').textContent =
+    `${labels[q.correct]} — ${q.answers[q.correct]}`;
+  overlay.style.display = 'flex';
+  setTimeout(() => { overlay.style.display = 'none'; }, 2200);
+
+  // Award points
+  awardPoints();
+  updateLeaderboard();
+}
+
+function awardPoints() {
+  const q = QUESTIONS[currentQIdx];
+  const updates = {};
+  // Sort by first-answer-time for speed bonus
+  const ansEntries = Object.entries(currentAnswers);
+  ansEntries.forEach(([uid, ans]) => {
+    if (parseInt(ans) === q.correct) {
+      const cur = (students[uid]?.score || 0);
+      updates[`${QUIZ_PATH}/students/${uid}/score`] = cur + 100;
+    }
+  });
+  if (Object.keys(updates).length) db.ref().update(updates);
+}
+
+function updateAnswerBars() {
+  // live update while question is running
+  if (!timerRunning) return;
+  const counts = [0,0,0,0];
+  Object.values(currentAnswers).forEach(a => { if(a>=0&&a<4) counts[a]++; });
+  const total = Math.max(1, Object.keys(currentAnswers).length);
+  const labels = ['A','B','C','D'];
+  labels.forEach((l,i) => {
+    const pct = (counts[i]/total*100).toFixed(0);
+    document.querySelectorAll('.ans-card')[i].querySelector('.ans-bar').style.width = pct+'%';
+  });
+}
+
+function updateResponseCount() {
+  const n = Object.keys(currentAnswers).length;
+  document.getElementById('resp-count').textContent = n;
+}
+
+// ═══════════════════════════════════════════════════════
+//  LEADERBOARD
+// ═══════════════════════════════════════════════════════
+const BAR_COLORS = ['#d4af37','#c0392b','#2980b9','#27ae60','#8e44ad','#e67e22'];
+function updateLeaderboard() {
+  const sorted = Object.entries(students)
+    .map(([uid,s]) => ({name:s.name||'?', score:s.score||0}))
+    .sort((a,b)=>b.score-a.score).slice(0,6);
+
+  // Mini bars
+  const mini = document.getElementById('mini-board');
+  mini.innerHTML='';
+  const maxScore = Math.max(1, sorted[0]?.score||1);
+  sorted.forEach((s,i) => {
+    const h = Math.max(4, (s.score/maxScore)*60);
+    mini.innerHTML += `<div class="mini-bar-wrap">
+      <div class="mini-bar" style="height:${h}px;background:${BAR_COLORS[i%6]}"></div>
+      <div class="mini-name">${s.name}</div>
+    </div>`;
+  });
+
+  // Full board (podium screen)
+  const board = document.getElementById('full-board-list');
+  board.innerHTML='';
+  sorted.forEach((s,i) => {
+    board.innerHTML += `<div class="board-row">
+      <div class="board-rank">${i+1}</div>
+      <div class="board-name">${s.name}</div>
+      <div class="board-pts">${s.score} pts</div>
+    </div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  NEXT / PODIUM
+// ═══════════════════════════════════════════════════════
+function nextQuestion() {
+  const next = currentQIdx + 1;
+  if (next >= QUESTIONS.length) showPodium();
+  else showQuestion(next);
+}
+
+function showPodium() {
+  db.ref(`${QUIZ_PATH}/gameState`).set({ phase:'podium' });
+  showScreen('screen-podium');
+  document.getElementById('phase-badge').textContent = 'PODIUM';
+
+  const sorted = Object.values(students)
+    .map(s=>({name:s.name||'?',score:s.score||0}))
+    .sort((a,b)=>b.score-a.score);
+
+  const top3 = [sorted[1]||{name:'—',score:0}, sorted[0]||{name:'—',score:0}, sorted[2]||{name:'—',score:0}];
+  const medals = ['🥈','🥇','🥉'];
+  const podium = document.getElementById('podium-wrap');
+  podium.innerHTML='';
+  top3.forEach((s,i) => {
+    podium.innerHTML+=`<div class="podium-col">
+      <div class="podium-name">${s.name}</div>
+      <div class="podium-score">${s.score} pts</div>
+      <div class="podium-block">${medals[i]}</div>
+    </div>`;
+  });
+
+  launchConfetti();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+}
+
+function resetQuiz() {
+  db.ref(`${QUIZ_PATH}`).set({
+    gameState: { phase:'reset' },
+    students: null, answers: null, questions: null
+  }).then(()=> location.reload());
+}
+
+// ═══════════════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════════════
+function launchConfetti() {
+  const colors=['#d4af37','#c0392b','#e74c3c','#f39c12','#27ae60','#2980b9'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');
+    el.className='confetti-particle';
+    el.style.cssText=`
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${2+Math.random()*2}s;
+      animation-delay:${Math.random()*1.5}s;
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  setupQR();
+  initListeners();
+  // Reset previous game state on load
+  db.ref(`${QUIZ_PATH}/gameState`).set({ phase:'lobby', questionIndex:-1 });
+  db.ref(`${QUIZ_PATH}/answers`).remove();
+  db.ref(`${QUIZ_PATH}/questions`).remove();
+});
+</script>
+</body>
+</html>
