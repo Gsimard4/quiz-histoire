@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr"> 
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,7 +141,7 @@ const ELEVE_URL = (function() {
 })();
 
 // ⚠️ Remplace cette URL par ta nouvelle Firebase Realtime Database pour ce quiz
-const firebaseConfig = { databaseURL:"https://quiz-deuxieme-guerre-mondiale1-default-rtdb.firebaseio.com/" };
+const firebaseConfig = { databaseURL:"https://quiz-guerre-mondiale-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -179,9 +179,9 @@ const QUESTIONS = [
     correct:3
   },
   {
-    q:"Quel avion britannique fut décisif lors de la Bataille d'Angleterre (1940) ?",
-    opts:["Messerschmitt Bf 109","Hawker Hurricane","Supermarine Spitfire","Avro Lancaster"],
-    correct:2
+    q:"Quel avantage technologique a permis aux Britanniques de remporter la Bataille d'Angleterre ?",
+    opts:["La supériorité numérique de la RAF","Le radar","Les bombes incendiaires","Le déchiffrement des codes ennemis"],
+    correct:1
   },
   {
     q:"Quelle ville représente le « point tournant de la guerre » sur le front de l'Est ?",
