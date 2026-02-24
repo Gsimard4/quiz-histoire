@@ -136,7 +136,7 @@
 
 <script>
 // ⚠️ Même URL que dans prof.html
-const firebaseConfig={databaseURL:"https://console.firebase.google.com/project/quiz-deuxieme-guerre-mondiale1/database/quiz-deuxieme-guerre-mondiale1-default-rtdb/data/~2F"};
+const firebaseConfig={databaseURL:"https://quiz-guerre-mondiale-default-rtdb.firebaseio.com/"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
