@@ -108,7 +108,7 @@
     <div class="answer-buttons" id="answer-buttons"></div>
   </div>
   <div class="status-panel" id="answered-panel">
-    <div class="status-icon" id="answered-icon">&#9989;</div>
+    <div class="status-icon" id="answered-icon">✅</div>
     <div class="status-title" id="answered-title">RÉPONSE ENREGISTRÉE !</div>
     <div class="status-sub">Attend la correction du professeur…</div>
   </div>
@@ -125,7 +125,7 @@
   <div class="results-score" id="final-score">0</div>
   <div class="results-pts">points</div>
   <div class="results-rank">Classement : <span id="rank-display">?</span></div>
-  <div style="font-size:0.85rem;color:var(--muted);text-align:center;max-width:260px;">Bravo pour ta participation ! &#127881;</div>
+  <div style="font-size:0.85rem;color:var(--muted);text-align:center;max-width:260px;">Bravo pour ta participation ! 🎉</div>
 </div>
 
 <div class="screen" id="closed-screen" style="display:none">
@@ -136,7 +136,7 @@
 
 <script>
 // ⚠️ Même URL que dans prof.html
-const firebaseConfig={databaseURL:"https://quiz-deuxieme-guerre-mondiale1-default-rtdb.firebaseio.com/"};
+const firebaseConfig={databaseURL:"https://quiz-guerre-mondiale-default-rtdb.firebaseio.com/"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
@@ -176,7 +176,7 @@ function registerPlayer(name){
   ref.set({name:name,score:0,joinedAt:Date.now()}).then(()=>{
     document.getElementById('header-name').textContent=name;
     document.getElementById('header-score').style.display='block';
-    document.getElementById('waiting-name').textContent='&#128100; '+name;
+    document.getElementById('waiting-name').textContent='👤 '+name;
     showScreen('waiting-screen');
     listenGameState();
   });
@@ -211,7 +211,7 @@ function handleState(state){
     if(!hasAnswered){
       document.getElementById('answer-buttons').style.display='none';
       document.getElementById('answered-panel').style.display='flex';
-      document.getElementById('answered-icon').textContent='&#9201;';
+      document.getElementById('answered-icon').textContent='⏱';
       document.getElementById('answered-title').textContent='TEMPS ÉCOULÉ !';
     }
     return;
@@ -264,7 +264,7 @@ function submitAnswer(idx){
   setTimeout(()=>{
     document.getElementById('answer-buttons').style.display='none';
     document.getElementById('answered-panel').style.display='flex';
-    document.getElementById('answered-icon').textContent='&#9989;';
+    document.getElementById('answered-icon').textContent='✅';
     document.getElementById('answered-title').textContent='RÉPONSE ENREGISTRÉE !';
   },300);
 }
@@ -280,14 +280,14 @@ function showReveal(correct){
   const pts=document.getElementById('pts-gained');
   const sub=document.getElementById('reveal-sub');
   if(!hasAnswered){
-    icon.textContent='&#9201;';msg.textContent='PAS DE RÉPONSE';msg.className='reveal-msg wrong';
+    icon.textContent='⏱';msg.textContent='PAS DE RÉPONSE';msg.className='reveal-msg wrong';
     pts.style.display='none';sub.textContent=`La bonne réponse était : ${LETTERS[correct]}`;
   } else if(wasCorrect){
-    icon.textContent='&#127881;';msg.textContent='BONNE RÉPONSE !';msg.className='reveal-msg correct';
+    icon.textContent='🎉';msg.textContent='BONNE RÉPONSE !';msg.className='reveal-msg correct';
     pts.textContent='+1000 pts';pts.style.display='block';sub.textContent='';
     myScore+=1000;document.getElementById('score-display').textContent=myScore;
   } else {
-    icon.textContent='&#10060;';msg.textContent='RATÉ…';msg.className='reveal-msg wrong';
+    icon.textContent='❌';msg.textContent='RATÉ…';msg.className='reveal-msg wrong';
     pts.style.display='none';sub.textContent=`La bonne réponse était : ${LETTERS[correct]}`;
   }
 }
