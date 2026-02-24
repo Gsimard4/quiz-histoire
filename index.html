@@ -22,7 +22,6 @@
   .quiz-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;display:flex;flex-direction:column;}
   .quiz-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
   .card-stripe{height:5px;background:var(--red);}
-  .card-stripe.blue{background:#2980b9;}.card-stripe.green{background:#27ae60;}
   .card-body{padding:20px;flex:1;display:flex;flex-direction:column;gap:10px;}
   .card-era{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
   .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;line-height:1.1;}
@@ -35,8 +34,6 @@
   .btn-prof:hover{filter:brightness(1.15);}
   .btn-eleve{padding:10px 14px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;white-space:nowrap;}
   .btn-eleve:hover{border-color:var(--text);color:var(--text);}
-  .quiz-card.soon{opacity:0.5;pointer-events:none;}
-  .soon-badge{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;background:var(--border);color:var(--muted);padding:3px 10px;border-radius:3px;margin-left:auto;}
   footer{padding:24px 40px;border-top:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:var(--muted);letter-spacing:1px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
   @media(max-width:600px){header{padding:24px 20px 20px;}.site-title{font-size:2.5rem;}main{padding:24px 16px;}}
 </style>
@@ -65,12 +62,11 @@
         </div>
       </div>
       <div class="card-footer">
-        <a class="btn-prof" href="totalitarisme/prof.html">▶ Vue Professeur</a>
-        <a class="btn-eleve" href="totalitarisme/eleve.html">👤 Vue Élève</a>
+        <a class="btn-prof" href="totalitarisme/prof.html">&#9654; Vue Professeur</a>
+        <a class="btn-eleve" href="totalitarisme/eleve.html">&#128100; Vue Élève</a>
       </div>
     </div>
 
-    <!-- NOUVEAU -->
     <div class="quiz-card">
       <div class="card-stripe" style="background:linear-gradient(90deg,#8b0000,#c0392b);"></div>
       <div class="card-body">
@@ -83,31 +79,26 @@
         </div>
       </div>
       <div class="card-footer">
-        <a class="btn-prof" href="revolution-bolchevique/prof.html">▶ Vue Professeur</a>
-        <a class="btn-eleve" href="revolution-bolchevique/eleve.html">👤 Vue Élève</a>
+        <a class="btn-prof" href="revolution-bolchevique/prof.html">&#9654; Vue Professeur</a>
+        <a class="btn-eleve" href="revolution-bolchevique/eleve.html">&#128100; Vue Élève</a>
       </div>
     </div>
 
-    <div class="quiz-card soon">
-      <div class="card-stripe blue"></div>
+    <div class="quiz-card">
+      <div class="card-stripe" style="background:linear-gradient(90deg,#4a0000,#8b0000);"></div>
       <div class="card-body">
-        <div class="card-era">XXe siècle · Géopolitique</div>
-        <div class="card-title">La Guerre froide</div>
-        <div class="card-desc">Bloc de l'Est, bloc de l'Ouest, crises et détente.</div>
-        <div class="card-meta"><span class="tag questions">— questions</span><span class="soon-badge">Bientôt</span></div>
+        <div class="card-era">XXe siècle · Conflits mondiaux</div>
+        <div class="card-title">La 2e Guerre mondiale</div>
+        <div class="card-desc">L'Axe et les Alliés, les coups de force d'Hitler, le Blitzkrieg, la Bataille d'Angleterre, Barbarossa et Stalingrad.</div>
+        <div class="card-meta">
+          <span class="tag questions">10 questions</span>
+          <span class="tag">20 sec / question</span>
+        </div>
       </div>
-      <div class="card-footer"><a class="btn-prof" href="#">▶ Vue Professeur</a></div>
-    </div>
-
-    <div class="quiz-card soon">
-      <div class="card-stripe green"></div>
-      <div class="card-body">
-        <div class="card-era">XVIIIe siècle · Révolutions</div>
-        <div class="card-title">La Révolution française</div>
-        <div class="card-desc">Causes, phases, personnages et héritage de 1789.</div>
-        <div class="card-meta"><span class="tag questions">— questions</span><span class="soon-badge">Bientôt</span></div>
+      <div class="card-footer">
+        <a class="btn-prof" href="guerre-mondiale-1/prof.html">&#9654; Vue Professeur</a>
+        <a class="btn-eleve" href="guerre-mondiale-1/eleve.html">&#128100; Vue Élève</a>
       </div>
-      <div class="card-footer"><a class="btn-prof" href="#">▶ Vue Professeur</a></div>
     </div>
 
   </div>
