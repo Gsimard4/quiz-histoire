@@ -217,7 +217,7 @@
 const ELEVE_URL = window.location.href.replace('prof.html','eleve.html');
 
 // ⚠️ Remplace cette URL par ta Firebase Realtime Database
-const firebaseConfig = { databaseURL:"https://REMPLACE-PAR-TON-URL-FIREBASE.firebaseio.com/" };
+const firebaseConfig = { databaseURL:"https://quiz-deuxieme-guerre-mondiale2-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
