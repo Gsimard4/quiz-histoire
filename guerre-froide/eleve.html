@@ -10,95 +10,91 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;900&display=swap');
 
   :root {
-    --teal:    #1a8a6b;
-    --teal-lo: #0d4f3e;
-    --coral:   #c85520;
-    --coral-hi:#e87040;
-    --dark:    #07100e;
-    --mid:     #0e201a;
-    --card:    #141f1c;
-    --border:  #243d34;
-    --border2: #2e4d44;
-    --text:    #d8efea;
-    --muted:   #5e9988;
-    --green:   #1e8a50;
-    --danger:  #c03828;
-    --A: #2563a8; --B: #1a7a5e; --C: #7a3a14; --D: #5a2a8a;
+    --accent:    #0f9b82;
+    --accent-lo: #0a6b5a;
+    --coral:     #d4612a;
+    --coral-hi:  #e87848;
+    /* Fonds neutres identiques à 2GM-2 */
+    --dark:   #07090e;
+    --mid:    #0e1220;
+    --card:   #141926;
+    --border: #242d44;
+    --border2:#2e3a54;
+    --text:   #d8e0ef;
+    --muted:  #5e7099;
+    --green:  #1e8a50;
+    --danger: #c03828;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { height:100%; }
   body { font-family:'Barlow',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
 
-  .topbar { padding:12px 20px; background:var(--mid); border-bottom:2px solid var(--teal); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .topbar { padding:12px 20px; background:var(--mid); border-bottom:2px solid var(--accent); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; box-shadow:0 2px 12px rgba(15,155,130,0.12); }
   .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:3px; }
-  .topbar-title span { color:var(--teal); }
+  .topbar-title span { color:var(--accent); }
   #score-badge { font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; color:var(--coral-hi); letter-spacing:1px; }
 
   .screen { display:none; flex:1; padding:20px; flex-direction:column; }
   .screen.active { display:flex; }
 
-  /* ── JOIN ── */
+  /* JOIN */
   #screen-join { align-items:center; justify-content:center; gap:20px; text-align:center; }
   .join-logo { font-family:'Bebas Neue',sans-serif; font-size:2.8rem; letter-spacing:4px; line-height:1; }
-  .join-logo span { color:var(--teal); }
+  .join-logo span { color:var(--accent); }
   .join-sub { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
   #name-input { width:100%; max-width:320px; padding:14px 16px; font-size:1rem; font-family:'Barlow',sans-serif; background:var(--card); border:1px solid var(--border); border-radius:4px; color:var(--text); outline:none; text-align:center; transition:border-color .2s; }
-  #name-input:focus { border-color:var(--teal); }
+  #name-input:focus { border-color:var(--accent); }
   #name-input::placeholder { color:var(--muted); }
-  #btn-join { width:100%; max-width:320px; padding:14px; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; background:var(--teal); color:white; border:none; border-radius:4px; cursor:pointer; transition:filter .2s; }
-  #btn-join:hover { filter:brightness(1.15); }
   .error-msg { color:var(--coral-hi); font-size:.82rem; min-height:18px; }
+  #btn-join { width:100%; max-width:320px; padding:14px; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; background:var(--accent); color:white; border:none; border-radius:4px; cursor:pointer; transition:filter .2s; }
+  #btn-join:hover { filter:brightness(1.15); }
 
-  /* ── WAITING ── */
+  /* WAITING */
   #screen-waiting { align-items:center; justify-content:center; gap:16px; text-align:center; }
   .wait-icon { font-size:2.5rem; }
-  #screen-waiting h2 { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:3px; color:var(--teal); }
+  #screen-waiting h2 { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:3px; color:var(--accent); }
   #waiting-name { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--coral-hi); letter-spacing:1px; }
   #screen-waiting p { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
 
-  /* ── QUESTION ── */
+  /* QUESTION */
   #screen-question { gap:12px; }
   .q-progress { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; text-align:center; }
   .timer-track { height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
-  #timer-bar { height:100%; background:linear-gradient(90deg,var(--teal-lo),var(--teal)); transition:width 1s linear; border-radius:3px; }
-  #q-text-e { background:var(--card); border-left:4px solid var(--teal); padding:14px 16px; border-radius:0 6px 6px 0; font-family:'Barlow Condensed',sans-serif; font-size:1.25rem; font-weight:700; line-height:1.4; flex-shrink:0; }
+  #timer-bar { height:100%; background:linear-gradient(90deg,var(--accent-lo),var(--accent)); transition:width 1s linear; border-radius:3px; }
+  #q-text-e { background:var(--card); border-left:4px solid var(--accent); padding:14px 16px; border-radius:0 6px 6px 0; font-family:'Barlow Condensed',sans-serif; font-size:1.25rem; font-weight:700; line-height:1.4; }
 
   .answers-stack { display:flex; flex-direction:column; gap:10px; flex:1; justify-content:center; }
   .ans-btn { display:flex; align-items:center; gap:12px; padding:16px; border-radius:6px; border:none; cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; color:white; text-align:left; transition:filter .15s, transform .1s; }
   .ans-btn:active:not(:disabled) { transform:scale(.97); }
-  .ans-btn[data-idx="0"] { background:var(--A); }
-  .ans-btn[data-idx="1"] { background:var(--B); }
-  .ans-btn[data-idx="2"] { background:var(--C); }
-  .ans-btn[data-idx="3"] { background:var(--D); }
+  .ans-btn[data-idx="0"] { background:#2563a8; }
+  .ans-btn[data-idx="1"] { background:#1a7a5e; }
+  .ans-btn[data-idx="2"] { background:#7a3a14; }
+  .ans-btn[data-idx="3"] { background:#5a2a8a; }
   .ans-btn .letter { min-width:30px; height:30px; background:rgba(0,0,0,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
-  .ans-btn:disabled { cursor:not-allowed; }
-  .ans-btn.selected { outline:3px solid white; }
-  .ans-btn.correct-reveal { outline:3px solid #2ecc71; box-shadow:0 0 20px rgba(46,204,113,0.4); }
-  .ans-btn.wrong-reveal   { opacity:.35; filter:grayscale(.7); }
+  .ans-btn:disabled { cursor:not-allowed; opacity:.7; }
+  .ans-btn.selected  { outline:3px solid white; }
 
-  /* ── WAITING FOR NEXT ── */
+  /* WAIT FOR NEXT */
   #screen-wait-next { align-items:center; justify-content:center; gap:14px; text-align:center; }
-  #screen-wait-next h2 { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:3px; color:var(--teal); }
-  .result-big { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:2px; }
-  .result-big.correct { color:var(--green); }
-  .result-big.wrong   { color:var(--danger); }
+  #screen-wait-next h2 { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:3px; color:var(--accent); }
+  .result-big { font-family:'Bebas Neue',sans-serif; font-size:2.8rem; letter-spacing:2px; }
   .pts-earned { font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:700; color:var(--coral-hi); letter-spacing:1px; }
   .blink { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; animation:blink 1.2s infinite; }
   @keyframes blink { 0%,100%{opacity:1;}50%{opacity:.2;} }
 
-  /* ── PODIUM ── */
+  /* PODIUM */
   #screen-podium { align-items:center; gap:16px; text-align:center; }
   #screen-podium h2 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; color:var(--coral-hi); }
-  .my-result { background:var(--card); border:1px solid var(--teal); border-radius:8px; padding:20px; width:100%; }
+  .my-result { background:var(--card); border:1px solid var(--accent); border-radius:8px; padding:20px; width:100%; }
   .my-rank-num   { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; color:var(--coral-hi); line-height:1; }
   .my-rank-label { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
   .my-final-pts  { font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:700; color:var(--coral-hi); margin-top:6px; letter-spacing:1px; }
   .lb-row { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--border); border-radius:5px; width:100%; }
-  .lb-row.me { border-left-color:var(--coral-hi); background:#1f160e; }
+  .lb-row.me { border-left-color:var(--coral-hi); }
   .lb-rank  { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--coral-hi); min-width:26px; }
   .lb-name  { flex:1; font-weight:600; font-size:.9rem; }
-  .lb-score { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; font-weight:700; color:var(--teal); letter-spacing:1px; }
+  .lb-score { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; font-weight:700; color:var(--accent); letter-spacing:1px; }
 </style>
 </head>
 <body>
@@ -141,8 +137,8 @@
 <!-- WAIT FOR NEXT -->
 <div id="screen-wait-next" class="screen">
   <h2>RÉPONSE ENVOYÉE</h2>
-  <div class="result-big" id="result-label">—</div>
-  <div class="pts-earned" id="pts-earned">—</div>
+  <div class="result-big" id="result-label">⏳</div>
+  <div class="pts-earned" id="pts-earned">En attente de la correction…</div>
   <div class="blink">En attente du prof…</div>
 </div>
 
@@ -155,46 +151,38 @@
     <div class="my-rank-label">sur <span id="total-players">?</span> joueurs</div>
     <div class="my-final-pts" id="my-final-pts">—</div>
   </div>
-  <div id="lb-podium" style="width:100%;display:flex;flex-direction:column;gap:6px;"></div>
+  <div id="lb-podium" style="width:100%;display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
 </div>
 
 <script>
-// ── Firebase ──────────────────────────────────────────────────
-const firebaseConfig = { databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/" };
+const firebaseConfig = { databaseURL:"https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ── State ─────────────────────────────────────────────────────
-let myId    = null;
-let myName  = '';
-let myScore = 0;
-let currentQuestionIndex = -1;
-let answered = false;
-let timeLeft = 20;
-let timerInterval = null;
+let myId = null, myName = '', myScore = 0;
+let currentQuestionIndex = -1, answered = false;
+let timeLeft = 20, timerInterval = null;
 
-// ── Helpers ───────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
 }
-function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── Join ──────────────────────────────────────────────────────
+// ── JOIN ─────────────────────────────────────────────────────
 document.getElementById('btn-join').addEventListener('click', doJoin);
-document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') doJoin(); });
+document.getElementById('name-input').addEventListener('keydown', e=>{if(e.key==='Enter')doJoin();});
 
-function doJoin() {
+function doJoin(){
   const name = document.getElementById('name-input').value.trim();
   const err  = document.getElementById('error-msg');
-  if (!name) { err.textContent = 'Entre ton prénom pour continuer.'; return; }
-  err.textContent = '';
+  if(!name){ err.textContent='Entre ton prénom pour continuer.'; return; }
+  err.textContent='';
   myName = name;
 
-  // Écrire dans players/ — même endroit que le prof écoute
   const ref = db.ref('players').push();
   myId = ref.key;
-  ref.set({ name: myName, score: 0 });
+  ref.set({ name:myName, score:0 });
   ref.onDisconnect().remove();
 
   document.getElementById('waiting-name').textContent = myName;
@@ -202,135 +190,115 @@ function doJoin() {
   listenGameState();
 }
 
-// ── Écouter gameState ─────────────────────────────────────────
-function listenGameState() {
-  db.ref('gameState').on('value', snap => {
+// ── GAME STATE ───────────────────────────────────────────────
+function listenGameState(){
+  db.ref('gameState').on('value', snap=>{
     const state = snap.val();
-    if (!state) return;
+    if(!state) return;
 
-    if (state.phase === 'lobby') {
+    if(state.phase==='lobby'){
       showScreen('waiting');
     }
-    else if (state.phase === 'question') {
-      if (state.questionIndex !== currentQuestionIndex) {
+    else if(state.phase==='question'){
+      if(state.questionIndex !== currentQuestionIndex){
         currentQuestionIndex = state.questionIndex;
         answered = false;
         loadQuestion(state);
       }
     }
-    else if (state.phase === 'closed') {
-      // Temps écoulé — bloquer les boutons si pas encore répondu
+    else if(state.phase==='closed'){
       clearInterval(timerInterval);
-      disableAllButtons();
-      if (!answered) {
-        document.getElementById('result-label').textContent = 'TEMPS ÉCOULÉ';
-        document.getElementById('result-label').className = 'result-big wrong';
-        document.getElementById('pts-earned').textContent = '+0 points';
+      disableAll();
+      if(!answered){
+        document.getElementById('result-label').textContent = '⏰';
+        document.getElementById('pts-earned').textContent   = '+0 points — temps écoulé';
         showScreen('wait-next');
       }
     }
-    else if (state.phase === 'revealed') {
-      // Le prof a révélé — on reste sur wait-next (déjà affiché)
-      // Mettre à jour le score affiché
-      db.ref('players/' + myId + '/score').once('value', s => {
-        myScore = s.val() || 0;
-        document.getElementById('score-badge').textContent = myScore + ' pts';
+    else if(state.phase==='revealed'){
+      db.ref('players/'+myId+'/score').once('value', s=>{
+        myScore = s.val()||0;
+        document.getElementById('score-badge').textContent = myScore+' pts';
       });
     }
-    else if (state.phase === 'podium') {
+    else if(state.phase==='podium'){
       showPodium();
     }
   });
 }
 
-// ── Charger une question ──────────────────────────────────────
-function loadQuestion(state) {
+// ── LOAD QUESTION ────────────────────────────────────────────
+function loadQuestion(state){
   clearInterval(timerInterval);
+  document.getElementById('q-prog-e').textContent = 'Question '+(state.questionIndex+1)+' / 10';
+  document.getElementById('q-text-e').textContent = state.question||'—';
+  const opts = state.options||['—','—','—','—'];
+  for(let i=0;i<4;i++) document.getElementById('e-opt-'+i).textContent = opts[i]||'—';
 
-  document.getElementById('q-prog-e').textContent = 'Question ' + (state.questionIndex + 1) + ' / 10';
-  document.getElementById('q-text-e').textContent = state.question || '—';
-
-  const opts = state.options || ['—','—','—','—'];
-  ['A','B','C','D'].forEach((l, i) => {
-    document.getElementById('e-opt-' + i).textContent = opts[i] || '—';
+  document.querySelectorAll('.ans-btn').forEach(b=>{
+    b.disabled=false;
+    b.className='ans-btn';
+    b.onclick=()=>submitAnswer(parseInt(b.dataset.idx));
   });
 
-  // Réactiver les boutons
-  document.querySelectorAll('.ans-btn').forEach(b => {
-    b.disabled = false;
-    b.className = 'ans-btn';
-    b.onclick = () => submitAnswer(parseInt(b.dataset.idx));
-  });
-
-  // Timer local (visuel seulement)
-  timeLeft = 20;
-  document.getElementById('timer-bar').style.width = '100%';
-  timerInterval = setInterval(() => {
-    timeLeft = Math.max(0, timeLeft - 1);
-    document.getElementById('timer-bar').style.width = (timeLeft / 20 * 100) + '%';
-    if (timeLeft <= 0) clearInterval(timerInterval);
-  }, 1000);
+  timeLeft=20;
+  document.getElementById('timer-bar').style.width='100%';
+  timerInterval=setInterval(()=>{
+    timeLeft=Math.max(0,timeLeft-1);
+    document.getElementById('timer-bar').style.width=(timeLeft/20*100)+'%';
+    if(timeLeft<=0)clearInterval(timerInterval);
+  },1000);
 
   showScreen('question');
 }
 
-// ── Soumettre une réponse ─────────────────────────────────────
-function submitAnswer(idx) {
-  if (answered) return;
-  answered = true;
+// ── SUBMIT ───────────────────────────────────────────────────
+function submitAnswer(idx){
+  if(answered)return;
+  answered=true;
   clearInterval(timerInterval);
-  disableAllButtons();
-
-  // Marquer le bouton choisi
+  disableAll();
   document.querySelectorAll('.ans-btn')[idx].classList.add('selected');
 
-  // Écrire dans answers/ — même structure que le prof lit
-  db.ref('answers/' + myId).set({
+  db.ref('answers/'+myId).set({
     question: currentQuestionIndex,
     answer:   idx,
     time:     timeLeft,
     uid:      myId
   });
 
-  // Afficher écran attente
-  document.getElementById('result-label').textContent = '⏳ ENVOYÉE';
-  document.getElementById('result-label').className = 'result-big';
-  document.getElementById('pts-earned').textContent = 'En attente de la correction…';
+  document.getElementById('result-label').textContent = '✅ ENVOYÉE';
+  document.getElementById('pts-earned').textContent   = 'En attente de la correction…';
   showScreen('wait-next');
 }
 
-function disableAllButtons() {
-  document.querySelectorAll('.ans-btn').forEach(b => { b.disabled = true; b.onclick = null; });
+function disableAll(){
+  document.querySelectorAll('.ans-btn').forEach(b=>{b.disabled=true;b.onclick=null;});
 }
 
-// ── Podium ────────────────────────────────────────────────────
-function showPodium() {
-  db.ref('players').once('value', snap => {
-    const data = snap.val() || {};
+// ── PODIUM ───────────────────────────────────────────────────
+function showPodium(){
+  db.ref('players').once('value', snap=>{
+    const data   = snap.val()||{};
     const sorted = Object.entries(data)
-      .map(([id, p]) => ({ id, name: p.name, score: p.score || 0 }))
-      .sort((a, b) => b.score - a.score);
+      .map(([id,p])=>({id,name:p.name,score:p.score||0}))
+      .sort((a,b)=>b.score-a.score);
 
-    myScore = (data[myId] && data[myId].score) || 0;
-    document.getElementById('score-badge').textContent = myScore + ' pts';
-
-    const myRank = sorted.findIndex(p => p.id === myId) + 1;
-    document.getElementById('my-rank').textContent      = myRank;
+    myScore = (data[myId]&&data[myId].score)||0;
+    document.getElementById('score-badge').textContent  = myScore+' pts';
+    document.getElementById('my-rank').textContent      = (sorted.findIndex(p=>p.id===myId)+1)||'—';
     document.getElementById('total-players').textContent = sorted.length;
-    document.getElementById('my-final-pts').textContent = myScore + ' points';
+    document.getElementById('my-final-pts').textContent  = myScore+' points';
 
-    const lb = document.getElementById('lb-podium');
-    lb.innerHTML = '';
-    sorted.slice(0, 8).forEach((p, i) => {
-      const row = document.createElement('div');
-      row.className = 'lb-row' + (p.id === myId ? ' me' : '');
-      row.innerHTML =
-        '<span class="lb-rank">' + (i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)) + '</span>' +
-        '<span class="lb-name">'  + escHtml(p.name) + (p.id===myId?' 👈':'') + '</span>' +
-        '<span class="lb-score">' + p.score + ' pts</span>';
+    const lb=document.getElementById('lb-podium');lb.innerHTML='';
+    sorted.slice(0,8).forEach((p,i)=>{
+      const row=document.createElement('div');
+      row.className='lb-row'+(p.id===myId?' me':'');
+      row.innerHTML='<span class="lb-rank">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1))+'</span>'
+        +'<span class="lb-name">'+escHtml(p.name)+(p.id===myId?' 👈':'')+'</span>'
+        +'<span class="lb-score">'+p.score+' pts</span>';
       lb.appendChild(row);
     });
-
     showScreen('podium');
   });
 }
