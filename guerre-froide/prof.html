@@ -1,1 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — La Guerre froide | Vue Professeur</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:    #0d4f4f;
+    --teal2:   #1a6b6b;
+    --coral:   #ff6847;
+    --coral2:  #ff8c6e;
+    --cream:   #f5f0e8;
+    --cream2:  #e8e0d0;
+    --dark:    #071a1a;
+    --mid:     #0d2f2f;
+    --gold:    #f0c060;
+    --A: #e74c3c; --B: #2980b9; --C: #27ae60; --D: #8e44ad;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
+  /* ── HEADER ── */
+  header {
+    background: var(--teal);
+    border-bottom: 3px solid var(--coral);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .title-block h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    color: var(--cream);
+    line-height: 1;
+  }
+  .title-block span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .75rem;
+    color: var(--coral2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .session-badge {
+    background: var(--coral);
+    color: var(--dark);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 4px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── LOBBY ── */
+  #screen-lobby {
+    display: none;
+    padding: 32px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  #screen-lobby.active { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+  .qr-panel {
+    background: var(--mid);
+    border: 2px solid var(--teal2);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+  }
+  .qr-panel h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: var(--coral);
+    margin-bottom: 6px;
+  }
+  .qr-panel .url-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .72rem;
+    color: var(--gold);
+    background: var(--dark);
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin: 8px 0 18px;
+    word-break: break-all;
+  }
+  #qrcode {
+    display: inline-block;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+  }
+
+  .players-panel {
+    background: var(--mid);
+    border: 2px solid var(--teal2);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .players-panel h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: var(--coral);
+    margin-bottom: 16px;
+  }
+  #player-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  #player-list {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .player-chip {
+    background: var(--teal2);
+    color: var(--cream);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: .85rem;
+    animation: chipIn .3s ease;
+  }
+  @keyframes chipIn { from { opacity:0; transform:scale(.7); } to { opacity:1; transform:scale(1); } }
+
+  #btn-start {
+    margin-top: 20px;
+    width: 100%;
+    background: var(--coral);
+    color: var(--dark);
+    border: none;
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  #btn-start:hover { background: var(--coral2); transform: translateY(-2px); }
+  #btn-start:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* ── QUESTION ── */
+  #screen-question {
+    display: none;
+    padding: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  #screen-question.active { display: block; }
+
+  .q-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .q-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: var(--coral);
+  }
+  #timer-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--gold);
+    line-height: 1;
+    min-width: 60px;
+    text-align: center;
+    transition: color .3s;
+  }
+  #timer-display.urgent { color: var(--coral); animation: pulse .4s infinite alternate; }
+  @keyframes pulse { to { transform: scale(1.15); } }
+
+  .timer-bar-wrap {
+    height: 8px;
+    background: var(--mid);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  #timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal2), var(--coral));
+    transition: width 1s linear;
+    border-radius: 4px;
+  }
+
+  #question-text {
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 24px;
+    padding: 24px;
+    background: var(--mid);
+    border-left: 5px solid var(--coral);
+    border-radius: 0 10px 10px 0;
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .answer-box {
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 1.05rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .answer-box .letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+  }
+  .answer-box.A { background: #2d0a0a; border-color: var(--A); }
+  .answer-box.B { background: #0a1d2d; border-color: var(--B); }
+  .answer-box.C { background: #0a2d12; border-color: var(--C); }
+  .answer-box.D { background: #1a0a2d; border-color: var(--D); }
+  .answer-box .letter.A { color: var(--A); }
+  .answer-box .letter.B { color: var(--B); }
+  .answer-box .letter.C { color: var(--C); }
+  .answer-box .letter.D { color: var(--D); }
+  .answer-box.correct { animation: correctFlash .6s forwards; }
+  @keyframes correctFlash {
+    0%   { box-shadow: none; }
+    50%  { box-shadow: 0 0 30px 6px #27ae60; }
+    100% { box-shadow: 0 0 12px 3px #27ae60; border-color: #27ae60; }
+  }
+
+  /* answer bar inside box */
+  .answer-bar {
+    position: absolute;
+    left: 0; top: 0; height: 100%;
+    opacity: .18;
+    transition: width .6s ease;
+    border-radius: 8px;
+  }
+  .answer-box.A .answer-bar { background: var(--A); }
+  .answer-box.B .answer-bar { background: var(--B); }
+  .answer-box.C .answer-bar { background: var(--C); }
+  .answer-box.D .answer-bar { background: var(--D); }
+  .answer-count {
+    margin-left: auto;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--cream2);
+    position: relative;
+  }
+
+  /* response stats bar */
+  .response-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  #response-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .9rem;
+    color: var(--cream2);
+  }
+
+  #btn-next {
+    background: var(--teal2);
+    color: var(--cream);
+    border: 2px solid var(--coral);
+    padding: 12px 32px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    display: none;
+  }
+  #btn-next:hover { background: var(--coral); color: var(--dark); transform: translateY(-2px); }
+
+  /* ── LEADERBOARD ── */
+  #screen-leaderboard {
+    display: none;
+    padding: 32px 24px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  #screen-leaderboard.active { display: block; }
+  #screen-leaderboard h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    color: var(--coral);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+    background: var(--mid);
+    border-radius: 10px;
+    border-left: 4px solid var(--teal2);
+    animation: slideIn .3s ease;
+  }
+  .lb-row:nth-child(1) { border-left-color: #ffd700; }
+  .lb-row:nth-child(2) { border-left-color: #c0c0c0; }
+  .lb-row:nth-child(3) { border-left-color: #cd7f32; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:none; } }
+  .lb-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+    min-width: 32px;
+    text-align: center;
+  }
+  .lb-name { flex: 1; font-weight: 600; }
+  .lb-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--coral);
+    font-weight: 700;
+  }
+  .lb-delta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .85rem;
+    color: var(--teal2);
+    min-width: 50px;
+    text-align: right;
+  }
+  .lb-delta.pos { color: #27ae60; }
+
+  #btn-continue {
+    display: block;
+    margin: 24px auto 0;
+    background: var(--coral);
+    color: var(--dark);
+    border: none;
+    padding: 14px 48px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  #btn-continue:hover { background: var(--coral2); transform: translateY(-2px); }
+
+  /* ── PODIUM ── */
+  #screen-podium {
+    display: none;
+    padding: 32px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  #screen-podium.active { display: block; }
+  #screen-podium h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 6px;
+    color: var(--gold);
+    margin-bottom: 40px;
+  }
+  .podium-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .podium-place {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .podium-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--dark);
+  }
+  .podium-place:nth-child(1) .podium-avatar { background: #c0c0c0; }
+  .podium-place:nth-child(2) .podium-avatar { background: #ffd700; width: 80px; height: 80px; font-size: 2.2rem; }
+  .podium-place:nth-child(3) .podium-avatar { background: #cd7f32; }
+  .podium-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--cream);
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .podium-score {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--gold);
+    font-size: 1rem;
+  }
+  .podium-block {
+    border-radius: 10px 10px 0 0;
+    width: 100%;
+  }
+  .podium-place:nth-child(1) .podium-block { background: var(--mid); border: 2px solid #c0c0c0; height: 80px; }
+  .podium-place:nth-child(2) .podium-block { background: var(--mid); border: 2px solid #ffd700; height: 130px; }
+  .podium-place:nth-child(3) .podium-block { background: var(--mid); border: 2px solid #cd7f32; height: 55px; }
+  .place-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    letter-spacing: 2px;
+  }
+
+  /* ── MISC ── */
+  .fade { animation: fadeIn .5s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>La Guerre froide</h1>
+    <span>Vue Professeur · 10 questions</span>
+  </div>
+  <div id="session-badge" class="session-badge">—</div>
+</header>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- LOBBY -->
+<div id="screen-lobby" class="screen">
+  <div class="qr-panel">
+    <h2>📱 Rejoindre le quiz</h2>
+    <div class="url-display" id="eleve-url">—</div>
+    <div id="qrcode"></div>
+  </div>
+  <div class="players-panel">
+    <h2>Joueurs connectés</h2>
+    <div id="player-count">0</div>
+    <div id="player-list"></div>
+    <button id="btn-start" disabled>Lancer le quiz</button>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="screen-question" class="screen">
+  <div class="q-header">
+    <span class="q-num" id="q-num">Question 1/10</span>
+    <div id="timer-display">20</div>
+  </div>
+  <div class="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
+  <div id="question-text">—</div>
+  <div class="answers-grid">
+    <div class="answer-box A" id="box-A">
+      <div class="answer-bar" id="bar-A" style="width:0"></div>
+      <span class="letter A">A</span>
+      <span id="ans-A">—</span>
+      <span class="answer-count" id="cnt-A">0</span>
+    </div>
+    <div class="answer-box B" id="box-B">
+      <div class="answer-bar" id="bar-B" style="width:0"></div>
+      <span class="letter B">B</span>
+      <span id="ans-B">—</span>
+      <span class="answer-count" id="cnt-B">0</span>
+    </div>
+    <div class="answer-box C" id="box-C">
+      <div class="answer-bar" id="bar-C" style="width:0"></div>
+      <span class="letter C">C</span>
+      <span id="ans-C">—</span>
+      <span class="answer-count" id="cnt-C">0</span>
+    </div>
+    <div class="answer-box D" id="box-D">
+      <div class="answer-bar" id="bar-D" style="width:0"></div>
+      <span class="letter D">D</span>
+      <span id="ans-D">—</span>
+      <span class="answer-count" id="cnt-D">0</span>
+    </div>
+  </div>
+  <div class="response-row">
+    <span id="response-count">0 réponse(s)</span>
+    <button id="btn-next">Voir le classement →</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="screen-leaderboard" class="screen">
+  <h2>Classement</h2>
+  <div id="lb-list"></div>
+  <button id="btn-continue" id="btn-continue">Question suivante →</button>
+</div>
+
+<!-- PODIUM -->
+<div id="screen-podium" class="screen">
+  <h2>🏆 PODIUM FINAL</h2>
+  <div class="podium-wrap" id="podium-wrap"></div>
+  <div id="lb-list-final"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ══════════════════════════════════════════════════════
+const firebaseConfig = {
+  databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ══════════════════════════════════════════════════════
+//  QUESTIONS
+// ══════════════════════════════════════════════════════
+const QUESTIONS = [
+  {
+    q: "Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe après la guerre ?",
+    answers: [
+      "Ils s'opposent sur leurs systèmes politiques et économiques",
+      "Ils divergent sur le sort des criminels de guerre nazis",
+      "Ils ont des visions différentes sur la reconstruction du Japon",
+      "Ils refusent chacun de financer la reconstruction de l'Allemagne"
+    ],
+    correct: 0
+  },
+  {
+    q: "Quel concept décrit la politique américaine consistant à empêcher le communisme de s'étendre à de nouveaux pays ?",
+    answers: [
+      "La satellisation",
+      "La déstalinisation",
+      "L'endiguement",
+      "La coexistence pacifique"
+    ],
+    correct: 2
+  },
+  {
+    q: "Quel est l'objectif principal du Plan Marshall ?",
+    answers: [
+      "Créer une alliance militaire contre l'URSS",
+      "Reconstruire économiquement l'Europe pour freiner l'influence soviétique",
+      "Punir les pays ayant collaboré avec les nazis",
+      "Financer la reconstruction du Japon sous occupation américaine"
+    ],
+    correct: 1
+  },
+  {
+    q: "Quelle est la principale conséquence du maccarthysme dans la société américaine ?",
+    answers: [
+      "Une ouverture vers le dialogue avec l'URSS",
+      "Une remise en question de la politique d'endiguement",
+      "Une psychose anticommuniste et une panique morale généralisée",
+      "Un renforcement des libertés civiles pour contrer la propagande soviétique"
+    ],
+    correct: 2
+  },
+  {
+    q: "Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?",
+    answers: [
+      "Elle impose l'adhésion au Pacte de Varsovie par la force militaire directe",
+      "Elle installe les communistes aux postes clés du gouvernement (Intérieur, Justice, Armée…)",
+      "Elle organise des référendums pro-communistes dans chaque pays",
+      "Elle finance des partis travaillistes pour remplacer les gouvernements en place"
+    ],
+    correct: 1
+  },
+  {
+    q: "Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?",
+    answers: [
+      "Il a conduit l'URSS à la défaite dans la course à l'espace",
+      "Il a perdu le soutien de l'armée après la crise de Cuba",
+      "La nomenclatura craint de perdre ses privilèges avec la déstalinisation",
+      "Il a voulu rapprocher l'URSS des États-Unis trop rapidement"
+    ],
+    correct: 2
+  },
+  {
+    q: "Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?",
+    answers: [
+      "Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire",
+      "Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique",
+      "Elle soutient secrètement les révolutionnaires cubains contre Moscou",
+      "Elle accepte l'aide économique américaine tout en restant officiellement neutre"
+    ],
+    correct: 1
+  },
+  {
+    q: "Quelle est la principale cause de la crise des missiles de Cuba ?",
+    answers: [
+      "L'URSS réagit à l'installation de missiles américains en Turquie",
+      "Cuba cherche à envahir la Floride avec le soutien soviétique",
+      "Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS",
+      "Kennedy ordonne un blocus naval de Cuba sans provocation préalable"
+    ],
+    correct: 2
+  },
+  {
+    q: "Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?",
+    answers: [
+      "Les États-Unis, grâce à leur supériorité technologique d'après-guerre",
+      "L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite",
+      "Les deux puissances progressent exactement au même rythme",
+      "L'URSS, uniquement grâce à l'espionnage des laboratoires américains"
+    ],
+    correct: 1
+  },
+  {
+    q: "Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?",
+    answers: [
+      "La concurrence des industries japonaise et allemande sur les marchés mondiaux",
+      "L'échec du modèle keynésien face à la montée des inégalités sociales",
+      "Le choc pétrolier, entraînant inflation, crédit généralisé et abandon du dollar-étalon",
+      "La fin de la course aux armements qui réduit les investissements technologiques"
+    ],
+    correct: 2
+  }
+];
+
+const TIME_PER_Q = 20;
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let sessionId, timerInterval, timeLeft;
+let currentQ = 0;
+let scores = {}; // { playerId: score }
+let prevScores = {};
+let players = {};   // { playerId: { name } }
+let answersSnapshot = {}; // { playerId: answerIndex }
+let phase = 'lobby'; // lobby | question | leaderboard | podium
+
+// ══════════════════════════════════════════════════════
+//  INIT SESSION
+// ══════════════════════════════════════════════════════
+function initSession() {
+  sessionId = Math.random().toString(36).substr(2, 6).toUpperCase();
+  document.getElementById('session-badge').textContent = sessionId;
+
+  const eleveURL = `${location.href.replace('prof.html','eleve.html')}?session=${sessionId}`;
+  document.getElementById('eleve-url').textContent = eleveURL;
+
+  new QRCode(document.getElementById('qrcode'), {
+    text: eleveURL,
+    width: 180,
+    height: 180,
+    colorDark: '#0d4f4f',
+    colorLight: '#ffffff'
+  });
+
+  db.ref(`sessions/${sessionId}`).set({
+    state: 'lobby',
+    currentQuestion: -1,
+    timeLeft: 0
+  });
+
+  db.ref(`sessions/${sessionId}/players`).on('value', snap => {
+    const data = snap.val() || {};
+    players = {};
+    const list = document.getElementById('player-list');
+    const count = document.getElementById('player-count');
+    list.innerHTML = '';
+    Object.entries(data).forEach(([id, p]) => {
+      players[id] = p;
+      if (!scores[id]) scores[id] = 0;
+      const chip = document.createElement('div');
+      chip.className = 'player-chip';
+      chip.textContent = p.name;
+      list.appendChild(chip);
+    });
+    const n = Object.keys(data).length;
+    count.textContent = n;
+    document.getElementById('btn-start').disabled = n < 1;
+  });
+
+  showScreen('lobby');
+}
+
+// ══════════════════════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+  phase = name;
+}
+
+// ══════════════════════════════════════════════════════
+//  QUESTION
+// ══════════════════════════════════════════════════════
+function showQuestion(idx) {
+  clearInterval(timerInterval);
+  answersSnapshot = {};
+  currentQ = idx;
+  const q = QUESTIONS[idx];
+
+  document.getElementById('q-num').textContent = `Question ${idx+1}/10`;
+  document.getElementById('question-text').textContent = q.q;
+  ['A','B','C','D'].forEach((l,i) => {
+    document.getElementById(`ans-${l}`).textContent = q.answers[i];
+    document.getElementById(`cnt-${l}`).textContent = '0';
+    document.getElementById(`bar-${l}`).style.width = '0';
+    document.getElementById(`box-${l}`).classList.remove('correct');
+  });
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('response-count').textContent = '0 réponse(s)';
+
+  db.ref(`sessions/${sessionId}/answers`).remove();
+  db.ref(`sessions/${sessionId}`).update({ state: 'question', currentQuestion: idx, timeLeft: TIME_PER_Q });
+
+  db.ref(`sessions/${sessionId}/answers`).on('value', snap => {
+    const data = snap.val() || {};
+    answersSnapshot = data;
+    updateAnswerBars(data);
+    document.getElementById('response-count').textContent = `${Object.keys(data).length} réponse(s) / ${Object.keys(players).length}`;
+  });
+
+  showScreen('question');
+  startTimer();
+}
+
+function updateAnswerBars(data) {
+  const counts = [0,0,0,0];
+  Object.values(data).forEach(a => { if (a >= 0 && a <= 3) counts[a]++; });
+  const total = Object.keys(players).length || 1;
+  ['A','B','C','D'].forEach((l,i) => {
+    document.getElementById(`cnt-${l}`).textContent = counts[i];
+    document.getElementById(`bar-${l}`).style.width = `${(counts[i]/total)*100}%`;
+  });
+}
+
+function startTimer() {
+  timeLeft = TIME_PER_Q;
+  const disp = document.getElementById('timer-display');
+  const bar  = document.getElementById('timer-bar');
+  disp.classList.remove('urgent');
+  disp.textContent = timeLeft;
+  bar.style.width = '100%';
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    disp.textContent = timeLeft;
+    bar.style.width = `${(timeLeft/TIME_PER_Q)*100}%`;
+    if (timeLeft <= 5) disp.classList.add('urgent');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      db.ref(`sessions/${sessionId}`).update({ state: 'reveal', timeLeft: 0 });
+      revealAnswer();
+    }
+  }, 1000);
+}
+
+function revealAnswer() {
+  const q = QUESTIONS[currentQ];
+  const letters = ['A','B','C','D'];
+  const correctLetter = letters[q.correct];
+  document.getElementById(`box-${correctLetter}`).classList.add('correct');
+
+  // Calculate scores
+  prevScores = { ...scores };
+  Object.entries(answersSnapshot).forEach(([pid, ans]) => {
+    if (ans === q.correct) {
+      const bonus = Math.round((timeLeft / TIME_PER_Q) * 500) + 500;
+      scores[pid] = (scores[pid] || 0) + bonus;
+    }
+  });
+
+  document.getElementById('btn-next').style.display = 'inline-block';
+  db.ref(`sessions/${sessionId}/answers`).off('value');
+}
+
+// ══════════════════════════════════════════════════════
+//  LEADERBOARD
+// ══════════════════════════════════════════════════════
+function showLeaderboard() {
+  const sorted = Object.entries(scores)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0,10);
+
+  const list = document.getElementById('lb-list');
+  list.innerHTML = '';
+  sorted.forEach(([pid, score], i) => {
+    const name = players[pid]?.name || pid;
+    const prev = prevScores[pid] || 0;
+    const delta = score - prev;
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `
+      <span class="lb-rank">${i+1}</span>
+      <span class="lb-name">${name}</span>
+      <span class="lb-score">${score} pts</span>
+      <span class="lb-delta ${delta>0?'pos':''}">${delta>0?'+'+delta:''}</span>`;
+    list.appendChild(row);
+  });
+
+  db.ref(`sessions/${sessionId}`).update({ state: 'leaderboard', scores });
+
+  const isLast = currentQ >= QUESTIONS.length - 1;
+  const btn = document.getElementById('btn-continue');
+  btn.textContent = isLast ? '🏆 Voir le podium' : 'Question suivante →';
+  btn.onclick = isLast ? showPodium : () => showQuestion(currentQ + 1);
+
+  showScreen('leaderboard');
+}
+
+// ══════════════════════════════════════════════════════
+//  PODIUM
+// ══════════════════════════════════════════════════════
+function showPodium() {
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const top3 = [sorted[1], sorted[0], sorted[2]]; // 2nd, 1st, 3rd visually
+
+  const wrap = document.getElementById('podium-wrap');
+  wrap.innerHTML = '';
+  const medals = ['🥈','🥇','🥉'];
+  const ranks  = ['2e','1er','3e'];
+
+  top3.forEach((entry, i) => {
+    if (!entry) return;
+    const [pid, score] = entry;
+    const name = players[pid]?.name || pid;
+    const div = document.createElement('div');
+    div.className = 'podium-place';
+    div.innerHTML = `
+      <div class="podium-avatar">${medals[i]}</div>
+      <div class="podium-name">${name}</div>
+      <div class="podium-score">${score} pts</div>
+      <div class="podium-block"><div class="place-num">${ranks[i]}</div></div>`;
+    wrap.appendChild(div);
+  });
+
+  // Full leaderboard below
+  const full = document.getElementById('lb-list-final');
+  full.innerHTML = '';
+  sorted.forEach(([pid, score], i) => {
+    if (i < 3) return;
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `
+      <span class="lb-rank">${i+1}</span>
+      <span class="lb-name">${players[pid]?.name || pid}</span>
+      <span class="lb-score">${score} pts</span>`;
+    full.appendChild(row);
+  });
+
+  db.ref(`sessions/${sessionId}`).update({ state: 'podium', scores });
+  showScreen('podium');
+  launchConfetti();
+}
+
+// ══════════════════════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════════════════════
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = Array.from({length:120}, () => ({
+    x: Math.random()*canvas.width,
+    y: -10,
+    r: Math.random()*8+4,
+    d: Math.random()*3+1,
+    color: ['#ff6847','#0d4f4f','#f0c060','#f5f0e8','#1a6b6b'][Math.floor(Math.random()*5)],
+    tilt: Math.random()*10-10
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.ellipse(p.x, p.y, p.r, p.r/2, p.tilt, 0, Math.PI*2);
+      ctx.fill();
+      p.y += p.d;
+      p.tilt += .05;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random()*canvas.width; }
+    });
+    frame++;
+    if (frame < 300) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ══════════════════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════════════════
+document.getElementById('btn-start').onclick = () => showQuestion(0);
+document.getElementById('btn-next').onclick   = showLeaderboard;
+
+initSession();
+</script>
+</body>
+</html>
