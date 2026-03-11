@@ -1,1 +1,701 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quiz — La Guerre froide</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:   #0d4f4f;
+    --teal2:  #1a6b6b;
+    --coral:  #ff6847;
+    --coral2: #ff8c6e;
+    --cream:  #f5f0e8;
+    --dark:   #071a1a;
+    --mid:    #0d2f2f;
+    --gold:   #f0c060;
+    --A: #e74c3c; --B: #2980b9; --C: #27ae60; --D: #8e44ad;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--teal);
+    border-bottom: 3px solid var(--coral);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    color: var(--cream);
+  }
+  #score-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex: 1; padding: 24px 18px; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── JOIN ── */
+  #screen-join {
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    text-align: center;
+  }
+  #screen-join .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 4px;
+    color: var(--coral);
+    line-height: 1;
+  }
+  #screen-join .sub {
+    font-size: .9rem;
+    color: var(--teal2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  #name-input {
+    width: 100%;
+    max-width: 320px;
+    padding: 14px 18px;
+    font-size: 1.1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--mid);
+    border: 2px solid var(--teal2);
+    border-radius: 10px;
+    color: var(--cream);
+    outline: none;
+    text-align: center;
+    transition: border-color .2s;
+  }
+  #name-input:focus { border-color: var(--coral); }
+  #name-input::placeholder { color: #446060; }
+
+  #btn-join {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    background: var(--coral);
+    color: var(--dark);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  #btn-join:hover { background: var(--coral2); transform: translateY(-2px); }
+  #btn-join:active { transform: scale(.97); }
+
+  .error-msg {
+    color: var(--coral);
+    font-size: .85rem;
+    min-height: 20px;
+  }
+
+  /* ── WAITING ── */
+  #screen-waiting {
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+  }
+  .waiting-icon {
+    font-size: 3rem;
+    animation: spin 3s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #screen-waiting h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: var(--coral);
+  }
+  #screen-waiting p {
+    color: var(--teal2);
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  #waiting-name {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--gold);
+    font-size: 1rem;
+  }
+
+  /* ── QUESTION ── */
+  #screen-question { gap: 14px; }
+
+  .q-progress {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: .95rem;
+    letter-spacing: 2px;
+    color: var(--coral2);
+    text-align: center;
+  }
+
+  .timer-bar-wrap {
+    height: 6px;
+    background: var(--mid);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #timer-bar-e {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal2), var(--coral));
+    transition: width 1s linear;
+    border-radius: 3px;
+  }
+
+  #question-text-e {
+    background: var(--mid);
+    border-left: 4px solid var(--coral);
+    padding: 16px;
+    border-radius: 0 10px 10px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  .answers-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    justify-content: center;
+  }
+  .ans-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    transition: transform .1s, filter .2s;
+    background: var(--mid);
+    color: var(--cream);
+    text-align: left;
+  }
+  .ans-btn:active { transform: scale(.97); }
+  .ans-btn .letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+    line-height: 1;
+  }
+  .ans-btn[data-idx="0"] { border-color: var(--A); }
+  .ans-btn[data-idx="1"] { border-color: var(--B); }
+  .ans-btn[data-idx="2"] { border-color: var(--C); }
+  .ans-btn[data-idx="3"] { border-color: var(--D); }
+  .ans-btn[data-idx="0"] .letter { color: var(--A); }
+  .ans-btn[data-idx="1"] .letter { color: var(--B); }
+  .ans-btn[data-idx="2"] .letter { color: var(--C); }
+  .ans-btn[data-idx="3"] .letter { color: var(--D); }
+
+  .ans-btn.selected { opacity: .85; transform: scale(.97); }
+  .ans-btn.disabled { cursor: default; }
+  .ans-btn.correct { background: #0a2d12; border-color: var(--C) !important; animation: correctPop .5s ease; }
+  .ans-btn.wrong   { background: #2d0a0a; border-color: var(--A) !important; opacity: .6; }
+  @keyframes correctPop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── RESULT ── */
+  #screen-result {
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+  .result-icon { font-size: 4rem; animation: pop .4s ease; }
+  @keyframes pop {
+    0%   { transform: scale(0); opacity:0; }
+    70%  { transform: scale(1.2); }
+    100% { transform: scale(1); opacity:1; }
+  }
+  #result-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+  }
+  #result-label.correct { color: #27ae60; }
+  #result-label.wrong   { color: var(--A); }
+  #points-gained {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--gold);
+  }
+  #result-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .9rem;
+    color: var(--teal2);
+  }
+  .result-waiting {
+    font-size: .85rem;
+    color: var(--teal2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+  /* ── LEADERBOARD ── */
+  #screen-lb {
+    gap: 16px;
+  }
+  #screen-lb h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    color: var(--coral);
+    text-align: center;
+  }
+  .lb-e-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--mid);
+    border-radius: 8px;
+    border-left: 3px solid var(--teal2);
+  }
+  .lb-e-row.me { border-left-color: var(--gold); background: #1a2a10; }
+  .lb-e-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--gold); min-width: 28px; }
+  .lb-e-name { flex:1; font-weight: 600; font-size: .95rem; }
+  .lb-e-score { font-family: 'IBM Plex Mono', monospace; font-size: .95rem; color: var(--coral); }
+  .waiting-next {
+    text-align: center;
+    font-size: .82rem;
+    color: var(--teal2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: blink 1.2s infinite;
+  }
+
+  /* ── PODIUM ── */
+  #screen-podium {
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+  #screen-podium h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+  }
+  #podium-rank-display {
+    background: var(--mid);
+    border: 2px solid var(--coral);
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+  }
+  #podium-rank-display .rank-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  #podium-rank-display .rank-label {
+    color: var(--cream);
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  #podium-rank-display .final-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--coral);
+    margin-top: 8px;
+  }
+
+  .lb-e-row:nth-child(1) { border-left-color: #ffd700; }
+  .lb-e-row:nth-child(2) { border-left-color: #c0c0c0; }
+  .lb-e-row:nth-child(3) { border-left-color: #cd7f32; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Guerre froide</h1>
+  <div id="score-display">0 pts</div>
+</header>
+
+<!-- JOIN -->
+<div id="screen-join" class="screen active">
+  <div>
+    <div class="logo">QUIZ</div>
+    <div class="sub">La Guerre froide</div>
+  </div>
+  <input id="name-input" type="text" maxlength="20" placeholder="Ton prénom…" autocomplete="off" autocorrect="off" spellcheck="false">
+  <div class="error-msg" id="error-msg"></div>
+  <button id="btn-join">Rejoindre</button>
+</div>
+
+<!-- WAITING -->
+<div id="screen-waiting" class="screen">
+  <div class="waiting-icon">⏳</div>
+  <h2>En attente</h2>
+  <div id="waiting-name"></div>
+  <p>Le prof va bientôt lancer le quiz</p>
+</div>
+
+<!-- QUESTION -->
+<div id="screen-question" class="screen">
+  <div class="q-progress" id="q-progress-e">Question 1/10</div>
+  <div class="timer-bar-wrap"><div id="timer-bar-e" style="width:100%"></div></div>
+  <div id="question-text-e">—</div>
+  <div class="answers-stack" id="answers-stack">
+    <button class="ans-btn" data-idx="0"><span class="letter">A</span><span id="e-ans-0">—</span></button>
+    <button class="ans-btn" data-idx="1"><span class="letter">B</span><span id="e-ans-1">—</span></button>
+    <button class="ans-btn" data-idx="2"><span class="letter">C</span><span id="e-ans-2">—</span></button>
+    <button class="ans-btn" data-idx="3"><span class="letter">D</span><span id="e-ans-3">—</span></button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="result-icon" id="result-icon">—</div>
+  <div id="result-label" class="correct">—</div>
+  <div id="points-gained">—</div>
+  <div id="result-score">Score total : 0 pts</div>
+  <div class="result-waiting">En attente du classement…</div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="screen-lb" class="screen">
+  <h2>Classement</h2>
+  <div id="lb-e-list"></div>
+  <div class="waiting-next">En attente de la prochaine question…</div>
+</div>
+
+<!-- PODIUM -->
+<div id="screen-podium" class="screen">
+  <h2>🏆 Fin du quiz !</h2>
+  <div id="podium-rank-display">
+    <div class="rank-label">Ta position</div>
+    <div class="rank-num" id="my-rank">—</div>
+    <div class="rank-label">sur <span id="total-players">?</span> joueurs</div>
+    <div class="final-score" id="my-final-score">—</div>
+  </div>
+  <div id="lb-e-list-final" style="width:100%"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ══════════════════════════════════════════════════════
+const firebaseConfig = {
+  databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ══════════════════════════════════════════════════════
+//  QUESTIONS (needed for local display)
+// ══════════════════════════════════════════════════════
+const QUESTIONS = [
+  {
+    q: "Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe après la guerre ?",
+    answers: ["Ils s'opposent sur leurs systèmes politiques et économiques","Ils divergent sur le sort des criminels de guerre nazis","Ils ont des visions différentes sur la reconstruction du Japon","Ils refusent chacun de financer la reconstruction de l'Allemagne"],
+    correct: 0
+  },
+  {
+    q: "Quel concept décrit la politique américaine consistant à empêcher le communisme de s'étendre à de nouveaux pays ?",
+    answers: ["La satellisation","La déstalinisation","L'endiguement","La coexistence pacifique"],
+    correct: 2
+  },
+  {
+    q: "Quel est l'objectif principal du Plan Marshall ?",
+    answers: ["Créer une alliance militaire contre l'URSS","Reconstruire économiquement l'Europe pour freiner l'influence soviétique","Punir les pays ayant collaboré avec les nazis","Financer la reconstruction du Japon sous occupation américaine"],
+    correct: 1
+  },
+  {
+    q: "Quelle est la principale conséquence du maccarthysme dans la société américaine ?",
+    answers: ["Une ouverture vers le dialogue avec l'URSS","Une remise en question de la politique d'endiguement","Une psychose anticommuniste et une panique morale généralisée","Un renforcement des libertés civiles pour contrer la propagande soviétique"],
+    correct: 2
+  },
+  {
+    q: "Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?",
+    answers: ["Elle impose l'adhésion au Pacte de Varsovie par la force militaire directe","Elle installe les communistes aux postes clés du gouvernement (Intérieur, Justice, Armée…)","Elle organise des référendums pro-communistes dans chaque pays","Elle finance des partis travaillistes pour remplacer les gouvernements en place"],
+    correct: 1
+  },
+  {
+    q: "Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?",
+    answers: ["Il a conduit l'URSS à la défaite dans la course à l'espace","Il a perdu le soutien de l'armée après la crise de Cuba","La nomenclatura craint de perdre ses privilèges avec la déstalinisation","Il a voulu rapprocher l'URSS des États-Unis trop rapidement"],
+    correct: 2
+  },
+  {
+    q: "Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?",
+    answers: ["Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire","Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique","Elle soutient secrètement les révolutionnaires cubains contre Moscou","Elle accepte l'aide économique américaine tout en restant officiellement neutre"],
+    correct: 1
+  },
+  {
+    q: "Quelle est la principale cause de la crise des missiles de Cuba ?",
+    answers: ["L'URSS réagit à l'installation de missiles américains en Turquie","Cuba cherche à envahir la Floride avec le soutien soviétique","Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS","Kennedy ordonne un blocus naval de Cuba sans provocation préalable"],
+    correct: 2
+  },
+  {
+    q: "Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?",
+    answers: ["Les États-Unis, grâce à leur supériorité technologique d'après-guerre","L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite","Les deux puissances progressent exactement au même rythme","L'URSS, uniquement grâce à l'espionnage des laboratoires américains"],
+    correct: 1
+  },
+  {
+    q: "Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?",
+    answers: ["La concurrence des industries japonaise et allemande sur les marchés mondiaux","L'échec du modèle keynésien face à la montée des inégalités sociales","Le choc pétrolier, entraînant inflation, crédit généralisé et abandon du dollar-étalon","La fin de la course aux armements qui réduit les investissements technologiques"],
+    correct: 2
+  }
+];
+
+const TIME_PER_Q = 20;
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let sessionId = new URLSearchParams(location.search).get('session');
+let myId = null, myName = '', myScore = 0;
+let currentQ = -1, answered = false, timerInterval;
+
+// ══════════════════════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+}
+
+function updateScoreDisplay() {
+  document.getElementById('score-display').textContent = `${myScore} pts`;
+}
+
+// ══════════════════════════════════════════════════════
+//  JOIN
+// ══════════════════════════════════════════════════════
+document.getElementById('btn-join').onclick = () => {
+  const name = document.getElementById('name-input').value.trim();
+  const err  = document.getElementById('error-msg');
+  if (!name) { err.textContent = 'Entre ton prénom pour continuer.'; return; }
+  if (!sessionId) { err.textContent = 'Lien de session invalide.'; return; }
+  err.textContent = '';
+  myName = name;
+
+  const playerRef = db.ref(`sessions/${sessionId}/players`).push();
+  myId = playerRef.key;
+  playerRef.set({ name });
+  db.ref(`sessions/${sessionId}/players/${myId}`).onDisconnect().remove();
+
+  document.getElementById('waiting-name').textContent = name;
+  showScreen('waiting');
+  listenSession();
+};
+
+document.getElementById('name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-join').click();
+});
+
+// ══════════════════════════════════════════════════════
+//  LISTEN SESSION
+// ══════════════════════════════════════════════════════
+function listenSession() {
+  db.ref(`sessions/${sessionId}`).on('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+
+    if (data.state === 'lobby') {
+      showScreen('waiting');
+    }
+    else if (data.state === 'question') {
+      const q = data.currentQuestion;
+      if (q !== currentQ) {
+        currentQ = q;
+        answered = false;
+        loadQuestion(q);
+      }
+    }
+    else if (data.state === 'reveal') {
+      if (!answered) {
+        // Didn't answer — show wrong
+        showResult(false, -1, 0);
+      }
+      revealAllButtons(QUESTIONS[currentQ].correct);
+    }
+    else if (data.state === 'leaderboard') {
+      const scores = data.scores || {};
+      myScore = scores[myId] || 0;
+      updateScoreDisplay();
+      showLeaderboard(scores);
+    }
+    else if (data.state === 'podium') {
+      const scores = data.scores || {};
+      myScore = scores[myId] || 0;
+      updateScoreDisplay();
+      showPodium(scores);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  QUESTION
+// ══════════════════════════════════════════════════════
+function loadQuestion(idx) {
+  clearInterval(timerInterval);
+  const q = QUESTIONS[idx];
+  document.getElementById('q-progress-e').textContent = `Question ${idx+1}/10`;
+  document.getElementById('question-text-e').textContent = q.q;
+  for (let i=0; i<4; i++) {
+    document.getElementById(`e-ans-${i}`).textContent = q.answers[i];
+  }
+
+  // Reset buttons
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    b.classList.remove('selected','disabled','correct','wrong');
+    b.disabled = false;
+    b.onclick = () => submitAnswer(parseInt(b.dataset.idx));
+  });
+
+  // Timer
+  let t = TIME_PER_Q;
+  const bar = document.getElementById('timer-bar-e');
+  bar.style.width = '100%';
+  timerInterval = setInterval(() => {
+    t--;
+    bar.style.width = `${(t/TIME_PER_Q)*100}%`;
+    if (t <= 0) clearInterval(timerInterval);
+  }, 1000);
+
+  showScreen('question');
+}
+
+function submitAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const correct = QUESTIONS[currentQ].correct;
+  clearInterval(timerInterval);
+
+  // Disable all
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    b.disabled = true;
+    b.classList.add('disabled');
+  });
+  document.querySelectorAll('.ans-btn')[idx].classList.add('selected');
+
+  // Save to Firebase
+  db.ref(`sessions/${sessionId}/answers/${myId}`).set(idx);
+
+  // Compute score optimistically
+  const isCorrect = idx === correct;
+  const bar = document.getElementById('timer-bar-e');
+  const pct = parseFloat(bar.style.width) / 100;
+  const pts = isCorrect ? Math.round(pct * 500) + 500 : 0;
+
+  showResult(isCorrect, idx, pts);
+}
+
+function showResult(isCorrect, chosenIdx, pts) {
+  document.getElementById('result-icon').textContent = isCorrect ? '✅' : '❌';
+  const label = document.getElementById('result-label');
+  label.textContent = isCorrect ? 'BONNE RÉPONSE !' : 'MAUVAISE RÉPONSE';
+  label.className = isCorrect ? 'correct' : 'wrong';
+  document.getElementById('points-gained').textContent = isCorrect ? `+${pts} points` : '+0 points';
+  document.getElementById('result-score').textContent = `Score total : ${(myScore + pts)} pts`;
+  showScreen('result');
+}
+
+function revealAllButtons(correct) {
+  if (document.getElementById('screen-question').classList.contains('active')) {
+    document.querySelectorAll('.ans-btn').forEach((b, i) => {
+      b.classList.remove('selected');
+      if (i === correct) b.classList.add('correct');
+      else b.classList.add('wrong');
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  LEADERBOARD
+// ══════════════════════════════════════════════════════
+function showLeaderboard(scores) {
+  const players = {};
+  db.ref(`sessions/${sessionId}/players`).once('value', snap => {
+    const p = snap.val() || {};
+    Object.assign(players, p);
+    const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+    const list = document.getElementById('lb-e-list');
+    list.innerHTML = '';
+    sorted.slice(0,8).forEach(([pid, score], i) => {
+      const name = p[pid]?.name || pid;
+      const row = document.createElement('div');
+      row.className = `lb-e-row${pid===myId?' me':''}`;
+      row.innerHTML = `<span class="lb-e-rank">${i+1}</span><span class="lb-e-name">${name}${pid===myId?' 👈':''}</span><span class="lb-e-score">${score} pts</span>`;
+      list.appendChild(row);
+    });
+  });
+  showScreen('lb');
+}
+
+// ══════════════════════════════════════════════════════
+//  PODIUM
+// ══════════════════════════════════════════════════════
+function showPodium(scores) {
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const myRank = sorted.findIndex(([pid]) => pid === myId) + 1;
+  document.getElementById('my-rank').textContent = myRank;
+  document.getElementById('total-players').textContent = sorted.length;
+  document.getElementById('my-final-score').textContent = `${myScore} points`;
+
+  db.ref(`sessions/${sessionId}/players`).once('value', snap => {
+    const p = snap.val() || {};
+    const list = document.getElementById('lb-e-list-final');
+    list.innerHTML = '';
+    sorted.slice(0,8).forEach(([pid, score], i) => {
+      const name = p[pid]?.name || pid;
+      const row = document.createElement('div');
+      row.className = `lb-e-row${pid===myId?' me':''}`;
+      row.innerHTML = `<span class="lb-e-rank">${i+1}</span><span class="lb-e-name">${name}${pid===myId?' 👈':''}</span><span class="lb-e-score">${score} pts</span>`;
+      list.appendChild(row);
+    });
+  });
+  showScreen('podium');
+}
+
+// If URL has no session param, show error
+if (!sessionId) {
+  document.getElementById('error-msg').textContent = 'Paramètre de session manquant dans l\'URL.';
+}
+</script>
+</body>
+</html>
