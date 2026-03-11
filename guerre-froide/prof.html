@@ -3,397 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Guerre froide — Vue Professeur</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<title>Quiz Guerre froide — Vue Professeur</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+
   :root {
-    --accent:  #1a6b6b;
-    --accent2: #0d4f4f;
-    --coral:   #ff6847;
-    --dark:    #0d0d0d;
-    --mid:     #1a1a1a;
-    --card:    #1e1e1e;
-    --border:  #2e2e2e;
-    --text:    #f0ece4;
-    --muted:   #777;
-    --gold:    #f39c12;
-    --A: #c0392b; --B: #2471a3; --C: #1e8449; --D: #7d3c98;
+    --teal:    #1a8a6b;
+    --teal-lo: #0d4f3e;
+    --coral:   #c85520;
+    --coral-hi:#e87040;
+    --dark:    #07100e;
+    --mid:     #0e201a;
+    --card:    #141f1c;
+    --card2:   #1a2d28;
+    --border:  #243d34;
+    --border2: #2e4d44;
+    --text:    #d8efea;
+    --muted:   #5e9988;
+    --green:   #1e8a50;
+    --danger:  #c03828;
   }
+
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Barlow',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; }
 
-  header {
-    padding:20px 32px;
-    background:var(--mid);
-    border-bottom:3px solid var(--accent);
-    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
-  .header-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; line-height:1; }
-  .header-title span { color:var(--coral); }
-  .header-sub { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
-  .session-pill { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:4px; background:var(--accent2); color:var(--text); padding:6px 20px; border-radius:4px; border:1px solid var(--accent); }
 
-  .screen { display:none; }
-  .screen.active { display:block; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,138,107,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,138,107,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
 
-  /* LOBBY */
-  #screen-lobby { padding:32px; }
-  #screen-lobby.active { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:900px; margin:0 auto; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 24px; background: var(--mid);
+    border-bottom: 2px solid var(--teal);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 24px rgba(26,138,107,0.12);
+  }
+  .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px; }
+  .topbar-title span { color: var(--teal); }
+  .topbar-title .tag { font-size:0.95rem; letter-spacing:2px; color:var(--muted); margin-left:10px; vertical-align:middle; }
+  .topbar-right { display:flex; gap:12px; align-items:center; }
+  .badge { background:var(--card); border:1px solid var(--border2); padding:6px 14px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:1px; }
+  .badge strong { color:var(--coral-hi); }
+  .btn-home { font-family:'Barlow Condensed',sans-serif; font-size:0.9rem; color:var(--muted); text-decoration:none; padding:6px 12px; border:1px solid var(--border); border-radius:4px; transition:color 0.2s,border-color 0.2s; }
+  .btn-home:hover { color:var(--text); border-color:var(--border2); }
 
-  .panel { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:24px; }
-  .panel-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--accent); margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border); }
-  .url-box { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; color:var(--muted); background:var(--mid); padding:8px 12px; border-radius:4px; margin-bottom:16px; word-break:break-all; }
-  #qrcode { display:inline-block; background:white; padding:10px; border-radius:4px; }
+  .main { display:grid; grid-template-columns:1fr 320px; min-height:calc(100vh - 62px); position:relative; z-index:1; }
+  .left-panel { padding:28px; border-right:1px solid var(--border); }
+  .right-panel { background:var(--mid); padding:20px; display:flex; flex-direction:column; gap:16px; }
 
-  #player-count { font-family:'Bebas Neue',sans-serif; font-size:4rem; line-height:1; color:var(--gold); }
-  #player-count-label { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; }
-  #player-list { display:flex; flex-wrap:wrap; gap:6px; max-height:200px; overflow-y:auto; }
-  .player-chip { background:var(--mid); border:1px solid var(--accent); color:var(--text); padding:4px 12px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:1px; animation:chipIn .25s ease; }
-  @keyframes chipIn { from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);} }
+  #lobby { display:flex; flex-direction:column; align-items:center; gap:24px; padding:20px 0; }
+  .lobby-title { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:4px; text-align:center; line-height:1.15; }
+  .lobby-title .t1 { color:var(--teal); display:block; }
+  .lobby-title .t2 { color:var(--text); display:block; }
+  .lobby-title .t3 { color:var(--muted); display:block; font-size:1.4rem; letter-spacing:5px; margin-top:4px; }
+  .qr-wrapper { background:white; padding:16px; border-radius:6px; box-shadow:0 0 40px rgba(26,138,107,0.3); border:2px solid var(--teal-lo); }
+  .join-url { background:var(--card); border:1px solid var(--border2); padding:10px 20px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:0.95rem; color:var(--coral-hi); text-align:center; word-break:break-all; max-width:420px; }
 
-  #btn-start { margin-top:20px; width:100%; padding:14px; background:var(--coral); color:white; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
-  #btn-start:hover:not(:disabled) { filter:brightness(1.15); }
-  #btn-start:disabled { opacity:.35; cursor:not-allowed; }
-
-  /* QUESTION */
-  #screen-question { padding:28px 32px; max-width:1100px; margin:0 auto; }
-  .q-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .q-label { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
-  #timer-num { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; line-height:1; color:var(--gold); min-width:56px; text-align:right; transition:color .3s; }
-  #timer-num.urgent { color:var(--coral); animation:pulse .5s infinite alternate; }
-  @keyframes pulse { to{transform:scale(1.1);} }
-  .timer-track { height:6px; background:var(--border); border-radius:3px; margin-bottom:20px; overflow:hidden; }
-  #timer-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--coral)); transition:width 1s linear; border-radius:3px; }
-
-  #q-text { font-size:1.45rem; font-weight:700; line-height:1.4; padding:20px 22px; background:var(--card); border-left:4px solid var(--coral); border-radius:0 6px 6px 0; margin-bottom:20px; }
-
-  .answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
-  .ans-box { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:14px 16px; display:flex; align-items:center; gap:12px; position:relative; overflow:hidden; }
-  .ans-box.A { border-left:4px solid var(--A); }
-  .ans-box.B { border-left:4px solid var(--B); }
-  .ans-box.C { border-left:4px solid var(--C); }
-  .ans-box.D { border-left:4px solid var(--D); }
-  .ans-letter { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; flex-shrink:0; width:28px; text-align:center; }
-  .ans-box.A .ans-letter { color:var(--A); }
-  .ans-box.B .ans-letter { color:var(--B); }
-  .ans-box.C .ans-letter { color:var(--C); }
-  .ans-box.D .ans-letter { color:var(--D); }
-  .ans-text { flex:1; font-size:.95rem; font-weight:600; position:relative; }
-  .ans-count { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--muted); position:relative; min-width:28px; text-align:right; }
-  .ans-fill { position:absolute; left:0; top:0; height:100%; opacity:.12; transition:width .5s ease; border-radius:4px; }
-  .ans-box.A .ans-fill { background:var(--A); }
-  .ans-box.B .ans-fill { background:var(--B); }
-  .ans-box.C .ans-fill { background:var(--C); }
-  .ans-box.D .ans-fill { background:var(--D); }
-  .ans-box.correct { border-color:#1e8449 !important; box-shadow:0 0 14px rgba(30,132,73,.4); }
-
-  .resp-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  #resp-count { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:1px; color:var(--muted); }
-  #btn-next { display:none; padding:10px 28px; background:var(--accent); color:var(--text); border:1px solid var(--coral); border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
-  #btn-next:hover { filter:brightness(1.2); }
-
-  /* LEADERBOARD */
-  #screen-leaderboard { padding:32px; max-width:680px; margin:0 auto; }
-  #screen-leaderboard h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:4px; color:var(--accent); margin-bottom:20px; }
-  .lb-row { display:flex; align-items:center; gap:14px; padding:11px 16px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--border); border-radius:5px; margin-bottom:7px; animation:slideIn .3s ease; }
-  .lb-row:nth-child(1){border-left-color:#f1c40f;}
-  .lb-row:nth-child(2){border-left-color:#bdc3c7;}
-  .lb-row:nth-child(3){border-left-color:#ca6f1e;}
-  @keyframes slideIn{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:none;}}
-  .lb-rank { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--gold); min-width:28px; }
-  .lb-name { flex:1; font-weight:600; }
-  .lb-score { font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; color:var(--coral); letter-spacing:1px; }
-  .lb-delta { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; color:var(--muted); min-width:48px; text-align:right; }
-  .lb-delta.pos { color:#1e8449; }
-
-  #btn-continue { display:block; margin:20px auto 0; padding:12px 40px; background:var(--coral); color:white; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
-  #btn-continue:hover { filter:brightness(1.15); }
-
-  /* PODIUM */
-  #screen-podium { padding:32px; max-width:700px; margin:0 auto; text-align:center; }
-  #screen-podium h2 { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:5px; color:var(--gold); margin-bottom:32px; }
-  .podium-wrap { display:flex; align-items:flex-end; justify-content:center; gap:6px; margin-bottom:28px; }
-  .podium-col { width:180px; display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .podium-medal { font-size:2.2rem; }
-  .podium-name { font-weight:700; font-size:1rem; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .podium-pts { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; color:var(--gold); letter-spacing:1px; }
-  .podium-block { width:100%; background:var(--card); border:1px solid var(--border); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; }
-  .podium-col:nth-child(1) .podium-block { height:72px; border-top-color:#bdc3c7; }
-  .podium-col:nth-child(2) .podium-block { height:120px; border-top-color:#f1c40f; }
-  .podium-col:nth-child(3) .podium-block { height:50px; border-top-color:#ca6f1e; }
-  .podium-pos { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--muted); }
-
-  canvas#confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
+  #question-view { display:none; }
+  .q-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .q-number { font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:2px; color:var(--muted); }
+  .phase-label { font-family:'Barlow Condensed',sans-serif; font-size:0.85rem; color:var(--teal); text-transform:uppercase; letter-spacing:2px; }
+  .q-timer { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--coral-hi); width:80px; height:80px; background:var(--card); border:3px solid var(--coral); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:color 0.3s,border-color 0.3s; box-shadow:0 0 20px rgba(200,85,32,0.15); }
+  .q-timer.urgent { color:var(--danger); border-color:var(--danger); box-shadow:0 0 20px rgba(192,56,40,0.3); animation:pulse 0.5s infinite alternate; }
+  @keyframes pulse { from{transform:scale(1);}to{transform:scale(1.08);} }
+  .progress-outer { width:100%; height:5px; background:var(--border); border-radius:3px; margin-bottom:14px; overflow:hidden; }
+  .progress-inner { height:100%; background:linear-gradient(90deg,var(--teal-lo),var(--teal)); border-radius:3px; transition:width 0.4s; box-shadow:0 0 8px var(--teal); }
+  .q-text { font-family:'Barlow Condensed',sans-serif; font-size:1.95rem; font-weight:700; line-height:1.2; margin-bottom:22px; background:var(--card2); border-left:5px solid var(--teal); padding:16px 20px; border-radius:0 8px 8px 0; box-shadow:inset 0 0 30px rgba(26,138,107,0.05); }
+  .answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .answer-btn { padding:14px 16px; border-radius:6px; border:none; font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:700; color:white; text-align:left; display:flex; align-items:center; gap:10px; transition:all 0.4s; }
+  .answer-btn.A { background:#2563a8; }
+  .answer-btn.B { background:#1a7a5e; }
+  .answer-btn.C { background:#7a3a14; }
+  .answer-btn.D { background:#5a2a8a; }
+  .answer-btn .letter { min-width:30px; height:30px; background:rgba(0,0,0,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; }
+  .answer-btn.correct-reveal { box-shadow:0 0 0 3px #2ecc71,0 0 30px rgba(46,204,113,0.5); transform:scale(1.03); }
+  .answer-btn.wrong-reveal { opacity:0.3; filter:grayscale(0.7); }
+  .answered-count { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); text-align:center; margin-top:6px; letter-spacing:1px; }
+  #charts-section { display:none; margin-top:14px; }
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .bar-lbl { font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; width:22px; color:white; }
+  .bar-outer { flex:1; height:28px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .bar-inner { height:100%; transition:width 0.5s; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:0.8rem; font-weight:700; color:white; min-width:36px; }
+  .bar-inner.A{background:#2563a8;}.bar-inner.B{background:#1a7a5e;}.bar-inner.C{background:#7a3a14;}.bar-inner.D{background:#5a2a8a;}
+  .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { padding:11px 20px; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.05rem; font-weight:700; letter-spacing:1px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+  .btn:hover { transform:translateY(-2px); filter:brightness(1.12); }
+  .btn:active { transform:translateY(0); }
+  .btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+  .btn-primary { background:var(--teal); color:white; }
+  .btn-coral   { background:var(--coral); color:white; }
+  .btn-green   { background:var(--green); color:white; }
+  .btn-muted   { background:var(--border2); color:var(--text); }
+  .start-big { padding:18px 48px; font-size:1.5rem; border-radius:6px; box-shadow:0 0 30px rgba(26,138,107,0.4); }
+  .panel-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--muted); border-bottom:1px solid var(--border); padding-bottom:8px; }
+  .leaderboard { display:flex; flex-direction:column; gap:6px; }
+  .lb-entry { display:flex; align-items:center; gap:10px; background:var(--card); padding:8px 12px; border-radius:4px; border-left:3px solid transparent; animation:slideIn 0.3s ease; }
+  @keyframes slideIn { from{transform:translateX(16px);opacity:0;}to{transform:translateX(0);opacity:1;} }
+  .lb-entry.rank-1 { border-left-color:gold; background:linear-gradient(90deg,rgba(255,215,0,0.08),var(--card)); }
+  .lb-entry.rank-2 { border-left-color:silver; }
+  .lb-entry.rank-3 { border-left-color:#cd7f32; }
+  .lb-rank { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; width:24px; text-align:center; color:var(--muted); }
+  .lb-name { flex:1; font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-score { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.1rem; color:var(--coral-hi); }
+  .players-list { display:flex; flex-direction:column; gap:4px; max-height:500px; overflow-y:auto; }
+  .player-chip { background:var(--card); border:1px solid var(--border); padding:6px 12px; border-radius:4px; font-size:0.9rem; animation:slideIn 0.3s ease; }
+  #podium-view { display:none; text-align:center; padding:20px 0; }
+  .podium-title { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:5px; color:var(--coral-hi); margin-bottom:32px; text-shadow:0 0 40px rgba(200,85,32,0.4); }
+  .podium-wrap { display:flex; justify-content:center; align-items:flex-end; gap:16px; margin-bottom:40px; }
+  .podium-block { display:flex; flex-direction:column; align-items:center; gap:8px; width:180px; }
+  .podium-emoji { font-size:3rem; }
+  .podium-name { font-family:'Barlow Condensed',sans-serif; font-size:1.3rem; font-weight:700; }
+  .podium-pts  { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); }
+  .podium-bar  { width:100%; border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:#000; }
+  .podium-bar.p1{height:160px;background:linear-gradient(180deg,#ffd700,#c8a000);}
+  .podium-bar.p2{height:120px;background:linear-gradient(180deg,#c0c0c0,#909090);}
+  .podium-bar.p3{height:90px; background:linear-gradient(180deg,#cd7f32,#9a5c20);}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
-
-<header>
-  <div>
-    <div class="header-title">LA GUERRE <span>FROIDE</span></div>
-    <div class="header-sub">Vue Professeur · 10 questions · 20 sec</div>
+<div class="topbar">
+  <div class="topbar-title">
+    QUIZ <span>GUERRE FROIDE</span>
+    <span class="tag">— PROF</span>
   </div>
-  <div class="session-pill" id="session-pill">——</div>
-</header>
-
-<canvas id="confetti"></canvas>
-
-<!-- LOBBY -->
-<div id="screen-lobby" class="screen">
-  <div class="panel" style="text-align:center;">
-    <div class="panel-title">REJOINDRE LE QUIZ</div>
-    <div class="url-box" id="eleve-url">—</div>
-    <div id="qrcode"></div>
-  </div>
-  <div class="panel">
-    <div class="panel-title">JOUEURS CONNECTÉS</div>
-    <div id="player-count">0</div>
-    <div id="player-count-label">joueur(s) en attente</div>
-    <div id="player-list"></div>
-    <button id="btn-start" disabled>▶ LANCER LE QUIZ</button>
+  <div class="topbar-right">
+    <a class="btn-home" href="../index.html">← Tous les quiz</a>
+    <div class="badge">Joueurs : <strong id="player-count">0</strong></div>
+    <div class="badge" id="q-badge" style="display:none">Q <strong id="q-num-badge">0</strong>/10</div>
   </div>
 </div>
 
-<!-- QUESTION -->
-<div id="screen-question" class="screen">
-  <div class="q-topbar">
-    <span class="q-label" id="q-label">Question 1 / 10</span>
-    <div id="timer-num">20</div>
-  </div>
-  <div class="timer-track"><div id="timer-fill" style="width:100%"></div></div>
-  <div id="q-text">—</div>
-  <div class="answers-grid">
-    <div class="ans-box A" id="box-A"><div class="ans-fill" id="fill-A" style="width:0"></div><span class="ans-letter">A</span><span class="ans-text" id="txt-A">—</span><span class="ans-count" id="cnt-A">0</span></div>
-    <div class="ans-box B" id="box-B"><div class="ans-fill" id="fill-B" style="width:0"></div><span class="ans-letter">B</span><span class="ans-text" id="txt-B">—</span><span class="ans-count" id="cnt-B">0</span></div>
-    <div class="ans-box C" id="box-C"><div class="ans-fill" id="fill-C" style="width:0"></div><span class="ans-letter">C</span><span class="ans-text" id="txt-C">—</span><span class="ans-count" id="cnt-C">0</span></div>
-    <div class="ans-box D" id="box-D"><div class="ans-fill" id="fill-D" style="width:0"></div><span class="ans-letter">D</span><span class="ans-text" id="txt-D">—</span><span class="ans-count" id="cnt-D">0</span></div>
-  </div>
-  <div class="resp-row">
-    <span id="resp-count">0 réponse(s)</span>
-    <button id="btn-next">Classement →</button>
-  </div>
-</div>
+<div class="main">
+  <div class="left-panel">
+    <div id="lobby">
+      <div class="lobby-title">
+        <span class="t1">GUERRE FROIDE</span>
+        <span class="t2">REJOIGNEZ LE QUIZ</span>
+        <span class="t3">CAUSES · BLOCS · CRISES</span>
+      </div>
+      <div class="join-url" id="join-url-text"></div>
+      <div class="qr-wrapper"><div id="qrcode"></div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);">
+        Joueurs connectés : <strong id="lobby-count" style="color:var(--text);font-size:1.3rem;">0</strong>
+      </div>
+      <button class="btn btn-primary start-big" onclick="startQuiz()">▶ LANCER LE QUIZ</button>
+      <button class="btn btn-muted" onclick="resetAll()" style="font-size:0.9rem;margin-top:4px;">🗑 Réinitialiser</button>
+    </div>
 
-<!-- LEADERBOARD -->
-<div id="screen-leaderboard" class="screen">
-  <h2>CLASSEMENT</h2>
-  <div id="lb-list"></div>
-  <button id="btn-continue">—</button>
-</div>
+    <div id="question-view">
+      <div class="q-header">
+        <div>
+          <div class="phase-label" id="phase-label">EN ATTENTE</div>
+          <div class="q-number" id="q-number-display">QUESTION 1 / 10</div>
+        </div>
+        <div class="q-timer" id="timer-display">20</div>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progress-bar" style="width:0%"></div></div>
+      <div class="q-text" id="q-text-display">…</div>
+      <div class="answers-grid" id="answers-grid"></div>
+      <div class="answered-count" id="answered-count">0 réponse reçue</div>
+      <div id="charts-section"><div id="charts-bars"></div></div>
+      <div class="btn-row">
+        <button class="btn btn-muted"   id="btn-stop"    onclick="stopTimer()">⏹ Stop</button>
+        <button class="btn btn-coral"   id="btn-results" onclick="showResults()"  disabled>📊 Résultats</button>
+        <button class="btn btn-green"   id="btn-reveal"  onclick="revealAnswer()" disabled>✅ Révéler</button>
+        <button class="btn btn-primary" id="btn-next"    onclick="nextQuestion()" disabled>➡ Suivante</button>
+      </div>
+    </div>
 
-<!-- PODIUM -->
-<div id="screen-podium" class="screen">
-  <h2>🏆 PODIUM FINAL</h2>
-  <div class="podium-wrap" id="podium-wrap"></div>
-  <div id="lb-final"></div>
+    <div id="podium-view">
+      <div class="podium-title">🏆 RÉSULTATS FINAUX</div>
+      <div class="podium-wrap" id="podium-wrap"></div>
+      <button class="btn btn-primary start-big" onclick="resetAll()">🔄 Nouveau Quiz</button>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="panel-title" id="right-panel-title">JOUEURS CONNECTÉS</div>
+    <div id="players-list-wrap" class="players-list"></div>
+    <div id="leaderboard-wrap" class="leaderboard" style="display:none;"></div>
+  </div>
 </div>
 
 <script>
-const firebaseConfig = { databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/" };
+const ELEVE_URL = window.location.href.replace('prof.html','eleve.html');
+
+const firebaseConfig = { databaseURL:"https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+const TOTAL_QUESTIONS = 10;
+
 const QUESTIONS = [
-  { q:"Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe ?", answers:["Ils s'opposent sur leurs systèmes politiques et économiques","Ils divergent sur le sort des criminels de guerre nazis","Ils ont des visions différentes sur la reconstruction du Japon","Ils refusent chacun de financer la reconstruction de l'Allemagne"], correct:0 },
-  { q:"Quel concept décrit la politique américaine visant à empêcher le communisme de s'étendre à de nouveaux pays ?", answers:["La satellisation","La déstalinisation","L'endiguement","La coexistence pacifique"], correct:2 },
-  { q:"Quel est l'objectif principal du Plan Marshall ?", answers:["Créer une alliance militaire contre l'URSS","Reconstruire économiquement l'Europe pour freiner l'influence soviétique","Punir les pays ayant collaboré avec les nazis","Financer la reconstruction du Japon sous occupation américaine"], correct:1 },
-  { q:"Quelle est la principale conséquence du maccarthysme dans la société américaine ?", answers:["Une ouverture vers le dialogue avec l'URSS","Une remise en question de la politique d'endiguement","Une psychose anticommuniste et une panique morale généralisée","Un renforcement des libertés civiles pour contrer la propagande soviétique"], correct:2 },
-  { q:"Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?", answers:["Elle impose l'adhésion au Pacte de Varsovie par la force directe","Elle installe les communistes aux postes clés : Intérieur, Justice, Armée…","Elle organise des référendums sous contrôle dans chaque pays","Elle finance des partis travaillistes pour remplacer les gouvernements"], correct:1 },
-  { q:"Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?", answers:["Il a conduit l'URSS à la défaite dans la course à l'espace","Il a perdu le soutien de l'armée après la crise de Cuba","La nomenclatura craint de perdre ses privilèges avec la déstalinisation","Il a voulu rapprocher l'URSS des États-Unis trop rapidement"], correct:2 },
-  { q:"Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?", answers:["Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire","Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique","Elle soutient secrètement les révolutionnaires cubains contre Moscou","Elle accepte l'aide économique américaine tout en restant officiellement neutre"], correct:1 },
-  { q:"Quelle est la principale cause de la crise des missiles de Cuba ?", answers:["L'URSS réagit à l'installation de missiles américains en Turquie","Cuba cherche à envahir la Floride avec le soutien soviétique","Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS","Kennedy ordonne un blocus naval sans provocation préalable"], correct:2 },
-  { q:"Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?", answers:["Les États-Unis, grâce à leur supériorité technologique d'après-guerre","L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite","Les deux puissances progressent exactement au même rythme","L'URSS, uniquement grâce à l'espionnage des laboratoires américains"], correct:1 },
-  { q:"Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?", answers:["La concurrence des industries japonaise et allemande sur les marchés mondiaux","L'échec du modèle keynésien face à la montée des inégalités sociales","Le choc pétrolier : inflation, crédit généralisé et abandon du dollar-étalon","La fin de la course aux armements qui réduit les investissements technologiques"], correct:2 }
+  { q:"Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe ?",
+    opts:["Ils s'opposent sur leurs systèmes politiques et économiques","Ils divergent sur le sort des criminels de guerre nazis","Ils ont des visions différentes sur la reconstruction du Japon","Ils refusent de financer la reconstruction de l'Allemagne"],
+    correct:0 },
+  { q:"Quel concept décrit la politique américaine visant à empêcher le communisme de s'étendre à de nouveaux pays ?",
+    opts:["La satellisation","La déstalinisation","L'endiguement","La coexistence pacifique"],
+    correct:2 },
+  { q:"Quel est l'objectif principal du Plan Marshall ?",
+    opts:["Créer une alliance militaire contre l'URSS","Reconstruire économiquement l'Europe pour freiner l'influence soviétique","Punir les pays ayant collaboré avec les nazis","Financer la reconstruction du Japon sous occupation américaine"],
+    correct:1 },
+  { q:"Quelle est la principale conséquence du maccarthysme dans la société américaine ?",
+    opts:["Une ouverture vers le dialogue avec l'URSS","Une remise en question de la politique d'endiguement","Une psychose anticommuniste et une panique morale généralisée","Un renforcement des libertés civiles contre la propagande soviétique"],
+    correct:2 },
+  { q:"Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?",
+    opts:["Elle impose l'adhésion au Pacte de Varsovie par la force directe","Elle installe les communistes aux postes clés : Intérieur, Justice, Armée…","Elle organise des référendums sous contrôle dans chaque pays","Elle finance des partis travaillistes pour remplacer les gouvernements"],
+    correct:1 },
+  { q:"Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?",
+    opts:["Il a conduit l'URSS à la défaite dans la course à l'espace","Il a perdu le soutien de l'armée après la crise de Cuba","La nomenclatura craint de perdre ses privilèges avec la déstalinisation","Il a voulu rapprocher l'URSS des États-Unis trop rapidement"],
+    correct:2 },
+  { q:"Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?",
+    opts:["Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire","Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique","Elle soutient secrètement les révolutionnaires cubains contre Moscou","Elle accepte l'aide économique américaine tout en restant officiellement neutre"],
+    correct:1 },
+  { q:"Quelle est la principale cause de la crise des missiles de Cuba ?",
+    opts:["L'URSS réagit à l'installation de missiles américains en Turquie","Cuba cherche à envahir la Floride avec le soutien soviétique","Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS","Kennedy ordonne un blocus naval sans provocation préalable"],
+    correct:2 },
+  { q:"Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?",
+    opts:["Les États-Unis, grâce à leur supériorité technologique d'après-guerre","L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite","Les deux puissances progressent exactement au même rythme","L'URSS, uniquement grâce à l'espionnage des laboratoires américains"],
+    correct:1 },
+  { q:"Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?",
+    opts:["La concurrence des industries japonaise et allemande sur les marchés mondiaux","L'échec du modèle keynésien face à la montée des inégalités sociales","Le choc pétrolier : inflation, crédit généralisé et abandon du dollar-étalon","La fin de la course aux armements qui réduit les investissements technologiques"],
+    correct:2 }
 ];
 
-const TIME = 20;
-let sessionId, timerInterval, timeLeft = TIME;
-let currentQ = 0, scores = {}, prevScores = {}, players = {}, answersListener = null;
+const LETTERS=['A','B','C','D'];
+let currentQ=-1,timerInterval=null,timeLeft=20,phase='lobby',totalPlayers=0,answersData={};
+let shuffledQuestions=[];
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-}
-
-function init() {
-  sessionId = Math.random().toString(36).substr(2,6).toUpperCase();
-  document.getElementById('session-pill').textContent = sessionId;
-
-  const url = location.href.replace('prof.html','eleve.html') + '?session=' + sessionId;
-  document.getElementById('eleve-url').textContent = url;
-  new QRCode(document.getElementById('qrcode'), { text:url, width:180, height:180, colorDark:'#0d4f4f', colorLight:'#ffffff' });
-
-  db.ref('sessions/' + sessionId).set({ state:'lobby', currentQuestion:-1 });
-
-  db.ref('sessions/' + sessionId + '/players').on('value', snap => {
-    players = snap.val() || {};
-    Object.keys(players).forEach(id => { if (scores[id] === undefined) scores[id] = 0; });
-    const names = Object.values(players).map(p => p.name);
-    document.getElementById('player-count').textContent = names.length;
-    const list = document.getElementById('player-list');
-    list.innerHTML = '';
-    names.forEach(name => {
-      const chip = document.createElement('div');
-      chip.className = 'player-chip';
-      chip.textContent = name;
-      list.appendChild(chip);
-    });
-    document.getElementById('btn-start').disabled = (names.length === 0);
+function shuffleQuestions(){
+  shuffledQuestions=QUESTIONS.map(q=>{
+    const idx=[0,1,2,3];
+    for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+    return {q:q.q,opts:idx.map(i=>q.opts[i]),correct:idx.indexOf(q.correct)};
   });
-
-  showScreen('lobby');
 }
 
-function startQuestion(idx) {
+function initQR(){
+  document.getElementById('join-url-text').textContent=ELEVE_URL;
+  new QRCode(document.getElementById('qrcode'),{text:ELEVE_URL,width:200,height:200,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+}
+
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function listenPlayers(){
+  db.ref('players').on('value',snap=>{
+    const players=snap.val()||{};
+    const names=Object.values(players).map(p=>p.name).filter(Boolean);
+    totalPlayers=names.length;
+    document.getElementById('player-count').textContent=totalPlayers;
+    document.getElementById('lobby-count').textContent=totalPlayers;
+    if(phase==='lobby')
+      document.getElementById('players-list-wrap').innerHTML=names.map(n=>`<div class="player-chip">👤 ${escHtml(n)}</div>`).join('');
+    updateAnsweredCount();
+  });
+}
+
+function listenAnswers(){
+  db.ref('answers').on('value',snap=>{
+    answersData=snap.val()||{};
+    updateAnsweredCount();
+    if(phase==='question')updateChartsLive();
+  });
+}
+
+function updateAnsweredCount(){
+  if(currentQ<0)return;
+  const count=Object.values(answersData).filter(a=>a.question===currentQ).length;
+  document.getElementById('answered-count').textContent=`${count} réponse${count>1?'s':''} reçue${count>1?'s':''}`;
+}
+
+function startQuiz(){
+  if(totalPlayers===0){alert("Attendez qu'au moins un élève rejoigne !");return;}
+  shuffleQuestions();phase='question';
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('question-view').style.display='block';
+  document.getElementById('q-badge').style.display='flex';
+  document.getElementById('right-panel-title').textContent='CLASSEMENT EN DIRECT';
+  document.getElementById('players-list-wrap').style.display='none';
+  document.getElementById('leaderboard-wrap').style.display='flex';
+  loadQuestion(0);
+}
+
+function loadQuestion(index){
+  currentQ=index;phase='question';answersData={};timeLeft=20;
+  const q=shuffledQuestions[index];
+  document.getElementById('q-number-display').textContent=`QUESTION ${index+1} / ${TOTAL_QUESTIONS}`;
+  document.getElementById('q-num-badge').textContent=index+1;
+  document.getElementById('q-text-display').textContent=q.q;
+  document.getElementById('phase-label').textContent='EN COURS';
+  document.getElementById('progress-bar').style.width=`${(index/TOTAL_QUESTIONS)*100}%`;
+  const grid=document.getElementById('answers-grid');
+  grid.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className=`answer-btn ${LETTERS[i]}`;btn.id=`ans-${i}`;
+    btn.innerHTML=`<span class="letter">${LETTERS[i]}</span>${escHtml(opt)}`;
+    grid.appendChild(btn);
+  });
+  document.getElementById('charts-section').style.display='none';
+  document.getElementById('charts-bars').innerHTML='';
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('answered-count').textContent='0 réponse reçue';
+  db.ref('gameState').set({phase:'question',questionIndex:index,question:q.q,options:q.opts,timeLeft:20});
+  db.ref('answers').remove();
+  clearInterval(timerInterval);updateTimer();
+  timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);timerEnd();}},1000);
+}
+
+function updateTimer(){
+  const el=document.getElementById('timer-display');
+  el.textContent=timeLeft;
+  el.className='q-timer'+(timeLeft<=5?' urgent':'');
+  db.ref('gameState/timeLeft').set(timeLeft);
+}
+
+function stopTimer(){clearInterval(timerInterval);timerEnd();}
+
+function timerEnd(){
+  phase='results';
+  document.getElementById('phase-label').textContent='TEMPS ÉCOULÉ';
+  db.ref('gameState/phase').set('closed');
+  document.getElementById('btn-results').disabled=false;
+}
+
+function showResults(){
+  document.getElementById('charts-section').style.display='block';
+  buildCharts();
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=false;
+}
+
+function buildCharts(){
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  const counts=[0,0,0,0];
+  qAnswers.forEach(a=>{if(a.answer>=0&&a.answer<4)counts[a.answer]++;});
+  const total=qAnswers.length||1;
+  const container=document.getElementById('charts-bars');
+  container.innerHTML='';
+  counts.forEach((c,i)=>{
+    const pct=Math.round((c/total)*100);
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<div class="bar-lbl">${LETTERS[i]}</div><div class="bar-outer"><div class="bar-inner ${LETTERS[i]}" style="width:${pct}%">${c} (${pct}%)</div></div>`;
+    container.appendChild(row);
+  });
+}
+
+function updateChartsLive(){if(document.getElementById('charts-section').style.display==='block')buildCharts();}
+
+function revealAnswer(){
+  const correct=shuffledQuestions[currentQ].correct;
+  LETTERS.forEach((_,i)=>{
+    const btn=document.getElementById(`ans-${i}`);
+    if(btn)btn.classList.add(i===correct?'correct-reveal':'wrong-reveal');
+  });
+  computeAndUpdateScores();
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=false;
+  db.ref('gameState/phase').set('revealed');
+  db.ref('gameState/correctAnswer').set(correct);
+  updateLeaderboard();
+}
+
+function computeAndUpdateScores(){
+  const correct=shuffledQuestions[currentQ].correct;
+  const qAnswers=Object.values(answersData).filter(a=>a.question===currentQ);
+  qAnswers.sort((a,b)=>(a.time||9999)-(b.time||9999));
+  let rank=0;
+  qAnswers.forEach(ans=>{
+    if(ans.answer===correct){rank++;const pts=1000+Math.max(0,100-rank*5);db.ref(`players/${ans.uid}/score`).transaction(s=>(s||0)+pts);}
+  });
+}
+
+function updateLeaderboard(){
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score).slice(0,10);
+    document.getElementById('leaderboard-wrap').innerHTML=sorted.map((p,i)=>
+      `<div class="lb-entry rank-${i+1}"><div class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="lb-name">${escHtml(p.name)}</div><div class="lb-score">${p.score}</div></div>`
+    ).join('');
+  });
+}
+
+function nextQuestion(){
+  if(currentQ+1>=shuffledQuestions.length)showPodium();
+  else{loadQuestion(currentQ+1);updateLeaderboard();}
+}
+
+function showPodium(){
+  clearInterval(timerInterval);phase='podium';
+  document.getElementById('question-view').style.display='none';
+  document.getElementById('podium-view').style.display='block';
+  document.getElementById('progress-bar').style.width='100%';
+  db.ref('gameState/phase').set('podium');
+  db.ref('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const order=[sorted[1],sorted[0],sorted[2]];
+    const classes=['p2','p1','p3'],emojis=['🥈','🥇','🥉'];
+    document.getElementById('podium-wrap').innerHTML=order.map((p,i)=>p?`
+      <div class="podium-block">
+        <div class="podium-emoji">${emojis[i]}</div>
+        <div class="podium-name">${escHtml(p.name)}</div>
+        <div class="podium-pts">${p.score} pts</div>
+        <div class="podium-bar ${classes[i]}">${i===1?'1':i===0?'2':'3'}</div>
+      </div>`:'').join('');
+  });
+}
+
+function resetAll(){
   clearInterval(timerInterval);
-  if (answersListener) { db.ref('sessions/' + sessionId + '/answers').off('value', answersListener); answersListener = null; }
-
-  currentQ = idx;
-  const q = QUESTIONS[idx];
-  document.getElementById('q-label').textContent = 'Question ' + (idx+1) + ' / 10';
-  document.getElementById('q-text').textContent = q.q;
-  ['A','B','C','D'].forEach((l,i) => {
-    document.getElementById('txt-' + l).textContent = q.answers[i];
-    document.getElementById('cnt-' + l).textContent = '0';
-    document.getElementById('fill-' + l).style.width = '0';
-    document.getElementById('box-' + l).classList.remove('correct');
-  });
-  document.getElementById('btn-next').style.display = 'none';
-  document.getElementById('resp-count').textContent = '0 réponse(s)';
-
-  db.ref('sessions/' + sessionId + '/answers').remove();
-  db.ref('sessions/' + sessionId).update({ state:'question', currentQuestion:idx });
-
-  answersListener = db.ref('sessions/' + sessionId + '/answers').on('value', snap => {
-    const data = snap.val() || {};
-    const total = Math.max(Object.keys(players).length, 1);
-    const counts = [0,0,0,0];
-    Object.values(data).forEach(a => { if (a >= 0 && a < 4) counts[a]++; });
-    ['A','B','C','D'].forEach((l,i) => {
-      document.getElementById('cnt-' + l).textContent = counts[i];
-      document.getElementById('fill-' + l).style.width = (counts[i]/total*100) + '%';
-    });
-    document.getElementById('resp-count').textContent = Object.keys(data).length + ' / ' + Object.keys(players).length + ' réponses';
-  });
-
-  showScreen('question');
-
-  timeLeft = TIME;
-  document.getElementById('timer-num').classList.remove('urgent');
-  document.getElementById('timer-fill').style.width = '100%';
-  document.getElementById('timer-num').textContent = TIME;
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    document.getElementById('timer-num').textContent = timeLeft;
-    document.getElementById('timer-fill').style.width = (timeLeft/TIME*100) + '%';
-    document.getElementById('timer-num').classList.toggle('urgent', timeLeft <= 5);
-    if (timeLeft <= 0) { clearInterval(timerInterval); endQuestion(); }
-  }, 1000);
+  db.ref('/').remove().then(()=>location.reload());
 }
 
-function endQuestion() {
-  if (answersListener) { db.ref('sessions/' + sessionId + '/answers').off('value', answersListener); answersListener = null; }
-  db.ref('sessions/' + sessionId).update({ state:'reveal' });
-
-  prevScores = Object.assign({}, scores);
-  const correct = QUESTIONS[currentQ].correct;
-
-  db.ref('sessions/' + sessionId + '/answers').once('value', snap => {
-    const data = snap.val() || {};
-    Object.entries(data).forEach(([pid, ans]) => {
-      if (parseInt(ans) === correct) {
-        scores[pid] = (scores[pid] || 0) + Math.round((timeLeft / TIME) * 500) + 500;
-      }
-    });
-  });
-
-  document.getElementById('box-' + ['A','B','C','D'][correct]).classList.add('correct');
-  document.getElementById('btn-next').style.display = 'inline-block';
-}
-
-function showLeaderboard() {
-  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]).slice(0,10);
-  const list = document.getElementById('lb-list');
-  list.innerHTML = '';
-  sorted.forEach(([pid, score], i) => {
-    const delta = score - (prevScores[pid] || 0);
-    const row = document.createElement('div');
-    row.className = 'lb-row';
-    row.innerHTML = '<span class="lb-rank">'+(i+1)+'</span>'
-      +'<span class="lb-name">'+(players[pid]?.name||pid)+'</span>'
-      +'<span class="lb-score">'+score+' pts</span>'
-      +'<span class="lb-delta'+(delta>0?' pos':'')+'">'+( delta>0?'+'+delta:'' )+'</span>';
-    list.appendChild(row);
-  });
-  db.ref('sessions/' + sessionId).update({ state:'leaderboard', scores });
-  const isLast = currentQ >= QUESTIONS.length - 1;
-  const btn = document.getElementById('btn-continue');
-  btn.textContent = isLast ? '🏆 Voir le podium' : 'Question suivante →';
-  btn.onclick = isLast ? showPodium : () => startQuestion(currentQ + 1);
-  showScreen('leaderboard');
-}
-
-function showPodium() {
-  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-  const order = [sorted[1], sorted[0], sorted[2]];
-  const medals = ['🥈','🥇','🥉'], labels = ['2e','1er','3e'];
-  const wrap = document.getElementById('podium-wrap');
-  wrap.innerHTML = '';
-  order.forEach((entry, i) => {
-    if (!entry) return;
-    const [pid, pts] = entry;
-    const col = document.createElement('div');
-    col.className = 'podium-col';
-    col.innerHTML = '<div class="podium-medal">'+medals[i]+'</div>'
-      +'<div class="podium-name">'+(players[pid]?.name||pid)+'</div>'
-      +'<div class="podium-pts">'+pts+' pts</div>'
-      +'<div class="podium-block"><div class="podium-pos">'+labels[i]+'</div></div>';
-    wrap.appendChild(col);
-  });
-  const final = document.getElementById('lb-final');
-  final.innerHTML = '';
-  sorted.slice(3).forEach(([pid, score], i) => {
-    const row = document.createElement('div');
-    row.className = 'lb-row';
-    row.innerHTML = '<span class="lb-rank">'+(i+4)+'</span><span class="lb-name">'+(players[pid]?.name||pid)+'</span><span class="lb-score">'+score+' pts</span>';
-    final.appendChild(row);
-  });
-  db.ref('sessions/' + sessionId).update({ state:'podium', scores });
-  showScreen('podium');
-  launchConfetti();
-}
-
-function launchConfetti() {
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const pieces = Array.from({length:100}, () => ({
-    x:Math.random()*canvas.width, y:-10, r:Math.random()*7+3,
-    speed:Math.random()*3+1, tilt:Math.random()*8-4,
-    color:['#ff6847','#1a6b6b','#f39c12','#f0ece4'][Math.floor(Math.random()*4)]
-  }));
-  let frame = 0;
-  (function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p => {
-      ctx.beginPath(); ctx.fillStyle = p.color;
-      ctx.ellipse(p.x,p.y,p.r,p.r/2,p.tilt,0,Math.PI*2); ctx.fill();
-      p.y += p.speed; p.tilt += .04;
-      if (p.y > canvas.height) { p.y = -10; p.x = Math.random()*canvas.width; }
-    });
-    if (++frame < 350) requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  })();
-}
-
-document.getElementById('btn-start').addEventListener('click', () => startQuestion(0));
-document.getElementById('btn-next').addEventListener('click', showLeaderboard);
-
-init();
+window.onload=()=>{
+  initQR();listenPlayers();listenAnswers();
+  db.ref('gameState').set({phase:'lobby'});
+};
 </script>
 </body>
 </html>
