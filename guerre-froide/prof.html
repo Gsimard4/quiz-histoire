@@ -3,940 +3,397 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz — La Guerre froide | Vue Professeur</title>
+<title>La Guerre froide — Vue Professeur</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --teal:    #0d4f4f;
-    --teal2:   #1a6b6b;
+    --accent:  #1a6b6b;
+    --accent2: #0d4f4f;
     --coral:   #ff6847;
-    --coral2:  #ff8c6e;
-    --cream:   #f5f0e8;
-    --cream2:  #e8e0d0;
-    --dark:    #071a1a;
-    --mid:     #0d2f2f;
-    --gold:    #f0c060;
-    --A: #e74c3c; --B: #2980b9; --C: #27ae60; --D: #8e44ad;
+    --dark:    #0d0d0d;
+    --mid:     #1a1a1a;
+    --card:    #1e1e1e;
+    --border:  #2e2e2e;
+    --text:    #f0ece4;
+    --muted:   #777;
+    --gold:    #f39c12;
+    --A: #c0392b; --B: #2471a3; --C: #1e8449; --D: #7d3c98;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background: var(--dark);
-    color: var(--cream);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Barlow',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; }
 
-  /* ── HEADER ── */
   header {
-    background: var(--teal);
-    border-bottom: 3px solid var(--coral);
-    padding: 14px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    padding:20px 32px;
+    background:var(--mid);
+    border-bottom:3px solid var(--accent);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
   }
-  .title-block h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: 3px;
-    color: var(--cream);
-    line-height: 1;
-  }
-  .title-block span {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .75rem;
-    color: var(--coral2);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .session-badge {
-    background: var(--coral);
-    color: var(--dark);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 3px;
-    padding: 6px 18px;
-    border-radius: 4px;
-  }
+  .header-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; line-height:1; }
+  .header-title span { color:var(--coral); }
+  .header-sub { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+  .session-pill { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:4px; background:var(--accent2); color:var(--text); padding:6px 20px; border-radius:4px; border:1px solid var(--accent); }
 
-  /* ── SCREENS ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
+  .screen { display:none; }
+  .screen.active { display:block; }
 
-  /* ── LOBBY ── */
-  #screen-lobby {
-    display: none;
-    padding: 32px 24px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  #screen-lobby.active { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  /* LOBBY */
+  #screen-lobby { padding:32px; }
+  #screen-lobby.active { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:900px; margin:0 auto; }
 
-  .qr-panel {
-    background: var(--mid);
-    border: 2px solid var(--teal2);
-    border-radius: 12px;
-    padding: 28px;
-    text-align: center;
-  }
-  .qr-panel h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-    color: var(--coral);
-    margin-bottom: 6px;
-  }
-  .qr-panel .url-display {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .72rem;
-    color: var(--gold);
-    background: var(--dark);
-    padding: 6px 10px;
-    border-radius: 4px;
-    margin: 8px 0 18px;
-    word-break: break-all;
-  }
-  #qrcode {
-    display: inline-block;
-    padding: 12px;
-    background: white;
-    border-radius: 8px;
-  }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:24px; }
+  .panel-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--accent); margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+  .url-box { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; color:var(--muted); background:var(--mid); padding:8px 12px; border-radius:4px; margin-bottom:16px; word-break:break-all; }
+  #qrcode { display:inline-block; background:white; padding:10px; border-radius:4px; }
 
-  .players-panel {
-    background: var(--mid);
-    border: 2px solid var(--teal2);
-    border-radius: 12px;
-    padding: 28px;
-  }
-  .players-panel h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-    color: var(--coral);
-    margin-bottom: 16px;
-  }
-  #player-count {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    color: var(--gold);
-    line-height: 1;
-  }
-  #player-list {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 260px;
-    overflow-y: auto;
-  }
-  .player-chip {
-    background: var(--teal2);
-    color: var(--cream);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: .85rem;
-    animation: chipIn .3s ease;
-  }
-  @keyframes chipIn { from { opacity:0; transform:scale(.7); } to { opacity:1; transform:scale(1); } }
+  #player-count { font-family:'Bebas Neue',sans-serif; font-size:4rem; line-height:1; color:var(--gold); }
+  #player-count-label { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; }
+  #player-list { display:flex; flex-wrap:wrap; gap:6px; max-height:200px; overflow-y:auto; }
+  .player-chip { background:var(--mid); border:1px solid var(--accent); color:var(--text); padding:4px 12px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:1px; animation:chipIn .25s ease; }
+  @keyframes chipIn { from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);} }
 
-  #btn-start {
-    margin-top: 20px;
-    width: 100%;
-    background: var(--coral);
-    color: var(--dark);
-    border: none;
-    padding: 14px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 3px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
-  }
-  #btn-start:hover { background: var(--coral2); transform: translateY(-2px); }
-  #btn-start:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  #btn-start { margin-top:20px; width:100%; padding:14px; background:var(--coral); color:white; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
+  #btn-start:hover:not(:disabled) { filter:brightness(1.15); }
+  #btn-start:disabled { opacity:.35; cursor:not-allowed; }
 
-  /* ── QUESTION ── */
-  #screen-question {
-    display: none;
-    padding: 24px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  #screen-question.active { display: block; }
+  /* QUESTION */
+  #screen-question { padding:28px 32px; max-width:1100px; margin:0 auto; }
+  .q-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .q-label { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+  #timer-num { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; line-height:1; color:var(--gold); min-width:56px; text-align:right; transition:color .3s; }
+  #timer-num.urgent { color:var(--coral); animation:pulse .5s infinite alternate; }
+  @keyframes pulse { to{transform:scale(1.1);} }
+  .timer-track { height:6px; background:var(--border); border-radius:3px; margin-bottom:20px; overflow:hidden; }
+  #timer-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--coral)); transition:width 1s linear; border-radius:3px; }
 
-  .q-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-  }
-  .q-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    color: var(--coral);
-  }
-  #timer-display {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    color: var(--gold);
-    line-height: 1;
-    min-width: 60px;
-    text-align: center;
-    transition: color .3s;
-  }
-  #timer-display.urgent { color: var(--coral); animation: pulse .4s infinite alternate; }
-  @keyframes pulse { to { transform: scale(1.15); } }
+  #q-text { font-size:1.45rem; font-weight:700; line-height:1.4; padding:20px 22px; background:var(--card); border-left:4px solid var(--coral); border-radius:0 6px 6px 0; margin-bottom:20px; }
 
-  .timer-bar-wrap {
-    height: 8px;
-    background: var(--mid);
-    border-radius: 4px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  #timer-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--teal2), var(--coral));
-    transition: width 1s linear;
-    border-radius: 4px;
-  }
+  .answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+  .ans-box { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:14px 16px; display:flex; align-items:center; gap:12px; position:relative; overflow:hidden; }
+  .ans-box.A { border-left:4px solid var(--A); }
+  .ans-box.B { border-left:4px solid var(--B); }
+  .ans-box.C { border-left:4px solid var(--C); }
+  .ans-box.D { border-left:4px solid var(--D); }
+  .ans-letter { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; flex-shrink:0; width:28px; text-align:center; }
+  .ans-box.A .ans-letter { color:var(--A); }
+  .ans-box.B .ans-letter { color:var(--B); }
+  .ans-box.C .ans-letter { color:var(--C); }
+  .ans-box.D .ans-letter { color:var(--D); }
+  .ans-text { flex:1; font-size:.95rem; font-weight:600; position:relative; }
+  .ans-count { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--muted); position:relative; min-width:28px; text-align:right; }
+  .ans-fill { position:absolute; left:0; top:0; height:100%; opacity:.12; transition:width .5s ease; border-radius:4px; }
+  .ans-box.A .ans-fill { background:var(--A); }
+  .ans-box.B .ans-fill { background:var(--B); }
+  .ans-box.C .ans-fill { background:var(--C); }
+  .ans-box.D .ans-fill { background:var(--D); }
+  .ans-box.correct { border-color:#1e8449 !important; box-shadow:0 0 14px rgba(30,132,73,.4); }
 
-  #question-text {
-    font-size: 1.55rem;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 24px;
-    padding: 24px;
-    background: var(--mid);
-    border-left: 5px solid var(--coral);
-    border-radius: 0 10px 10px 0;
-  }
+  .resp-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  #resp-count { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:1px; color:var(--muted); }
+  #btn-next { display:none; padding:10px 28px; background:var(--accent); color:var(--text); border:1px solid var(--coral); border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
+  #btn-next:hover { filter:brightness(1.2); }
 
-  .answers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .answer-box {
-    padding: 18px 20px;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    font-size: 1.05rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: relative;
-    overflow: hidden;
-  }
-  .answer-box .letter {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-    width: 36px;
-    text-align: center;
-  }
-  .answer-box.A { background: #2d0a0a; border-color: var(--A); }
-  .answer-box.B { background: #0a1d2d; border-color: var(--B); }
-  .answer-box.C { background: #0a2d12; border-color: var(--C); }
-  .answer-box.D { background: #1a0a2d; border-color: var(--D); }
-  .answer-box .letter.A { color: var(--A); }
-  .answer-box .letter.B { color: var(--B); }
-  .answer-box .letter.C { color: var(--C); }
-  .answer-box .letter.D { color: var(--D); }
-  .answer-box.correct { animation: correctFlash .6s forwards; }
-  @keyframes correctFlash {
-    0%   { box-shadow: none; }
-    50%  { box-shadow: 0 0 30px 6px #27ae60; }
-    100% { box-shadow: 0 0 12px 3px #27ae60; border-color: #27ae60; }
-  }
+  /* LEADERBOARD */
+  #screen-leaderboard { padding:32px; max-width:680px; margin:0 auto; }
+  #screen-leaderboard h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:4px; color:var(--accent); margin-bottom:20px; }
+  .lb-row { display:flex; align-items:center; gap:14px; padding:11px 16px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--border); border-radius:5px; margin-bottom:7px; animation:slideIn .3s ease; }
+  .lb-row:nth-child(1){border-left-color:#f1c40f;}
+  .lb-row:nth-child(2){border-left-color:#bdc3c7;}
+  .lb-row:nth-child(3){border-left-color:#ca6f1e;}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:none;}}
+  .lb-rank { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--gold); min-width:28px; }
+  .lb-name { flex:1; font-weight:600; }
+  .lb-score { font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; color:var(--coral); letter-spacing:1px; }
+  .lb-delta { font-family:'Barlow Condensed',sans-serif; font-size:.9rem; color:var(--muted); min-width:48px; text-align:right; }
+  .lb-delta.pos { color:#1e8449; }
 
-  /* answer bar inside box */
-  .answer-bar {
-    position: absolute;
-    left: 0; top: 0; height: 100%;
-    opacity: .18;
-    transition: width .6s ease;
-    border-radius: 8px;
-  }
-  .answer-box.A .answer-bar { background: var(--A); }
-  .answer-box.B .answer-bar { background: var(--B); }
-  .answer-box.C .answer-bar { background: var(--C); }
-  .answer-box.D .answer-bar { background: var(--D); }
-  .answer-count {
-    margin-left: auto;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.3rem;
-    color: var(--cream2);
-    position: relative;
-  }
+  #btn-continue { display:block; margin:20px auto 0; padding:12px 40px; background:var(--coral); color:white; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:2px; cursor:pointer; transition:filter .2s; }
+  #btn-continue:hover { filter:brightness(1.15); }
 
-  /* response stats bar */
-  .response-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  #response-count {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .9rem;
-    color: var(--cream2);
-  }
+  /* PODIUM */
+  #screen-podium { padding:32px; max-width:700px; margin:0 auto; text-align:center; }
+  #screen-podium h2 { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:5px; color:var(--gold); margin-bottom:32px; }
+  .podium-wrap { display:flex; align-items:flex-end; justify-content:center; gap:6px; margin-bottom:28px; }
+  .podium-col { width:180px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .podium-medal { font-size:2.2rem; }
+  .podium-name { font-weight:700; font-size:1rem; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .podium-pts { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; color:var(--gold); letter-spacing:1px; }
+  .podium-block { width:100%; background:var(--card); border:1px solid var(--border); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; }
+  .podium-col:nth-child(1) .podium-block { height:72px; border-top-color:#bdc3c7; }
+  .podium-col:nth-child(2) .podium-block { height:120px; border-top-color:#f1c40f; }
+  .podium-col:nth-child(3) .podium-block { height:50px; border-top-color:#ca6f1e; }
+  .podium-pos { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--muted); }
 
-  #btn-next {
-    background: var(--teal2);
-    color: var(--cream);
-    border: 2px solid var(--coral);
-    padding: 12px 32px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.3rem;
-    letter-spacing: 2px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
-    display: none;
-  }
-  #btn-next:hover { background: var(--coral); color: var(--dark); transform: translateY(-2px); }
-
-  /* ── LEADERBOARD ── */
-  #screen-leaderboard {
-    display: none;
-    padding: 32px 24px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-  #screen-leaderboard.active { display: block; }
-  #screen-leaderboard h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: 4px;
-    color: var(--coral);
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .lb-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    background: var(--mid);
-    border-radius: 10px;
-    border-left: 4px solid var(--teal2);
-    animation: slideIn .3s ease;
-  }
-  .lb-row:nth-child(1) { border-left-color: #ffd700; }
-  .lb-row:nth-child(2) { border-left-color: #c0c0c0; }
-  .lb-row:nth-child(3) { border-left-color: #cd7f32; }
-  @keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:none; } }
-  .lb-rank {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    color: var(--gold);
-    min-width: 32px;
-    text-align: center;
-  }
-  .lb-name { flex: 1; font-weight: 600; }
-  .lb-score {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.1rem;
-    color: var(--coral);
-    font-weight: 700;
-  }
-  .lb-delta {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: .85rem;
-    color: var(--teal2);
-    min-width: 50px;
-    text-align: right;
-  }
-  .lb-delta.pos { color: #27ae60; }
-
-  #btn-continue {
-    display: block;
-    margin: 24px auto 0;
-    background: var(--coral);
-    color: var(--dark);
-    border: none;
-    padding: 14px 48px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 3px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
-  }
-  #btn-continue:hover { background: var(--coral2); transform: translateY(-2px); }
-
-  /* ── PODIUM ── */
-  #screen-podium {
-    display: none;
-    padding: 32px 24px;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-  }
-  #screen-podium.active { display: block; }
-  #screen-podium h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    letter-spacing: 6px;
-    color: var(--gold);
-    margin-bottom: 40px;
-  }
-  .podium-wrap {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 36px;
-  }
-  .podium-place {
-    width: 180px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .podium-avatar {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
-    color: var(--dark);
-  }
-  .podium-place:nth-child(1) .podium-avatar { background: #c0c0c0; }
-  .podium-place:nth-child(2) .podium-avatar { background: #ffd700; width: 80px; height: 80px; font-size: 2.2rem; }
-  .podium-place:nth-child(3) .podium-avatar { background: #cd7f32; }
-  .podium-name {
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--cream);
-    max-width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .podium-score {
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--gold);
-    font-size: 1rem;
-  }
-  .podium-block {
-    border-radius: 10px 10px 0 0;
-    width: 100%;
-  }
-  .podium-place:nth-child(1) .podium-block { background: var(--mid); border: 2px solid #c0c0c0; height: 80px; }
-  .podium-place:nth-child(2) .podium-block { background: var(--mid); border: 2px solid #ffd700; height: 130px; }
-  .podium-place:nth-child(3) .podium-block { background: var(--mid); border: 2px solid #cd7f32; height: 55px; }
-  .place-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    color: var(--cream);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    letter-spacing: 2px;
-  }
-
-  /* ── MISC ── */
-  .fade { animation: fadeIn .5s ease; }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-  #confetti-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 999;
-  }
+  canvas#confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="title-block">
-    <h1>La Guerre froide</h1>
-    <span>Vue Professeur · 10 questions</span>
+  <div>
+    <div class="header-title">LA GUERRE <span>FROIDE</span></div>
+    <div class="header-sub">Vue Professeur · 10 questions · 20 sec</div>
   </div>
-  <div id="session-badge" class="session-badge">—</div>
+  <div class="session-pill" id="session-pill">——</div>
 </header>
 
-<canvas id="confetti-canvas"></canvas>
+<canvas id="confetti"></canvas>
 
 <!-- LOBBY -->
 <div id="screen-lobby" class="screen">
-  <div class="qr-panel">
-    <h2>📱 Rejoindre le quiz</h2>
-    <div class="url-display" id="eleve-url">—</div>
+  <div class="panel" style="text-align:center;">
+    <div class="panel-title">REJOINDRE LE QUIZ</div>
+    <div class="url-box" id="eleve-url">—</div>
     <div id="qrcode"></div>
   </div>
-  <div class="players-panel">
-    <h2>Joueurs connectés</h2>
+  <div class="panel">
+    <div class="panel-title">JOUEURS CONNECTÉS</div>
     <div id="player-count">0</div>
+    <div id="player-count-label">joueur(s) en attente</div>
     <div id="player-list"></div>
-    <button id="btn-start" disabled>Lancer le quiz</button>
+    <button id="btn-start" disabled>▶ LANCER LE QUIZ</button>
   </div>
 </div>
 
 <!-- QUESTION -->
 <div id="screen-question" class="screen">
-  <div class="q-header">
-    <span class="q-num" id="q-num">Question 1/10</span>
-    <div id="timer-display">20</div>
+  <div class="q-topbar">
+    <span class="q-label" id="q-label">Question 1 / 10</span>
+    <div id="timer-num">20</div>
   </div>
-  <div class="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
-  <div id="question-text">—</div>
+  <div class="timer-track"><div id="timer-fill" style="width:100%"></div></div>
+  <div id="q-text">—</div>
   <div class="answers-grid">
-    <div class="answer-box A" id="box-A">
-      <div class="answer-bar" id="bar-A" style="width:0"></div>
-      <span class="letter A">A</span>
-      <span id="ans-A">—</span>
-      <span class="answer-count" id="cnt-A">0</span>
-    </div>
-    <div class="answer-box B" id="box-B">
-      <div class="answer-bar" id="bar-B" style="width:0"></div>
-      <span class="letter B">B</span>
-      <span id="ans-B">—</span>
-      <span class="answer-count" id="cnt-B">0</span>
-    </div>
-    <div class="answer-box C" id="box-C">
-      <div class="answer-bar" id="bar-C" style="width:0"></div>
-      <span class="letter C">C</span>
-      <span id="ans-C">—</span>
-      <span class="answer-count" id="cnt-C">0</span>
-    </div>
-    <div class="answer-box D" id="box-D">
-      <div class="answer-bar" id="bar-D" style="width:0"></div>
-      <span class="letter D">D</span>
-      <span id="ans-D">—</span>
-      <span class="answer-count" id="cnt-D">0</span>
-    </div>
+    <div class="ans-box A" id="box-A"><div class="ans-fill" id="fill-A" style="width:0"></div><span class="ans-letter">A</span><span class="ans-text" id="txt-A">—</span><span class="ans-count" id="cnt-A">0</span></div>
+    <div class="ans-box B" id="box-B"><div class="ans-fill" id="fill-B" style="width:0"></div><span class="ans-letter">B</span><span class="ans-text" id="txt-B">—</span><span class="ans-count" id="cnt-B">0</span></div>
+    <div class="ans-box C" id="box-C"><div class="ans-fill" id="fill-C" style="width:0"></div><span class="ans-letter">C</span><span class="ans-text" id="txt-C">—</span><span class="ans-count" id="cnt-C">0</span></div>
+    <div class="ans-box D" id="box-D"><div class="ans-fill" id="fill-D" style="width:0"></div><span class="ans-letter">D</span><span class="ans-text" id="txt-D">—</span><span class="ans-count" id="cnt-D">0</span></div>
   </div>
-  <div class="response-row">
-    <span id="response-count">0 réponse(s)</span>
-    <button id="btn-next">Voir le classement →</button>
+  <div class="resp-row">
+    <span id="resp-count">0 réponse(s)</span>
+    <button id="btn-next">Classement →</button>
   </div>
 </div>
 
 <!-- LEADERBOARD -->
 <div id="screen-leaderboard" class="screen">
-  <h2>Classement</h2>
+  <h2>CLASSEMENT</h2>
   <div id="lb-list"></div>
-  <button id="btn-continue" id="btn-continue">Question suivante →</button>
+  <button id="btn-continue">—</button>
 </div>
 
 <!-- PODIUM -->
 <div id="screen-podium" class="screen">
   <h2>🏆 PODIUM FINAL</h2>
   <div class="podium-wrap" id="podium-wrap"></div>
-  <div id="lb-list-final"></div>
+  <div id="lb-final"></div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════
-//  FIREBASE CONFIG
-// ══════════════════════════════════════════════════════
-const firebaseConfig = {
-  databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/"
-};
+const firebaseConfig = { databaseURL: "https://guerre-froide-bc2fb-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ══════════════════════════════════════════════════════
-//  QUESTIONS
-// ══════════════════════════════════════════════════════
 const QUESTIONS = [
-  {
-    q: "Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe après la guerre ?",
-    answers: [
-      "Ils s'opposent sur leurs systèmes politiques et économiques",
-      "Ils divergent sur le sort des criminels de guerre nazis",
-      "Ils ont des visions différentes sur la reconstruction du Japon",
-      "Ils refusent chacun de financer la reconstruction de l'Allemagne"
-    ],
-    correct: 0
-  },
-  {
-    q: "Quel concept décrit la politique américaine consistant à empêcher le communisme de s'étendre à de nouveaux pays ?",
-    answers: [
-      "La satellisation",
-      "La déstalinisation",
-      "L'endiguement",
-      "La coexistence pacifique"
-    ],
-    correct: 2
-  },
-  {
-    q: "Quel est l'objectif principal du Plan Marshall ?",
-    answers: [
-      "Créer une alliance militaire contre l'URSS",
-      "Reconstruire économiquement l'Europe pour freiner l'influence soviétique",
-      "Punir les pays ayant collaboré avec les nazis",
-      "Financer la reconstruction du Japon sous occupation américaine"
-    ],
-    correct: 1
-  },
-  {
-    q: "Quelle est la principale conséquence du maccarthysme dans la société américaine ?",
-    answers: [
-      "Une ouverture vers le dialogue avec l'URSS",
-      "Une remise en question de la politique d'endiguement",
-      "Une psychose anticommuniste et une panique morale généralisée",
-      "Un renforcement des libertés civiles pour contrer la propagande soviétique"
-    ],
-    correct: 2
-  },
-  {
-    q: "Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?",
-    answers: [
-      "Elle impose l'adhésion au Pacte de Varsovie par la force militaire directe",
-      "Elle installe les communistes aux postes clés du gouvernement (Intérieur, Justice, Armée…)",
-      "Elle organise des référendums pro-communistes dans chaque pays",
-      "Elle finance des partis travaillistes pour remplacer les gouvernements en place"
-    ],
-    correct: 1
-  },
-  {
-    q: "Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?",
-    answers: [
-      "Il a conduit l'URSS à la défaite dans la course à l'espace",
-      "Il a perdu le soutien de l'armée après la crise de Cuba",
-      "La nomenclatura craint de perdre ses privilèges avec la déstalinisation",
-      "Il a voulu rapprocher l'URSS des États-Unis trop rapidement"
-    ],
-    correct: 2
-  },
-  {
-    q: "Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?",
-    answers: [
-      "Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire",
-      "Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique",
-      "Elle soutient secrètement les révolutionnaires cubains contre Moscou",
-      "Elle accepte l'aide économique américaine tout en restant officiellement neutre"
-    ],
-    correct: 1
-  },
-  {
-    q: "Quelle est la principale cause de la crise des missiles de Cuba ?",
-    answers: [
-      "L'URSS réagit à l'installation de missiles américains en Turquie",
-      "Cuba cherche à envahir la Floride avec le soutien soviétique",
-      "Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS",
-      "Kennedy ordonne un blocus naval de Cuba sans provocation préalable"
-    ],
-    correct: 2
-  },
-  {
-    q: "Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?",
-    answers: [
-      "Les États-Unis, grâce à leur supériorité technologique d'après-guerre",
-      "L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite",
-      "Les deux puissances progressent exactement au même rythme",
-      "L'URSS, uniquement grâce à l'espionnage des laboratoires américains"
-    ],
-    correct: 1
-  },
-  {
-    q: "Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?",
-    answers: [
-      "La concurrence des industries japonaise et allemande sur les marchés mondiaux",
-      "L'échec du modèle keynésien face à la montée des inégalités sociales",
-      "Le choc pétrolier, entraînant inflation, crédit généralisé et abandon du dollar-étalon",
-      "La fin de la course aux armements qui réduit les investissements technologiques"
-    ],
-    correct: 2
-  }
+  { q:"Pourquoi les vainqueurs de la 2e Guerre mondiale ne s'entendent-ils pas sur l'avenir de l'Europe ?", answers:["Ils s'opposent sur leurs systèmes politiques et économiques","Ils divergent sur le sort des criminels de guerre nazis","Ils ont des visions différentes sur la reconstruction du Japon","Ils refusent chacun de financer la reconstruction de l'Allemagne"], correct:0 },
+  { q:"Quel concept décrit la politique américaine visant à empêcher le communisme de s'étendre à de nouveaux pays ?", answers:["La satellisation","La déstalinisation","L'endiguement","La coexistence pacifique"], correct:2 },
+  { q:"Quel est l'objectif principal du Plan Marshall ?", answers:["Créer une alliance militaire contre l'URSS","Reconstruire économiquement l'Europe pour freiner l'influence soviétique","Punir les pays ayant collaboré avec les nazis","Financer la reconstruction du Japon sous occupation américaine"], correct:1 },
+  { q:"Quelle est la principale conséquence du maccarthysme dans la société américaine ?", answers:["Une ouverture vers le dialogue avec l'URSS","Une remise en question de la politique d'endiguement","Une psychose anticommuniste et une panique morale généralisée","Un renforcement des libertés civiles pour contrer la propagande soviétique"], correct:2 },
+  { q:"Par quelle stratégie l'URSS prend-elle progressivement le contrôle des pays d'Europe de l'Est ?", answers:["Elle impose l'adhésion au Pacte de Varsovie par la force directe","Elle installe les communistes aux postes clés : Intérieur, Justice, Armée…","Elle organise des référendums sous contrôle dans chaque pays","Elle finance des partis travaillistes pour remplacer les gouvernements"], correct:1 },
+  { q:"Pourquoi Khrouchtchev est-il renversé par la nomenclatura après la mort de Staline ?", answers:["Il a conduit l'URSS à la défaite dans la course à l'espace","Il a perdu le soutien de l'armée après la crise de Cuba","La nomenclatura craint de perdre ses privilèges avec la déstalinisation","Il a voulu rapprocher l'URSS des États-Unis trop rapidement"], correct:2 },
+  { q:"Pourquoi la Yougoslavie est-elle une « épine » pour le bloc communiste de Moscou ?", answers:["Elle menace d'adhérer à l'OTAN pour obtenir une protection militaire","Elle est communiste mais revendique son autonomie et refuse l'autorité soviétique","Elle soutient secrètement les révolutionnaires cubains contre Moscou","Elle accepte l'aide économique américaine tout en restant officiellement neutre"], correct:1 },
+  { q:"Quelle est la principale cause de la crise des missiles de Cuba ?", answers:["L'URSS réagit à l'installation de missiles américains en Turquie","Cuba cherche à envahir la Floride avec le soutien soviétique","Castro nationalise les investissements américains sans compensation, poussant Cuba vers l'URSS","Kennedy ordonne un blocus naval sans provocation préalable"], correct:2 },
+  { q:"Dans la course à l'espace, quelle puissance obtient les premières grandes réussites ?", answers:["Les États-Unis, grâce à leur supériorité technologique d'après-guerre","L'URSS, avec le premier satellite artificiel et le premier être vivant en orbite","Les deux puissances progressent exactement au même rythme","L'URSS, uniquement grâce à l'espionnage des laboratoires américains"], correct:1 },
+  { q:"Qu'est-ce qui met fin aux « Trente Glorieuses » et provoque l'essoufflement économique du bloc occidental ?", answers:["La concurrence des industries japonaise et allemande sur les marchés mondiaux","L'échec du modèle keynésien face à la montée des inégalités sociales","Le choc pétrolier : inflation, crédit généralisé et abandon du dollar-étalon","La fin de la course aux armements qui réduit les investissements technologiques"], correct:2 }
 ];
 
-const TIME_PER_Q = 20;
+const TIME = 20;
+let sessionId, timerInterval, timeLeft = TIME;
+let currentQ = 0, scores = {}, prevScores = {}, players = {}, answersListener = null;
 
-// ══════════════════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════════════════
-let sessionId, timerInterval, timeLeft;
-let currentQ = 0;
-let scores = {}; // { playerId: score }
-let prevScores = {};
-let players = {};   // { playerId: { name } }
-let answersSnapshot = {}; // { playerId: answerIndex }
-let phase = 'lobby'; // lobby | question | leaderboard | podium
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
 
-// ══════════════════════════════════════════════════════
-//  INIT SESSION
-// ══════════════════════════════════════════════════════
-function initSession() {
-  sessionId = Math.random().toString(36).substr(2, 6).toUpperCase();
-  document.getElementById('session-badge').textContent = sessionId;
+function init() {
+  sessionId = Math.random().toString(36).substr(2,6).toUpperCase();
+  document.getElementById('session-pill').textContent = sessionId;
 
-  const eleveURL = `${location.href.replace('prof.html','eleve.html')}?session=${sessionId}`;
-  document.getElementById('eleve-url').textContent = eleveURL;
+  const url = location.href.replace('prof.html','eleve.html') + '?session=' + sessionId;
+  document.getElementById('eleve-url').textContent = url;
+  new QRCode(document.getElementById('qrcode'), { text:url, width:180, height:180, colorDark:'#0d4f4f', colorLight:'#ffffff' });
 
-  new QRCode(document.getElementById('qrcode'), {
-    text: eleveURL,
-    width: 180,
-    height: 180,
-    colorDark: '#0d4f4f',
-    colorLight: '#ffffff'
-  });
+  db.ref('sessions/' + sessionId).set({ state:'lobby', currentQuestion:-1 });
 
-  db.ref(`sessions/${sessionId}`).set({
-    state: 'lobby',
-    currentQuestion: -1,
-    timeLeft: 0
-  });
-
-  db.ref(`sessions/${sessionId}/players`).on('value', snap => {
-    const data = snap.val() || {};
-    players = {};
+  db.ref('sessions/' + sessionId + '/players').on('value', snap => {
+    players = snap.val() || {};
+    Object.keys(players).forEach(id => { if (scores[id] === undefined) scores[id] = 0; });
+    const names = Object.values(players).map(p => p.name);
+    document.getElementById('player-count').textContent = names.length;
     const list = document.getElementById('player-list');
-    const count = document.getElementById('player-count');
     list.innerHTML = '';
-    Object.entries(data).forEach(([id, p]) => {
-      players[id] = p;
-      if (!scores[id]) scores[id] = 0;
+    names.forEach(name => {
       const chip = document.createElement('div');
       chip.className = 'player-chip';
-      chip.textContent = p.name;
+      chip.textContent = name;
       list.appendChild(chip);
     });
-    const n = Object.keys(data).length;
-    count.textContent = n;
-    document.getElementById('btn-start').disabled = n < 1;
+    document.getElementById('btn-start').disabled = (names.length === 0);
   });
 
   showScreen('lobby');
 }
 
-// ══════════════════════════════════════════════════════
-//  SCREENS
-// ══════════════════════════════════════════════════════
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(`screen-${name}`).classList.add('active');
-  phase = name;
-}
-
-// ══════════════════════════════════════════════════════
-//  QUESTION
-// ══════════════════════════════════════════════════════
-function showQuestion(idx) {
+function startQuestion(idx) {
   clearInterval(timerInterval);
-  answersSnapshot = {};
+  if (answersListener) { db.ref('sessions/' + sessionId + '/answers').off('value', answersListener); answersListener = null; }
+
   currentQ = idx;
   const q = QUESTIONS[idx];
-
-  document.getElementById('q-num').textContent = `Question ${idx+1}/10`;
-  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('q-label').textContent = 'Question ' + (idx+1) + ' / 10';
+  document.getElementById('q-text').textContent = q.q;
   ['A','B','C','D'].forEach((l,i) => {
-    document.getElementById(`ans-${l}`).textContent = q.answers[i];
-    document.getElementById(`cnt-${l}`).textContent = '0';
-    document.getElementById(`bar-${l}`).style.width = '0';
-    document.getElementById(`box-${l}`).classList.remove('correct');
+    document.getElementById('txt-' + l).textContent = q.answers[i];
+    document.getElementById('cnt-' + l).textContent = '0';
+    document.getElementById('fill-' + l).style.width = '0';
+    document.getElementById('box-' + l).classList.remove('correct');
   });
   document.getElementById('btn-next').style.display = 'none';
-  document.getElementById('response-count').textContent = '0 réponse(s)';
+  document.getElementById('resp-count').textContent = '0 réponse(s)';
 
-  db.ref(`sessions/${sessionId}/answers`).remove();
-  db.ref(`sessions/${sessionId}`).update({ state: 'question', currentQuestion: idx, timeLeft: TIME_PER_Q });
+  db.ref('sessions/' + sessionId + '/answers').remove();
+  db.ref('sessions/' + sessionId).update({ state:'question', currentQuestion:idx });
 
-  db.ref(`sessions/${sessionId}/answers`).on('value', snap => {
+  answersListener = db.ref('sessions/' + sessionId + '/answers').on('value', snap => {
     const data = snap.val() || {};
-    answersSnapshot = data;
-    updateAnswerBars(data);
-    document.getElementById('response-count').textContent = `${Object.keys(data).length} réponse(s) / ${Object.keys(players).length}`;
+    const total = Math.max(Object.keys(players).length, 1);
+    const counts = [0,0,0,0];
+    Object.values(data).forEach(a => { if (a >= 0 && a < 4) counts[a]++; });
+    ['A','B','C','D'].forEach((l,i) => {
+      document.getElementById('cnt-' + l).textContent = counts[i];
+      document.getElementById('fill-' + l).style.width = (counts[i]/total*100) + '%';
+    });
+    document.getElementById('resp-count').textContent = Object.keys(data).length + ' / ' + Object.keys(players).length + ' réponses';
   });
 
   showScreen('question');
-  startTimer();
-}
 
-function updateAnswerBars(data) {
-  const counts = [0,0,0,0];
-  Object.values(data).forEach(a => { if (a >= 0 && a <= 3) counts[a]++; });
-  const total = Object.keys(players).length || 1;
-  ['A','B','C','D'].forEach((l,i) => {
-    document.getElementById(`cnt-${l}`).textContent = counts[i];
-    document.getElementById(`bar-${l}`).style.width = `${(counts[i]/total)*100}%`;
-  });
-}
-
-function startTimer() {
-  timeLeft = TIME_PER_Q;
-  const disp = document.getElementById('timer-display');
-  const bar  = document.getElementById('timer-bar');
-  disp.classList.remove('urgent');
-  disp.textContent = timeLeft;
-  bar.style.width = '100%';
+  timeLeft = TIME;
+  document.getElementById('timer-num').classList.remove('urgent');
+  document.getElementById('timer-fill').style.width = '100%';
+  document.getElementById('timer-num').textContent = TIME;
 
   timerInterval = setInterval(() => {
     timeLeft--;
-    disp.textContent = timeLeft;
-    bar.style.width = `${(timeLeft/TIME_PER_Q)*100}%`;
-    if (timeLeft <= 5) disp.classList.add('urgent');
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      db.ref(`sessions/${sessionId}`).update({ state: 'reveal', timeLeft: 0 });
-      revealAnswer();
-    }
+    document.getElementById('timer-num').textContent = timeLeft;
+    document.getElementById('timer-fill').style.width = (timeLeft/TIME*100) + '%';
+    document.getElementById('timer-num').classList.toggle('urgent', timeLeft <= 5);
+    if (timeLeft <= 0) { clearInterval(timerInterval); endQuestion(); }
   }, 1000);
 }
 
-function revealAnswer() {
-  const q = QUESTIONS[currentQ];
-  const letters = ['A','B','C','D'];
-  const correctLetter = letters[q.correct];
-  document.getElementById(`box-${correctLetter}`).classList.add('correct');
+function endQuestion() {
+  if (answersListener) { db.ref('sessions/' + sessionId + '/answers').off('value', answersListener); answersListener = null; }
+  db.ref('sessions/' + sessionId).update({ state:'reveal' });
 
-  // Calculate scores
-  prevScores = { ...scores };
-  Object.entries(answersSnapshot).forEach(([pid, ans]) => {
-    if (ans === q.correct) {
-      const bonus = Math.round((timeLeft / TIME_PER_Q) * 500) + 500;
-      scores[pid] = (scores[pid] || 0) + bonus;
-    }
+  prevScores = Object.assign({}, scores);
+  const correct = QUESTIONS[currentQ].correct;
+
+  db.ref('sessions/' + sessionId + '/answers').once('value', snap => {
+    const data = snap.val() || {};
+    Object.entries(data).forEach(([pid, ans]) => {
+      if (parseInt(ans) === correct) {
+        scores[pid] = (scores[pid] || 0) + Math.round((timeLeft / TIME) * 500) + 500;
+      }
+    });
   });
 
+  document.getElementById('box-' + ['A','B','C','D'][correct]).classList.add('correct');
   document.getElementById('btn-next').style.display = 'inline-block';
-  db.ref(`sessions/${sessionId}/answers`).off('value');
 }
 
-// ══════════════════════════════════════════════════════
-//  LEADERBOARD
-// ══════════════════════════════════════════════════════
 function showLeaderboard() {
-  const sorted = Object.entries(scores)
-    .sort((a,b) => b[1]-a[1])
-    .slice(0,10);
-
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]).slice(0,10);
   const list = document.getElementById('lb-list');
   list.innerHTML = '';
   sorted.forEach(([pid, score], i) => {
-    const name = players[pid]?.name || pid;
-    const prev = prevScores[pid] || 0;
-    const delta = score - prev;
+    const delta = score - (prevScores[pid] || 0);
     const row = document.createElement('div');
     row.className = 'lb-row';
-    row.innerHTML = `
-      <span class="lb-rank">${i+1}</span>
-      <span class="lb-name">${name}</span>
-      <span class="lb-score">${score} pts</span>
-      <span class="lb-delta ${delta>0?'pos':''}">${delta>0?'+'+delta:''}</span>`;
+    row.innerHTML = '<span class="lb-rank">'+(i+1)+'</span>'
+      +'<span class="lb-name">'+(players[pid]?.name||pid)+'</span>'
+      +'<span class="lb-score">'+score+' pts</span>'
+      +'<span class="lb-delta'+(delta>0?' pos':'')+'">'+( delta>0?'+'+delta:'' )+'</span>';
     list.appendChild(row);
   });
-
-  db.ref(`sessions/${sessionId}`).update({ state: 'leaderboard', scores });
-
+  db.ref('sessions/' + sessionId).update({ state:'leaderboard', scores });
   const isLast = currentQ >= QUESTIONS.length - 1;
   const btn = document.getElementById('btn-continue');
   btn.textContent = isLast ? '🏆 Voir le podium' : 'Question suivante →';
-  btn.onclick = isLast ? showPodium : () => showQuestion(currentQ + 1);
-
+  btn.onclick = isLast ? showPodium : () => startQuestion(currentQ + 1);
   showScreen('leaderboard');
 }
 
-// ══════════════════════════════════════════════════════
-//  PODIUM
-// ══════════════════════════════════════════════════════
 function showPodium() {
   const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-  const top3 = [sorted[1], sorted[0], sorted[2]]; // 2nd, 1st, 3rd visually
-
+  const order = [sorted[1], sorted[0], sorted[2]];
+  const medals = ['🥈','🥇','🥉'], labels = ['2e','1er','3e'];
   const wrap = document.getElementById('podium-wrap');
   wrap.innerHTML = '';
-  const medals = ['🥈','🥇','🥉'];
-  const ranks  = ['2e','1er','3e'];
-
-  top3.forEach((entry, i) => {
+  order.forEach((entry, i) => {
     if (!entry) return;
-    const [pid, score] = entry;
-    const name = players[pid]?.name || pid;
-    const div = document.createElement('div');
-    div.className = 'podium-place';
-    div.innerHTML = `
-      <div class="podium-avatar">${medals[i]}</div>
-      <div class="podium-name">${name}</div>
-      <div class="podium-score">${score} pts</div>
-      <div class="podium-block"><div class="place-num">${ranks[i]}</div></div>`;
-    wrap.appendChild(div);
+    const [pid, pts] = entry;
+    const col = document.createElement('div');
+    col.className = 'podium-col';
+    col.innerHTML = '<div class="podium-medal">'+medals[i]+'</div>'
+      +'<div class="podium-name">'+(players[pid]?.name||pid)+'</div>'
+      +'<div class="podium-pts">'+pts+' pts</div>'
+      +'<div class="podium-block"><div class="podium-pos">'+labels[i]+'</div></div>';
+    wrap.appendChild(col);
   });
-
-  // Full leaderboard below
-  const full = document.getElementById('lb-list-final');
-  full.innerHTML = '';
-  sorted.forEach(([pid, score], i) => {
-    if (i < 3) return;
+  const final = document.getElementById('lb-final');
+  final.innerHTML = '';
+  sorted.slice(3).forEach(([pid, score], i) => {
     const row = document.createElement('div');
     row.className = 'lb-row';
-    row.innerHTML = `
-      <span class="lb-rank">${i+1}</span>
-      <span class="lb-name">${players[pid]?.name || pid}</span>
-      <span class="lb-score">${score} pts</span>`;
-    full.appendChild(row);
+    row.innerHTML = '<span class="lb-rank">'+(i+4)+'</span><span class="lb-name">'+(players[pid]?.name||pid)+'</span><span class="lb-score">'+score+' pts</span>';
+    final.appendChild(row);
   });
-
-  db.ref(`sessions/${sessionId}`).update({ state: 'podium', scores });
+  db.ref('sessions/' + sessionId).update({ state:'podium', scores });
   showScreen('podium');
   launchConfetti();
 }
 
-// ══════════════════════════════════════════════════════
-//  CONFETTI
-// ══════════════════════════════════════════════════════
 function launchConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
+  const canvas = document.getElementById('confetti');
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const pieces = Array.from({length:120}, () => ({
-    x: Math.random()*canvas.width,
-    y: -10,
-    r: Math.random()*8+4,
-    d: Math.random()*3+1,
-    color: ['#ff6847','#0d4f4f','#f0c060','#f5f0e8','#1a6b6b'][Math.floor(Math.random()*5)],
-    tilt: Math.random()*10-10
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const pieces = Array.from({length:100}, () => ({
+    x:Math.random()*canvas.width, y:-10, r:Math.random()*7+3,
+    speed:Math.random()*3+1, tilt:Math.random()*8-4,
+    color:['#ff6847','#1a6b6b','#f39c12','#f0ece4'][Math.floor(Math.random()*4)]
   }));
   let frame = 0;
-  function draw() {
+  (function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     pieces.forEach(p => {
-      ctx.beginPath();
-      ctx.fillStyle = p.color;
-      ctx.ellipse(p.x, p.y, p.r, p.r/2, p.tilt, 0, Math.PI*2);
-      ctx.fill();
-      p.y += p.d;
-      p.tilt += .05;
+      ctx.beginPath(); ctx.fillStyle = p.color;
+      ctx.ellipse(p.x,p.y,p.r,p.r/2,p.tilt,0,Math.PI*2); ctx.fill();
+      p.y += p.speed; p.tilt += .04;
       if (p.y > canvas.height) { p.y = -10; p.x = Math.random()*canvas.width; }
     });
-    frame++;
-    if (frame < 300) requestAnimationFrame(draw);
+    if (++frame < 350) requestAnimationFrame(draw);
     else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-  draw();
+  })();
 }
 
-// ══════════════════════════════════════════════════════
-//  EVENTS
-// ══════════════════════════════════════════════════════
-document.getElementById('btn-start').onclick = () => showQuestion(0);
-document.getElementById('btn-next').onclick   = showLeaderboard;
+document.getElementById('btn-start').addEventListener('click', () => startQuestion(0));
+document.getElementById('btn-next').addEventListener('click', showLeaderboard);
 
-initSession();
+init();
 </script>
 </body>
 </html>
