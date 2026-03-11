@@ -220,6 +220,32 @@ function listenGameState(){
         myScore = s.val()||0;
         document.getElementById('score-badge').textContent = myScore+' pts';
       });
+      // Afficher si bonne ou mauvaise réponse
+      const correctIdx = state.correctAnswer;
+      if(typeof correctIdx !== 'undefined'){
+        db.ref('answers/'+myId).once('value', s=>{
+          const ans = s.val();
+          const wasCorrect = ans && ans.answer === correctIdx;
+          document.getElementById('result-label').textContent = wasCorrect ? '✅ BONNE RÉPONSE' : '❌ MAUVAISE RÉPONSE';
+          document.getElementById('result-label').style.color = wasCorrect ? '#1e8a50' : '#c03828';
+          if(ans){
+            const letters = ['A','B','C','D'];
+            if(wasCorrect){
+              db.ref('players/'+myId+'/score').once('value', s2=>{
+                const newScore = s2.val()||0;
+                const gained = newScore - myScore;
+                myScore = newScore;
+                document.getElementById('score-badge').textContent = myScore+' pts';
+                document.getElementById('pts-earned').textContent = gained > 0 ? '+'+gained+' points !' : 'Points comptabilisés';
+              });
+            } else {
+              document.getElementById('pts-earned').textContent = 'Bonne réponse : ' + letters[correctIdx];
+            }
+          } else {
+            document.getElementById('pts-earned').textContent = 'Pas de réponse — Bonne réponse : ' + ['A','B','C','D'][correctIdx];
+          }
+        });
+      }
     }
     else if(state.phase==='podium'){
       showPodium();
