@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -93,10 +92,14 @@
   .opt-btn.C { background:#7a3a14; }
   .opt-btn.D { background:#6a2878; }
   .opt-btn:disabled { cursor:default; }
-  .opt-btn.selected-correct { box-shadow:0 0 0 3px #2ecc71,0 0 20px rgba(46,204,113,0.4); transform:scale(1.02); }
-  .opt-btn.selected-wrong   { box-shadow:0 0 0 3px var(--danger),0 0 20px rgba(184,48,32,0.3); opacity:0.7; }
-  .opt-btn.correct-reveal   { box-shadow:0 0 0 3px #2ecc71,0 0 20px rgba(46,204,113,0.4); }
-  .opt-btn.wrong-reveal     { opacity:0.25; filter:grayscale(0.6); }
+  /* Réponse sélectionnée — contour blanc épais + luminosité */
+  .opt-btn.selected {
+    box-shadow: 0 0 0 4px #ffffff, 0 0 24px rgba(255,255,255,0.25);
+    transform: scale(1.04);
+    filter: brightness(1.35);
+  }
+  .opt-btn.correct-reveal   { box-shadow:0 0 0 4px #2ecc71,0 0 24px rgba(46,204,113,0.5); filter:brightness(1.2); }
+  .opt-btn.wrong-reveal     { opacity:0.2; filter:grayscale(0.7); transform:scale(1); }
   .opt-letter { min-width:28px; height:28px; background:rgba(0,0,0,0.35); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
   .status-msg { text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; color:var(--muted); letter-spacing:1px; min-height:1.5em; }
   .status-msg.correct { color:#2ecc71; font-size:1.3rem; }
@@ -204,7 +207,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const LETTERS = ['A','B','C','D'];
-let myUid = null, myName = '', myScore = 0, currentQuestionIndex = -1, hasAnswered = false, timerInterval = null, timeLeft = 20;
+let myUid = null, myName = '', myScore = 0, currentQuestionIndex = -1, hasAnswered = false, myAnswer = -1, timerInterval = null, timeLeft = 20;
 
 function uid(){ return 'u_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
 function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -248,6 +251,7 @@ function listenGameState(){
       if(idx !== currentQuestionIndex){
         currentQuestionIndex = idx;
         hasAnswered = false;
+        myAnswer = -1;
         loadQuestion(state, idx);
         show('screen-question');
       }
@@ -315,14 +319,20 @@ function updateTimerDisplay(){
 }
 
 function submitAnswer(answerIndex, questionIndex){
-  if(hasAnswered) return;
+  // Effacer la sélection précédente
+  LETTERS.forEach((_,i)=>{
+    const b = document.getElementById(`opt-${i}`);
+    if(b) b.classList.remove('selected');
+  });
+  // Enregistrer localement
+  myAnswer = answerIndex;
   hasAnswered = true;
-  disableAllOpts();
+  // Mettre en surbrillance la nouvelle sélection
+  document.getElementById(`opt-${answerIndex}`).classList.add('selected');
+  // Écraser la réponse précédente dans Firebase
   const answerTime = 20 - timeLeft;
   db.ref(`answers/${myUid}`).set({ question: questionIndex, answer: answerIndex, uid: myUid, time: answerTime });
-  document.getElementById(`opt-${answerIndex}`).style.opacity = '1';
-  document.getElementById(`opt-${answerIndex}`).style.filter = 'brightness(1.3)';
-  document.getElementById('status-msg').textContent = 'Réponse enregistrée — en attente de la révélation…';
+  document.getElementById('status-msg').textContent = 'Réponse enregistrée — tu peux encore changer !';
   document.getElementById('status-msg').className = 'status-msg waiting-reveal';
 }
 
@@ -334,12 +344,14 @@ function disableAllOpts(){
 }
 
 function revealAnswer(correctIndex){
+  const correct = Number(correctIndex);   // ← cast explicite, élimine tout bug de type
   stopTimerDisplay();
+  disableAllOpts();
   LETTERS.forEach((_,i)=>{
     const b = document.getElementById(`opt-${i}`);
     if(!b) return;
-    b.disabled = true;
-    if(i === correctIndex) b.classList.add('correct-reveal');
+    b.classList.remove('selected');       // effacer surbrillance de sélection
+    if(i === correct) b.classList.add('correct-reveal');
     else b.classList.add('wrong-reveal');
   });
   db.ref(`players/${myUid}/score`).once('value', snap=>{
@@ -348,18 +360,15 @@ function revealAnswer(correctIndex){
   });
   const status = document.getElementById('status-msg');
   if(hasAnswered){
-    db.ref(`answers/${myUid}`).once('value', snap=>{
-      const ans = snap.val();
-      if(ans && ans.answer === correctIndex){
-        status.textContent = '✅ Bonne réponse !';
-        status.className = 'status-msg correct';
-      } else {
-        status.textContent = '❌ Mauvaise réponse';
-        status.className = 'status-msg wrong';
-      }
-    });
+    if(myAnswer === correct){             // ← comparaison locale, fiable
+      status.textContent = '✅ Bonne réponse !';
+      status.className = 'status-msg correct';
+    } else {
+      status.textContent = '❌ Mauvaise réponse';
+      status.className = 'status-msg wrong';
+    }
   } else {
-    status.textContent = "⏰ Temps écoulé — pas de réponse";
+    status.textContent = '⏰ Temps écoulé — pas de réponse';
     status.className = 'status-msg wrong';
   }
 }
