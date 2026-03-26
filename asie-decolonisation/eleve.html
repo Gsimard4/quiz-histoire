@@ -1,1 +1,386 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quiz Décolonisation — Élève</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+
+  :root {
+    --accent:    #c9a227;
+    --accent-lo: #8a6e10;
+    --coral:     #8b3a2a;
+    --coral-hi:  #c05030;
+    --dark:   #0a0805;
+    --mid:    #13100a;
+    --card:   #1c1710;
+    --card2:  #221d14;
+    --border: #332a18;
+    --border2:#463a22;
+    --text:   #e8dfc8;
+    --muted:  #7a6a48;
+    --green:  #2a7a3a;
+    --danger: #b83020;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; }
+  body { font-family:'Barlow',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(201,162,39,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(201,162,39,0.04) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--mid); border-bottom:2px solid var(--accent); position:sticky; top:0; z-index:100; box-shadow:0 3px 16px rgba(201,162,39,0.12); }
+  .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:3px; }
+  .topbar-title span { color:var(--accent); }
+  .topbar-score { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); }
+  .topbar-score strong { color:var(--coral-hi); font-size:1.2rem; }
+
+  .screen { position:relative; z-index:1; min-height:calc(100vh - 50px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px; gap:20px; }
+
+  /* ── LOBBY / NAME ENTRY ── */
+  #screen-lobby { display:flex; }
+  .lobby-card { background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:28px 24px; width:100%; max-width:380px; display:flex; flex-direction:column; gap:16px; align-items:center; box-shadow:0 0 40px rgba(201,162,39,0.08); }
+  .lobby-title { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:3px; color:var(--accent); text-align:center; line-height:1.1; }
+  .lobby-subtitle { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); letter-spacing:2px; text-align:center; }
+  .name-input { width:100%; background:var(--card2); border:2px solid var(--border2); border-radius:6px; padding:14px 16px; font-family:'Barlow',sans-serif; font-size:1.1rem; color:var(--text); outline:none; text-align:center; transition:border-color .2s; }
+  .name-input:focus { border-color:var(--accent); }
+  .name-input::placeholder { color:var(--muted); }
+  .btn-join { width:100%; padding:16px; background:var(--accent); color:#0a0805; border:none; border-radius:6px; font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; cursor:pointer; transition:all .2s; box-shadow:0 0 24px rgba(201,162,39,0.3); }
+  .btn-join:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  .btn-join:active { transform:translateY(0); }
+  .waiting-msg { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); text-align:center; letter-spacing:1px; }
+  .waiting-dot { display:inline-block; animation:blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+
+  /* ── WAITING ROOM ── */
+  #screen-waiting { display:none; }
+  .waiting-card { background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:32px 24px; width:100%; max-width:380px; display:flex; flex-direction:column; gap:20px; align-items:center; text-align:center; }
+  .waiting-avatar { font-size:3.5rem; }
+  .waiting-name { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; color:var(--accent); }
+  .waiting-status { font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; color:var(--muted); letter-spacing:1px; }
+  .pulse-ring { width:60px; height:60px; border-radius:50%; border:3px solid var(--accent); animation:ringPulse 1.5s infinite; margin:0 auto; }
+  @keyframes ringPulse { 0%{transform:scale(0.9);opacity:1;}100%{transform:scale(1.4);opacity:0;} }
+
+  /* ── QUESTION SCREEN ── */
+  #screen-question { display:none; flex-direction:column; align-items:stretch; padding:14px 14px; gap:12px; justify-content:flex-start; min-height:calc(100vh - 50px); }
+  .q-meta { display:flex; justify-content:space-between; align-items:center; }
+  .q-num-label { font-family:'Barlow Condensed',sans-serif; font-size:0.9rem; color:var(--muted); letter-spacing:2px; }
+  .q-timer-ring { position:relative; width:52px; height:52px; }
+  .q-timer-ring svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
+  .q-timer-ring circle { fill:none; stroke-width:4; }
+  .timer-bg { stroke:var(--border2); }
+  .timer-fg { stroke:var(--coral-hi); stroke-dasharray:138; stroke-dashoffset:0; transition:stroke-dashoffset .9s linear; }
+  .timer-fg.urgent { stroke:var(--danger); }
+  .q-timer-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--coral-hi); }
+  .q-timer-num.urgent { color:var(--danger); }
+  .progress-outer { width:100%; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-inner { height:100%; background:linear-gradient(90deg,var(--accent-lo),var(--accent)); border-radius:2px; transition:width .4s; }
+  .q-text-box { background:var(--card2); border-left:4px solid var(--accent); padding:14px 16px; border-radius:0 8px 8px 0; font-family:'Barlow Condensed',sans-serif; font-size:1.35rem; font-weight:700; line-height:1.3; }
+  .opts-grid { display:flex; flex-direction:column; gap:10px; }
+  .opt-btn { padding:14px 16px; border-radius:8px; border:none; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; color:white; text-align:left; display:flex; align-items:flex-start; gap:12px; cursor:pointer; transition:all .15s; -webkit-tap-highlight-color:transparent; }
+  .opt-btn:active { transform:scale(0.97); }
+  .opt-btn.A { background:#1a5c8a; }
+  .opt-btn.B { background:#3a6e28; }
+  .opt-btn.C { background:#7a3a14; }
+  .opt-btn.D { background:#6a2878; }
+  .opt-btn:disabled { cursor:default; }
+  .opt-btn.selected-correct { box-shadow:0 0 0 3px #2ecc71,0 0 20px rgba(46,204,113,0.4); transform:scale(1.02); }
+  .opt-btn.selected-wrong   { box-shadow:0 0 0 3px var(--danger),0 0 20px rgba(184,48,32,0.3); opacity:0.7; }
+  .opt-btn.correct-reveal   { box-shadow:0 0 0 3px #2ecc71,0 0 20px rgba(46,204,113,0.4); }
+  .opt-btn.wrong-reveal     { opacity:0.25; filter:grayscale(0.6); }
+  .opt-letter { min-width:28px; height:28px; background:rgba(0,0,0,0.35); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+  .status-msg { text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; color:var(--muted); letter-spacing:1px; min-height:1.5em; }
+  .status-msg.correct { color:#2ecc71; font-size:1.3rem; }
+  .status-msg.wrong   { color:var(--danger); font-size:1.3rem; }
+  .status-msg.waiting-reveal { color:var(--muted); }
+
+  /* ── SCORE FEEDBACK ── */
+  #screen-score { display:none; }
+  .score-card { background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:32px 24px; width:100%; max-width:380px; display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center; }
+  .score-emoji { font-size:3rem; }
+  .score-label { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:3px; color:var(--muted); }
+  .score-pts { font-family:'Bebas Neue',sans-serif; font-size:4rem; color:var(--accent); line-height:1; }
+  .score-rank { font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; color:var(--muted); }
+
+  /* ── PODIUM ── */
+  #screen-podium { display:none; }
+  .podium-card { background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:28px 20px; width:100%; max-width:380px; display:flex; flex-direction:column; gap:20px; align-items:center; text-align:center; }
+  .podium-title { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:4px; color:var(--accent); }
+  .final-score { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; color:var(--accent); }
+  .final-label { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); letter-spacing:2px; }
+  .podium-list { width:100%; display:flex; flex-direction:column; gap:8px; }
+  .pl-entry { display:flex; align-items:center; gap:10px; background:var(--card2); padding:10px 14px; border-radius:6px; border-left:3px solid transparent; }
+  .pl-entry.rank-1 { border-left-color:gold; }
+  .pl-entry.rank-2 { border-left-color:silver; }
+  .pl-entry.rank-3 { border-left-color:#cd7f32; }
+  .pl-entry.is-me  { background:linear-gradient(90deg,rgba(201,162,39,0.12),var(--card2)); }
+  .pl-rank { font-family:'Bebas Neue',sans-serif; font-size:1rem; width:22px; color:var(--muted); }
+  .pl-name { flex:1; font-weight:700; font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pl-pts  { font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--coral-hi); }
+
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">DÉCO<span>LONISATION</span></div>
+  <div class="topbar-score">Score : <strong id="score-display">0</strong></div>
+</div>
+
+<!-- LOBBY -->
+<div class="screen" id="screen-lobby">
+  <div class="lobby-card">
+    <div class="lobby-title">DÉCOLONISATION</div>
+    <div class="lobby-subtitle">ASIE · AFRIQUE · TIERS-MONDE</div>
+    <input class="name-input" id="name-input" type="text" placeholder="Ton prénom…" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="btn-join" id="btn-join" onclick="joinGame()">REJOINDRE</button>
+    <div class="waiting-msg" id="lobby-msg" style="display:none">En attente du professeur <span class="waiting-dot">●</span></div>
+  </div>
+</div>
+
+<!-- WAITING ROOM -->
+<div class="screen" id="screen-waiting">
+  <div class="waiting-card">
+    <div class="waiting-avatar">🌍</div>
+    <div class="waiting-name" id="waiting-name">Joueur</div>
+    <div class="pulse-ring"></div>
+    <div class="waiting-status">En attente du lancement du quiz…</div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div class="screen" id="screen-question">
+  <div class="q-meta">
+    <div>
+      <div class="q-num-label" id="q-num-label">QUESTION 1/10</div>
+    </div>
+    <div class="q-timer-ring">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle class="timer-bg" cx="26" cy="26" r="22"/>
+        <circle class="timer-fg" id="timer-circle" cx="26" cy="26" r="22"/>
+      </svg>
+      <div class="q-timer-num" id="timer-num">20</div>
+    </div>
+  </div>
+  <div class="progress-outer"><div class="progress-inner" id="progress-inner" style="width:0%"></div></div>
+  <div class="q-text-box" id="q-text-box">…</div>
+  <div class="opts-grid" id="opts-grid"></div>
+  <div class="status-msg" id="status-msg"></div>
+</div>
+
+<!-- SCORE BETWEEN QUESTIONS -->
+<div class="screen" id="screen-score">
+  <div class="score-card">
+    <div class="score-emoji" id="score-emoji">🎉</div>
+    <div class="score-label">SCORE TOTAL</div>
+    <div class="score-pts" id="score-pts">0</div>
+    <div class="score-rank" id="score-rank"></div>
+  </div>
+</div>
+
+<!-- PODIUM -->
+<div class="screen" id="screen-podium">
+  <div class="podium-card">
+    <div class="podium-title">🏆 FIN DU QUIZ</div>
+    <div class="final-label">TON SCORE FINAL</div>
+    <div class="final-score" id="final-score">0</div>
+    <div class="podium-list" id="podium-list"></div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = { databaseURL:"https://asie-decolonisation-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const LETTERS = ['A','B','C','D'];
+let myUid = null, myName = '', myScore = 0, currentQuestionIndex = -1, hasAnswered = false, timerInterval = null, timeLeft = 20;
+
+function uid(){ return 'u_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function show(id){
+  ['screen-lobby','screen-waiting','screen-question','screen-score','screen-podium'].forEach(s=>{
+    const el = document.getElementById(s);
+    if(el) el.style.display = (s===id ? 'flex' : 'none');
+  });
+  if(id === 'screen-question') document.getElementById('screen-question').style.display = 'flex';
+}
+
+function joinGame(){
+  const input = document.getElementById('name-input');
+  const name = input.value.trim();
+  if(!name){ input.focus(); input.style.borderColor='var(--danger)'; setTimeout(()=>input.style.borderColor='',1200); return; }
+  myName = name;
+  myUid  = uid();
+  document.getElementById('btn-join').disabled = true;
+  db.ref(`players/${myUid}`).set({ name: myName, score: 0 }).then(()=>{
+    document.getElementById('lobby-msg').style.display = 'block';
+    document.getElementById('btn-join').style.display   = 'none';
+    document.getElementById('waiting-name').textContent = myName;
+    show('screen-waiting');
+    listenGameState();
+  }).catch(()=>{ document.getElementById('btn-join').disabled=false; });
+}
+
+document.getElementById('name-input').addEventListener('keydown', e=>{ if(e.key==='Enter') joinGame(); });
+
+function listenGameState(){
+  db.ref('gameState').on('value', snap=>{
+    const state = snap.val();
+    if(!state) return;
+    const phase = state.phase;
+
+    if(phase === 'lobby'){
+      show('screen-waiting');
+    } else if(phase === 'question'){
+      const idx = state.questionIndex;
+      if(idx !== currentQuestionIndex){
+        currentQuestionIndex = idx;
+        hasAnswered = false;
+        loadQuestion(state, idx);
+        show('screen-question');
+      }
+    } else if(phase === 'closed'){
+      stopTimerDisplay();
+      document.getElementById('status-msg').textContent = 'Temps écoulé — en attente de la révélation…';
+      document.getElementById('status-msg').className = 'status-msg waiting-reveal';
+      disableAllOpts();
+    } else if(phase === 'revealed'){
+      revealAnswer(state.correctAnswer);
+    } else if(phase === 'podium'){
+      showFinalPodium();
+    }
+  });
+}
+
+function loadQuestion(state, idx){
+  clearInterval(timerInterval);
+  timeLeft = state.timeLeft || 20;
+  const opts = state.options || [];
+  document.getElementById('q-num-label').textContent = `QUESTION ${idx+1}/10`;
+  document.getElementById('q-text-box').textContent = state.question || '';
+  document.getElementById('progress-inner').style.width = `${(idx/10)*100}%`;
+  document.getElementById('status-msg').textContent = '';
+  document.getElementById('status-msg').className = 'status-msg';
+
+  const grid = document.getElementById('opts-grid');
+  grid.innerHTML = '';
+  opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = `opt-btn ${LETTERS[i]}`;
+    btn.id = `opt-${i}`;
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span>${escHtml(opt)}`;
+    btn.onclick = ()=>submitAnswer(i, state.questionIndex);
+    grid.appendChild(btn);
+  });
+
+  startTimerDisplay();
+}
+
+function startTimerDisplay(){
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft<=0){ clearInterval(timerInterval); }
+  }, 1000);
+
+  db.ref('gameState/timeLeft').on('value', snap=>{
+    const t = snap.val();
+    if(t !== null && Math.abs(t - timeLeft) > 1){ timeLeft = t; updateTimerDisplay(); }
+  });
+}
+function stopTimerDisplay(){ clearInterval(timerInterval); }
+
+function updateTimerDisplay(){
+  const n = document.getElementById('timer-num');
+  const c = document.getElementById('timer-circle');
+  const urgent = timeLeft <= 5;
+  n.textContent = Math.max(0, timeLeft);
+  n.className = 'q-timer-num' + (urgent ? ' urgent' : '');
+  c.className = 'timer-fg' + (urgent ? ' urgent' : '');
+  const pct = Math.max(0, timeLeft) / 20;
+  c.style.strokeDashoffset = 138 * (1 - pct);
+}
+
+function submitAnswer(answerIndex, questionIndex){
+  if(hasAnswered) return;
+  hasAnswered = true;
+  disableAllOpts();
+  const answerTime = 20 - timeLeft;
+  db.ref(`answers/${myUid}`).set({ question: questionIndex, answer: answerIndex, uid: myUid, time: answerTime });
+  document.getElementById(`opt-${answerIndex}`).style.opacity = '1';
+  document.getElementById(`opt-${answerIndex}`).style.filter = 'brightness(1.3)';
+  document.getElementById('status-msg').textContent = 'Réponse enregistrée — en attente de la révélation…';
+  document.getElementById('status-msg').className = 'status-msg waiting-reveal';
+}
+
+function disableAllOpts(){
+  LETTERS.forEach((_,i)=>{
+    const b = document.getElementById(`opt-${i}`);
+    if(b) b.disabled = true;
+  });
+}
+
+function revealAnswer(correctIndex){
+  stopTimerDisplay();
+  LETTERS.forEach((_,i)=>{
+    const b = document.getElementById(`opt-${i}`);
+    if(!b) return;
+    b.disabled = true;
+    if(i === correctIndex) b.classList.add('correct-reveal');
+    else b.classList.add('wrong-reveal');
+  });
+  db.ref(`players/${myUid}/score`).once('value', snap=>{
+    myScore = snap.val() || 0;
+    document.getElementById('score-display').textContent = myScore;
+  });
+  const status = document.getElementById('status-msg');
+  if(hasAnswered){
+    db.ref(`answers/${myUid}`).once('value', snap=>{
+      const ans = snap.val();
+      if(ans && ans.answer === correctIndex){
+        status.textContent = '✅ Bonne réponse !';
+        status.className = 'status-msg correct';
+      } else {
+        status.textContent = '❌ Mauvaise réponse';
+        status.className = 'status-msg wrong';
+      }
+    });
+  } else {
+    status.textContent = "⏰ Temps écoulé — pas de réponse";
+    status.className = 'status-msg wrong';
+  }
+}
+
+function showFinalPodium(){
+  db.ref(`players/${myUid}/score`).once('value', snap=>{ myScore = snap.val() || 0; });
+  document.getElementById('final-score').textContent = myScore;
+  db.ref('players').once('value', snap=>{
+    const sorted = Object.entries(snap.val()||{}).map(([uid,p])=>({uid, name:p.name, score:p.score||0})).sort((a,b)=>b.score-a.score).slice(0,10);
+    const list = document.getElementById('podium-list');
+    list.innerHTML = sorted.map((p,i)=>`
+      <div class="pl-entry rank-${i+1} ${p.uid===myUid?'is-me':''}">
+        <div class="pl-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+        <div class="pl-name">${escHtml(p.name)}${p.uid===myUid?' ◀':''}</div>
+        <div class="pl-pts">${p.score} pts</div>
+      </div>`).join('');
+    show('screen-podium');
+  });
+}
+
+window.onload = ()=>{ show('screen-lobby'); };
+</script>
+</body>
+</html>
