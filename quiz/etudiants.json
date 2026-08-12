@@ -1,0 +1,17 @@
+{
+  "_mode_demo": true,
+
+  "_comment": "Tant que la liste est vide, l'étudiant tape son nom lui-même. Dès que tu remplis les deux tableaux ci-dessous, il devra choisir dans la liste. Format : \"Nom, Prénom\". Puis mets _mode_demo à false.",
+
+  "groupes": {
+    "Groupe 01": [],
+    "Groupe 02": []
+  },
+
+  "_exemple_une_fois_rempli": {
+    "groupes": {
+      "Groupe 01": ["Bouchard, Léa", "Nguyen, Kim", "Tremblay, Antoine"],
+      "Groupe 02": ["Côté, Sarah", "Roy, Jérémie"]
+    }
+  }
+}

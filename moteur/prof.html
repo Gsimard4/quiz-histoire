@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Vue Professeur</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+
+  :root {
+    --accent:    #3f6fd8;
+    --accent-lo: #24407e;
+    --coral:     #a81f34;
+    --coral-hi:  #d4283f;
+    --dark:   #05070f;
+    --mid:    #0a0e1c;
+    --card:   #101528;
+    --card2:  #161d33;
+    --border: #1e2846;
+    --border2:#2c3a63;
+    --text:   #e2e8f5;
+    --muted:  #5f6f95;
+    --green:  #2a7a4a;
+    --danger: #c03030;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Barlow',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(120,150,220,0.05) 1px,transparent 1px), linear-gradient(90deg,rgba(120,150,220,0.05) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 24px; background:var(--mid); border-bottom:2px solid var(--accent); position:sticky; top:0; z-index:100; box-shadow:0 4px 24px rgba(0,0,0,0.45); }
+  .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px; }
+  .topbar-title span { color:var(--accent); }
+  .topbar-title .tag { font-size:0.95rem; letter-spacing:2px; color:var(--muted); margin-left:10px; vertical-align:middle; }
+  .topbar-right { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .badge { background:var(--card); border:1px solid var(--border2); padding:6px 14px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:1px; }
+  .badge strong { color:var(--coral-hi); }
+  .btn-home { font-family:'Barlow Condensed',sans-serif; font-size:0.9rem; color:var(--muted); text-decoration:none; padding:6px 12px; border:1px solid var(--border); border-radius:4px; transition:color .2s,border-color .2s; }
+  .btn-home:hover { color:var(--text); border-color:var(--border2); }
+
+  .main { display:grid; grid-template-columns:1fr 320px; min-height:calc(100vh - 62px); position:relative; z-index:1; }
+  .left-panel  { padding:28px; border-right:1px solid var(--border); }
+  .right-panel { background:var(--mid); padding:20px; display:flex; flex-direction:column; gap:16px; }
+
+  #loading { padding:60px; text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:1.3rem; color:var(--muted); }
+  .fatal { color:var(--coral-hi); max-width:640px; margin:0 auto; line-height:1.6; }
+
+  #lobby { display:flex; flex-direction:column; align-items:center; gap:22px; padding:20px 0; }
+  .lobby-title { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:4px; text-align:center; line-height:1.15; }
+  .lobby-title .t1 { color:var(--accent);   display:block; }
+  .lobby-title .t2 { color:var(--text);     display:block; }
+  .lobby-title .t3 { color:var(--muted);    display:block; font-size:1.4rem; letter-spacing:5px; margin-top:4px; }
+  .qr-wrapper { background:white; padding:16px; border-radius:6px; box-shadow:0 0 40px rgba(63,111,216,0.3); border:2px solid var(--accent-lo); }
+  .join-url { background:var(--card); border:1px solid var(--border2); padding:10px 20px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:0.95rem; color:var(--coral-hi); text-align:center; word-break:break-all; max-width:460px; }
+
+  #question-view { display:none; }
+  .q-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .q-number   { font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:2px; color:var(--muted); }
+  .phase-label{ font-family:'Barlow Condensed',sans-serif; font-size:0.85rem; color:var(--accent); text-transform:uppercase; letter-spacing:2px; }
+  .q-timer { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--coral-hi); width:80px; height:80px; background:var(--card); border:3px solid var(--coral); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:color .3s,border-color .3s; }
+  .q-timer.urgent { color:var(--danger); border-color:var(--danger); animation:pulse .5s infinite alternate; }
+  @keyframes pulse { from{transform:scale(1);}to{transform:scale(1.08);} }
+  .progress-outer { width:100%; height:5px; background:var(--border); border-radius:3px; margin-bottom:14px; overflow:hidden; }
+  .progress-inner { height:100%; background:linear-gradient(90deg,var(--accent-lo),var(--accent)); border-radius:3px; transition:width .4s; }
+  .q-text { font-family:'Barlow Condensed',sans-serif; font-size:1.95rem; font-weight:700; line-height:1.2; margin-bottom:22px; background:var(--card2); border-left:5px solid var(--accent); padding:16px 20px; border-radius:0 8px 8px 0; }
+  .answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .answer-btn { padding:14px 16px; border-radius:6px; border:none; font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:700; color:white; text-align:left; display:flex; align-items:center; gap:10px; transition:all .4s; }
+  .answer-btn.A { background:#1a5c8a; }
+  .answer-btn.B { background:#3a6e28; }
+  .answer-btn.C { background:#7a3a14; }
+  .answer-btn.D { background:#6a2878; }
+  .answer-btn .letter { min-width:30px; height:30px; background:rgba(0,0,0,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+  .answer-btn.correct-reveal { box-shadow:0 0 0 3px #2ecc71,0 0 30px rgba(46,204,113,0.5); transform:scale(1.02); }
+  .answer-btn.wrong-reveal   { opacity:0.3; filter:grayscale(0.7); }
+  .answered-count { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); text-align:center; margin-top:6px; letter-spacing:1px; }
+
+  #charts-section { display:none; margin-top:14px; }
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .bar-lbl { font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; width:22px; color:white; }
+  .bar-outer { flex:1; height:28px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .bar-inner { height:100%; transition:width .5s; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:0.8rem; font-weight:700; color:white; min-width:36px; }
+  .bar-inner.A{background:#1a5c8a;}.bar-inner.B{background:#3a6e28;}.bar-inner.C{background:#7a3a14;}.bar-inner.D{background:#6a2878;}
+
+  .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { padding:11px 20px; border:none; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:1.05rem; font-weight:700; letter-spacing:1px; cursor:pointer; transition:all .2s; text-transform:uppercase; }
+  .btn:hover { transform:translateY(-2px); filter:brightness(1.12); }
+  .btn:active { transform:translateY(0); }
+  .btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+  .btn-accent  { background:var(--accent); color:#05070f; }
+  .btn-coral   { background:var(--coral);  color:white; }
+  .btn-green   { background:var(--green);  color:white; }
+  .btn-muted   { background:var(--border2);color:var(--text); }
+  .start-big { padding:18px 48px; font-size:1.5rem; border-radius:6px; box-shadow:0 0 30px rgba(63,111,216,0.4); }
+
+  .panel-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--muted); border-bottom:1px solid var(--border); padding-bottom:8px; }
+  .leaderboard { display:flex; flex-direction:column; gap:6px; }
+  .lb-entry { display:flex; align-items:center; gap:10px; background:var(--card); padding:8px 12px; border-radius:4px; border-left:3px solid transparent; animation:slideIn .3s ease; }
+  @keyframes slideIn { from{transform:translateX(16px);opacity:0;}to{transform:translateX(0);opacity:1;} }
+  .lb-entry.rank-1 { border-left-color:gold;    background:linear-gradient(90deg,rgba(255,215,0,0.1),var(--card)); }
+  .lb-entry.rank-2 { border-left-color:silver; }
+  .lb-entry.rank-3 { border-left-color:#cd7f32; }
+  .lb-rank  { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; width:24px; text-align:center; color:var(--muted); }
+  .lb-name  { flex:1; font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-score { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.1rem; color:var(--coral-hi); }
+  .players-list { display:flex; flex-direction:column; gap:4px; max-height:460px; overflow-y:auto; }
+  .player-chip  { background:var(--card); border:1px solid var(--border); padding:6px 12px; border-radius:4px; font-size:0.9rem; animation:slideIn .3s ease; display:flex; justify-content:space-between; gap:8px; }
+  .player-chip .grp { color:var(--muted); font-size:0.78rem; font-family:'Barlow Condensed',sans-serif; }
+
+  #podium-view { display:none; text-align:center; padding:20px 0; }
+  .podium-title { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:5px; color:var(--accent); margin-bottom:28px; }
+  .podium-wrap  { display:flex; justify-content:center; align-items:flex-end; gap:16px; margin-bottom:32px; }
+  .podium-block { display:flex; flex-direction:column; align-items:center; gap:8px; width:180px; }
+  .podium-emoji { font-size:3rem; }
+  .podium-name  { font-family:'Barlow Condensed',sans-serif; font-size:1.3rem; font-weight:700; }
+  .podium-pts   { font-family:'Barlow Condensed',sans-serif; font-size:1rem; color:var(--muted); }
+  .podium-bar   { width:100%; border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:#000; }
+  .podium-bar.p1{height:160px;background:linear-gradient(180deg,#ffd700,#c8a000);}
+  .podium-bar.p2{height:120px;background:linear-gradient(180deg,#c0c0c0,#909090);}
+  .podium-bar.p3{height:90px; background:linear-gradient(180deg,#cd7f32,#9a5c20);}
+
+  .export-box { background:var(--card); border:1px solid var(--border2); border-radius:8px; padding:20px; max-width:640px; margin:0 auto; text-align:left; }
+  .export-box h3 { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--text); margin-bottom:6px; }
+  .export-box p { font-size:0.92rem; color:var(--muted); line-height:1.5; margin-bottom:14px; }
+  .export-done { color:#4ade80; font-weight:700; }
+  select { background:var(--card2); color:var(--text); border:1px solid var(--border2); border-radius:4px; padding:9px 12px; font-family:'Barlow',sans-serif; font-size:0.95rem; }
+
+  .save-flag { position:fixed; bottom:14px; right:14px; background:var(--card); border:1px solid var(--border2); border-radius:4px; padding:6px 12px; font-family:'Barlow Condensed',sans-serif; font-size:0.85rem; color:var(--muted); z-index:200; }
+  .save-flag.ok { color:#4ade80; border-color:#2a7a4a; }
+
+  @media (max-width:900px){ .main{grid-template-columns:1fr;} .answers-grid{grid-template-columns:1fr;} }
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div id="loading">Chargement du quiz…</div>
+
+<div id="app" style="display:none">
+<div class="topbar">
+  <div class="topbar-title">
+    QUIZ <span id="tb-titre">…</span>
+    <span class="tag">— PROF</span>
+  </div>
+  <div class="topbar-right">
+    <a class="btn-home" href="../index.html">← Tous les quiz</a>
+    <div class="badge">Joueurs : <strong id="player-count">0</strong></div>
+    <div class="badge" id="q-badge" style="display:none">Q <strong id="q-num-badge">0</strong>/<span id="q-total-badge">10</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+
+    <div id="lobby">
+      <div class="lobby-title">
+        <span class="t1" id="lobby-t1">…</span>
+        <span class="t2">REJOIGNEZ LE QUIZ</span>
+        <span class="t3" id="lobby-t3"></span>
+      </div>
+      <div class="join-url" id="join-url-text"></div>
+      <div class="qr-wrapper"><div id="qrcode"></div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--muted);">
+        Joueurs connectés : <strong id="lobby-count" style="color:var(--text);font-size:1.3rem;">0</strong>
+      </div>
+      <button class="btn btn-accent start-big" onclick="startQuiz()">▶ Lancer le quiz</button>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn btn-muted" onclick="openArchives()" style="font-size:0.85rem;">📁 Exporter une séance antérieure</button>
+        <button class="btn btn-muted" onclick="resetAll()" style="font-size:0.85rem;">🗑 Vider la salle d'attente</button>
+      </div>
+      <div id="archives-box" style="display:none;width:100%;max-width:640px;">
+        <div class="export-box">
+          <h3>Séances archivées</h3>
+          <p>Les résultats de toutes tes séances sont conservés en permanence. Choisis-en une pour la télécharger.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <select id="archive-select"></select>
+            <button class="btn btn-green" onclick="exportSelectedArchive()">📥 Télécharger le CSV</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="question-view">
+      <div class="q-header">
+        <div>
+          <div class="phase-label" id="phase-label">EN ATTENTE</div>
+          <div class="q-number"   id="q-number-display">QUESTION 1 / 10</div>
+        </div>
+        <div class="q-timer" id="timer-display">30</div>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progress-bar" style="width:0%"></div></div>
+      <div class="q-text" id="q-text-display">…</div>
+      <div class="answers-grid" id="answers-grid"></div>
+      <div class="answered-count" id="answered-count">0 réponse reçue</div>
+      <div id="charts-section"><div id="charts-bars"></div></div>
+      <div class="btn-row">
+        <button class="btn btn-muted"  id="btn-plus"    onclick="addTime()">＋15 s</button>
+        <button class="btn btn-muted"  id="btn-stop"    onclick="stopTimer()">⏹ Arrêter le temps</button>
+        <button class="btn btn-coral"  id="btn-results" onclick="showResults()"  disabled>📊 Résultats</button>
+        <button class="btn btn-green"  id="btn-reveal"  onclick="revealAnswer()" disabled>✅ Révéler</button>
+        <button class="btn btn-accent" id="btn-next"    onclick="nextQuestion()" disabled>➡ Suivante</button>
+      </div>
+    </div>
+
+    <div id="podium-view">
+      <div class="podium-title">🏆 Résultats finaux</div>
+      <div class="podium-wrap" id="podium-wrap"></div>
+
+      <div class="export-box">
+        <h3>Notes de la séance</h3>
+        <p id="export-msg">Le fichier contient une ligne par étudiant : groupe, nom, réponse à chaque question, et total sur <span id="exp-total">10</span>. La rapidité n'y figure pas — elle ne servait qu'au classement affiché.</p>
+        <div class="btn-row" style="margin-top:0">
+          <button class="btn btn-green" onclick="exportCurrentSession()">📥 Télécharger le CSV</button>
+          <button class="btn btn-muted" onclick="resetAll()">🔄 Nouveau quiz</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="right-panel">
+    <div class="panel-title" id="right-panel-title">JOUEURS CONNECTÉS</div>
+    <div id="players-list-wrap" class="players-list"></div>
+    <div id="leaderboard-wrap" class="leaderboard" style="display:none;"></div>
+  </div>
+</div>
+</div>
+
+<div class="save-flag" id="save-flag">Archivage : en attente</div>
+
+<script>
+/* ============================================================
+   MOTEUR — ne pas modifier. Le contenu vit dans /quiz/*.json
+   ============================================================ */
+
+const params  = new URLSearchParams(location.search);
+const QUIZ_ID = params.get('quiz');
+const LETTERS = ['A','B','C','D'];
+
+let QUIZ=null, ROSTER=null, TOTAL_QUESTIONS=0;
+let db=null, live=null, results=null;
+let sessionId=null;
+let currentQ=-1, timerInterval=null, timeLeft=30, phase='lobby';
+let playersData={}, answersData={}, shuffledQuestions=[], exported=false;
+
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fatal(msg){
+  document.getElementById('loading').innerHTML = '<div class="fatal">'+msg+'</div>';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('app').style.display='none';
+}
+
+/* ---------- Démarrage ---------- */
+async function boot(){
+  if(!QUIZ_ID){
+    fatal("Aucun quiz demandé.<br><br>L'adresse doit se terminer par <b>?quiz=nom-du-quiz</b>, par exemple :<br><code>prof.html?quiz=revolution-francaise-1</code>");
+    return;
+  }
+  try {
+    const r = await fetch(`../quiz/${QUIZ_ID}.json`, {cache:'no-store'});
+    if(!r.ok) throw new Error('introuvable');
+    QUIZ = await r.json();
+  } catch(e){
+    fatal(`Le fichier <b>quiz/${escHtml(QUIZ_ID)}.json</b> est introuvable ou mal formé.<br><br>Vérifie le nom dans l'adresse, ou passe le fichier dans l'éditeur pour repérer l'erreur de ponctuation.`);
+    return;
+  }
+  try {
+    const r2 = await fetch('../quiz/etudiants.json', {cache:'no-store'});
+    ROSTER = r2.ok ? await r2.json() : null;
+  } catch(e){ ROSTER = null; }
+
+  applyPalette();
+  TOTAL_QUESTIONS = QUIZ.questions.length;
+
+  document.getElementById('tb-titre').textContent = QUIZ.titre;
+  document.getElementById('lobby-t1').textContent = QUIZ.titre.toUpperCase();
+  document.getElementById('lobby-t3').textContent = QUIZ.accroche || '';
+  document.getElementById('q-total-badge').textContent = TOTAL_QUESTIONS;
+  document.getElementById('exp-total').textContent = TOTAL_QUESTIONS;
+  document.title = `${QUIZ.titre} — Vue Professeur`;
+
+  firebase.initializeApp({ databaseURL: QUIZ_CONFIG.databaseURL });
+  db      = firebase.database();
+  live    = (p)=> db.ref(`live/${QUIZ_ID}/${p}`);
+  results = (p)=> db.ref(`resultats/${QUIZ_ID}/${p}`);
+
+  document.getElementById('loading').style.display='none';
+  document.getElementById('app').style.display='block';
+
+  initQR(); listenPlayers(); listenAnswers();
+  live('gameState').set({ phase:'lobby' });
+}
+
+function applyPalette(){
+  const p = QUIZ.palette || {};
+  const map = { accent:'--accent', accentSombre:'--accent-lo', corail:'--coral', corailClair:'--coral-hi',
+                fond:'--dark', fondMi:'--mid', carte:'--card', carte2:'--card2',
+                bordure:'--border', bordure2:'--border2', texte:'--text', sourdine:'--muted' };
+  Object.entries(map).forEach(([k,v])=>{ if(p[k]) document.documentElement.style.setProperty(v, p[k]); });
+}
+
+function initQR(){
+  const url = location.href.replace(/prof\.html.*$/, `eleve.html?quiz=${QUIZ_ID}`);
+  document.getElementById('join-url-text').textContent = url;
+  new QRCode(document.getElementById('qrcode'), {
+    text:url, width:280, height:280, colorDark:"#000000", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.M
+  });
+}
+
+/* ---------- Salle d'attente ---------- */
+function listenPlayers(){
+  live('players').on('value', snap=>{
+    playersData = snap.val() || {};
+    const list = Object.values(playersData);
+    document.getElementById('player-count').textContent = list.length;
+    document.getElementById('lobby-count').textContent  = list.length;
+    if(phase==='lobby'){
+      list.sort((a,b)=> (a.groupe||'').localeCompare(b.groupe||'') || (a.nom||'').localeCompare(b.nom||''));
+      document.getElementById('players-list-wrap').innerHTML = list.map(p=>
+        `<div class="player-chip"><span>👤 ${escHtml(p.nom)}</span><span class="grp">${escHtml(p.groupe||'')}</span></div>`).join('');
+    }
+    updateAnsweredCount();
+  });
+}
+
+function listenAnswers(){
+  live('answers').on('value', snap=>{
+    answersData = snap.val() || {};
+    updateAnsweredCount();
+    if(phase==='question') updateChartsLive();
+  });
+}
+
+function updateAnsweredCount(){
+  if(currentQ<0) return;
+  const n = Object.values(answersData).filter(a=>a.question===currentQ).length;
+  const t = Object.keys(playersData).length;
+  document.getElementById('answered-count').textContent = `${n} réponse${n>1?'s':''} sur ${t}`;
+}
+
+/* ---------- Déroulement ---------- */
+function startQuiz(){
+  if(Object.keys(playersData).length===0){ alert("Attends qu'au moins un étudiant rejoigne."); return; }
+  sessionId = newSessionId();
+  exported  = false;
+  flag('Archivage actif — séance '+sessionId, false);
+
+  shuffleQuestions();
+  phase='question';
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('question-view').style.display='block';
+  document.getElementById('q-badge').style.display='flex';
+  document.getElementById('right-panel-title').textContent='CLASSEMENT EN DIRECT';
+  document.getElementById('players-list-wrap').style.display='none';
+  document.getElementById('leaderboard-wrap').style.display='flex';
+
+  results(`${sessionId}/_meta`).set({
+    quiz: QUIZ.titre, sousTitre: QUIZ.sousTitre||'', nbQuestions: TOTAL_QUESTIONS,
+    debut: new Date().toISOString()
+  });
+  loadQuestion(0);
+}
+
+function newSessionId(){
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}h${p(d.getMinutes())}`;
+}
+
+function shuffleQuestions(){
+  // On mélange les options, jamais l'ordre des questions : l'index reste stable pour l'archivage.
+  shuffledQuestions = QUIZ.questions.map(q=>{
+    const idx=[0,1,2,3];
+    for(let i=3;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+    return { q:q.q, opts:idx.map(i=>q.opts[i]), correct:idx.indexOf(q.correct), temps:q.temps||QUIZ.tempsParDefaut||30 };
+  });
+}
+
+function loadQuestion(index){
+  currentQ=index; phase='question'; answersData={};
+  const q = shuffledQuestions[index];
+  timeLeft = q.temps;
+
+  document.getElementById('q-number-display').textContent = `QUESTION ${index+1} / ${TOTAL_QUESTIONS}`;
+  document.getElementById('q-num-badge').textContent = index+1;
+  document.getElementById('q-text-display').textContent = q.q;
+  document.getElementById('phase-label').textContent = 'EN COURS';
+  document.getElementById('progress-bar').style.width = `${(index/TOTAL_QUESTIONS)*100}%`;
+
+  const grid=document.getElementById('answers-grid'); grid.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className=`answer-btn ${LETTERS[i]}`; btn.id=`ans-${i}`;
+    btn.innerHTML=`<span class="letter">${LETTERS[i]}</span>${escHtml(opt)}`;
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('charts-section').style.display='none';
+  document.getElementById('charts-bars').innerHTML='';
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('btn-plus').disabled=false;
+  document.getElementById('answered-count').textContent='0 réponse reçue';
+
+  live('gameState').set({ phase:'question', questionIndex:index, question:q.q, options:q.opts, timeLeft:timeLeft, duree:q.temps });
+  live('answers').remove();
+
+  clearInterval(timerInterval); updateTimer();
+  timerInterval=setInterval(()=>{ timeLeft--; updateTimer(); if(timeLeft<=0){ clearInterval(timerInterval); timerEnd(); } },1000);
+}
+
+function updateTimer(){
+  const el=document.getElementById('timer-display');
+  el.textContent=Math.max(0,timeLeft);
+  el.className='q-timer'+(timeLeft<=5?' urgent':'');
+  live('gameState/timeLeft').set(timeLeft);
+}
+
+function addTime(){ if(phase!=='question') return; timeLeft+=15; updateTimer(); }
+function stopTimer(){ clearInterval(timerInterval); timerEnd(); }
+
+function timerEnd(){
+  phase='results';
+  document.getElementById('phase-label').textContent='TEMPS ÉCOULÉ';
+  document.getElementById('btn-plus').disabled=true;
+  live('gameState/phase').set('closed');
+  document.getElementById('btn-results').disabled=false;
+}
+
+function showResults(){
+  document.getElementById('charts-section').style.display='block';
+  buildCharts();
+  document.getElementById('btn-results').disabled=true;
+  document.getElementById('btn-reveal').disabled=false;
+}
+
+function buildCharts(){
+  const qa=Object.values(answersData).filter(a=>a.question===currentQ);
+  const counts=[0,0,0,0];
+  qa.forEach(a=>{ if(a.answer>=0&&a.answer<4) counts[a.answer]++; });
+  const total=qa.length||1;
+  const c=document.getElementById('charts-bars'); c.innerHTML='';
+  counts.forEach((n,i)=>{
+    const pct=Math.round((n/total)*100);
+    const row=document.createElement('div'); row.className='bar-row';
+    row.innerHTML=`<div class="bar-lbl">${LETTERS[i]}</div><div class="bar-outer"><div class="bar-inner ${LETTERS[i]}" style="width:${pct}%">${n} (${pct}%)</div></div>`;
+    c.appendChild(row);
+  });
+}
+function updateChartsLive(){ if(document.getElementById('charts-section').style.display==='block') buildCharts(); }
+
+function revealAnswer(){
+  const correct=shuffledQuestions[currentQ].correct;
+  LETTERS.forEach((_,i)=>{
+    const b=document.getElementById(`ans-${i}`);
+    if(b) b.classList.add(i===correct?'correct-reveal':'wrong-reveal');
+  });
+  archiveQuestion(correct);      // ← la note, permanente
+  computeLiveScores(correct);    // ← le jeu, avec la rapidité
+  document.getElementById('btn-reveal').disabled=true;
+  document.getElementById('btn-next').disabled=false;
+  live('gameState/phase').set('revealed');
+  live('gameState/correctAnswer').set(correct);
+  updateLeaderboard();
+}
+
+/* --- Archivage : une ligne par étudiant, pour chaque question --- */
+function archiveQuestion(correct){
+  const updates={};
+  Object.entries(playersData).forEach(([uid,p])=>{
+    const a = answersData[uid];
+    const aRepondu = a && a.question===currentQ;
+    const bon = aRepondu && a.answer===correct;
+    updates[`${sessionId}/${uid}/nom`]    = p.nom || '(sans nom)';
+    updates[`${sessionId}/${uid}/groupe`] = p.groupe || '';
+    updates[`${sessionId}/${uid}/reponses/q${currentQ}`] = {
+      lettre: aRepondu ? LETTERS[a.answer] : '—',
+      bon: bon ? 1 : 0
+    };
+  });
+  results('').update(updates)
+    .then(()=> flag(`Archivé — question ${currentQ+1}/${TOTAL_QUESTIONS}`, true))
+    .catch(()=> flag('⚠ Échec d\'archivage — vérifie la connexion', false));
+}
+
+/* --- Score affiché : bonne réponse + petit bonus de rapidité --- */
+function computeLiveScores(correct){
+  const qa=Object.values(answersData).filter(a=>a.question===currentQ);
+  qa.sort((a,b)=>(a.time||9999)-(b.time||9999));
+  let rank=0;
+  qa.forEach(ans=>{
+    if(ans.answer===correct){
+      rank++;
+      const pts=1000+Math.max(0,100-rank*5);
+      live(`players/${ans.uid}/score`).transaction(s=>(s||0)+pts);
+    }
+  });
+}
+
+function updateLeaderboard(){
+  live('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({nom:p.nom,score:p.score||0})).sort((a,b)=>b.score-a.score).slice(0,10);
+    document.getElementById('leaderboard-wrap').innerHTML=sorted.map((p,i)=>
+      `<div class="lb-entry rank-${i+1}"><div class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="lb-name">${escHtml(p.nom)}</div><div class="lb-score">${p.score}</div></div>`
+    ).join('');
+  });
+}
+
+function nextQuestion(){
+  if(currentQ+1>=shuffledQuestions.length) showPodium();
+  else { loadQuestion(currentQ+1); updateLeaderboard(); }
+}
+
+function showPodium(){
+  clearInterval(timerInterval); phase='podium';
+  document.getElementById('question-view').style.display='none';
+  document.getElementById('podium-view').style.display='block';
+  document.getElementById('progress-bar').style.width='100%';
+  live('gameState/phase').set('podium');
+  results(`${sessionId}/_meta/fin`).set(new Date().toISOString());
+  live('players').once('value',snap=>{
+    const sorted=Object.entries(snap.val()||{}).map(([uid,p])=>({nom:p.nom,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const order=[sorted[1],sorted[0],sorted[2]], classes=['p2','p1','p3'], emojis=['🥈','🥇','🥉'];
+    document.getElementById('podium-wrap').innerHTML=order.map((p,i)=>p?`
+      <div class="podium-block"><div class="podium-emoji">${emojis[i]}</div><div class="podium-name">${escHtml(p.nom)}</div><div class="podium-pts">${p.score} pts</div><div class="podium-bar ${classes[i]}">${i===1?'1':i===0?'2':'3'}</div></div>`:'').join('');
+  });
+}
+
+/* ---------- Export CSV ---------- */
+function buildCSV(data, nbQ){
+  const entries = Object.entries(data).filter(([k])=>k!=='_meta');
+  const rows = entries.map(([uid,e])=>{
+    const rep=e.reponses||{};
+    const cells=[]; let total=0;
+    for(let i=0;i<nbQ;i++){
+      const r=rep[`q${i}`]||{lettre:'—',bon:0};
+      total+=r.bon?1:0;
+      cells.push(r.bon?'1':'0');
+    }
+    return { groupe:e.groupe||'', nom:e.nom||'', cells, total };
+  });
+  rows.sort((a,b)=> a.groupe.localeCompare(b.groupe) || a.nom.localeCompare(b.nom));
+  const entete = ['Groupe','Nom'];
+  for(let i=0;i<nbQ;i++) entete.push(`Q${i+1}`);
+  entete.push(`Total sur ${nbQ}`, 'Pourcentage');
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const lignes = [entete.map(esc).join(';')];
+  rows.forEach(r=>{
+    const pct = nbQ ? Math.round(r.total/nbQ*100) : 0;
+    lignes.push([esc(r.groupe),esc(r.nom),...r.cells,r.total,pct].join(';'));
+  });
+  return '\uFEFF' + lignes.join('\r\n');
+}
+
+function download(nom, contenu){
+  const blob=new Blob([contenu],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=nom;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function exportSession(sid){
+  results(sid).once('value', snap=>{
+    const data=snap.val();
+    if(!data){ alert("Aucun résultat pour cette séance."); return; }
+    const nbQ=(data._meta&&data._meta.nbQuestions)||TOTAL_QUESTIONS;
+    download(`${QUIZ_ID}_${sid}.csv`, buildCSV(data,nbQ));
+    exported=true;
+    document.getElementById('export-msg').innerHTML='<span class="export-done">✔ Fichier téléchargé.</span> Il reste archivé en ligne : tu peux le retélécharger n\'importe quand depuis « Exporter une séance antérieure ».';
+  });
+}
+function exportCurrentSession(){ if(sessionId) exportSession(sessionId); }
+
+function openArchives(){
+  const box=document.getElementById('archives-box');
+  box.style.display = box.style.display==='none' ? 'block' : 'none';
+  if(box.style.display!=='block') return;
+  results('').once('value', snap=>{
+    const sessions=Object.keys(snap.val()||{}).sort().reverse();
+    const sel=document.getElementById('archive-select');
+    sel.innerHTML = sessions.length
+      ? sessions.map(s=>`<option value="${s}">${s}</option>`).join('')
+      : '<option value="">Aucune séance enregistrée</option>';
+  });
+}
+function exportSelectedArchive(){
+  const sid=document.getElementById('archive-select').value;
+  if(sid) exportSession(sid);
+}
+
+/* ---------- Réinitialisation ---------- */
+function resetAll(){
+  if(sessionId && !exported){
+    if(!confirm("Tu n'as pas encore téléchargé le CSV de cette séance.\n\nLes résultats restent archivés en ligne (rien ne se perd), mais tu devras les récupérer par « Exporter une séance antérieure ».\n\nContinuer quand même?")) return;
+  }
+  clearInterval(timerInterval);
+  live('').remove().then(()=>location.reload());
+}
+
+function flag(txt, ok){
+  const f=document.getElementById('save-flag');
+  f.textContent=txt; f.className='save-flag'+(ok?' ok':'');
+}
+
+window.onload = boot;
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éditeur de quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700&display=swap');
+  :root{ --accent:#3f6fd8; --dark:#05070f; --mid:#0a0e1c; --card:#101528; --card2:#161d33;
+         --border:#1e2846; --border2:#2c3a63; --text:#e2e8f5; --muted:#5f6f95; --green:#2a7a4a; --danger:#c03030; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);padding:0 0 60px;}
+  header{background:var(--mid);border-bottom:2px solid var(--accent);padding:14px 24px;position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:3px;}
+  h1 span{color:var(--accent);}
+  .wrap{max-width:900px;margin:0 auto;padding:24px;}
+  .card{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:18px;margin-bottom:16px;}
+  .card h2{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--accent);margin-bottom:4px;}
+  .card .hint{color:var(--muted);font-size:0.88rem;margin-bottom:14px;line-height:1.5;}
+  label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:12px 0 5px;}
+  input,textarea,select{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.98rem;outline:none;}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:58px;line-height:1.4;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .q-block{background:var(--card2);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:14px;margin-bottom:12px;}
+  .q-head{display:flex;justify-content:space-between;align-items:center;}
+  .q-num{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--accent);}
+  .opt-row{display:flex;gap:10px;align-items:flex-start;margin-top:8px;}
+  .opt-radio{display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:9px;min-width:34px;}
+  .opt-radio input{width:18px;height:18px;accent-color:#2ecc71;cursor:pointer;}
+  .opt-radio span{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;color:var(--muted);}
+  .btn{border:none;border-radius:6px;padding:10px 18px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:filter .2s;}
+  .btn:hover{filter:brightness(1.15);}
+  .btn-accent{background:var(--accent);color:#05070f;}
+  .btn-green{background:var(--green);color:#fff;}
+  .btn-muted{background:var(--border2);color:var(--text);}
+  .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:5px 11px;font-size:0.82rem;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .msg{padding:11px 14px;border-radius:6px;margin-top:12px;font-size:0.92rem;display:none;line-height:1.5;}
+  .msg.ok{background:rgba(42,122,74,0.18);border:1px solid var(--green);color:#8ef0b0;display:block;}
+  .msg.err{background:rgba(192,48,48,0.15);border:1px solid var(--danger);color:#ff9b9b;display:block;}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ÉDITEUR <span>DE QUIZ</span></h1>
+  <div class="row">
+    <button class="btn btn-muted" onclick="document.getElementById('file-in').click()">📂 Ouvrir un quiz existant</button>
+    <button class="btn btn-green" onclick="telecharger()">📥 Télécharger le fichier</button>
+  </div>
+  <input type="file" id="file-in" accept=".json" style="display:none" onchange="ouvrir(event)">
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>Identité du quiz</h2>
+    <p class="hint">Le nom de fichier détermine l'adresse : <code>revolution-francaise-1</code> donne <code>?quiz=revolution-francaise-1</code>. Minuscules, tirets, pas d'accents ni d'espaces.</p>
+    <label>Nom de fichier</label>
+    <input id="f-id" placeholder="revolution-francaise-1">
+    <div class="grid2">
+      <div><label>Titre affiché</label><input id="f-titre" placeholder="La Révolution française"></div>
+      <div><label>Sous-titre</label><input id="f-sous" placeholder="Partie 1 — 1789-1791"></div>
+    </div>
+    <div class="grid2">
+      <div><label>Catégorie (page d'accueil)</label><input id="f-cat" placeholder="Fin XVIIIe · Révolution phare"></div>
+      <div><label>Accroche (trois mots, écran d'accueil)</label><input id="f-accroche" placeholder="CRISE · SOUVERAINETÉ · RUPTURE"></div>
+    </div>
+    <label>Description (page d'accueil)</label>
+    <textarea id="f-desc" placeholder="Une ou deux phrases sur le contenu du quiz."></textarea>
+    <div class="grid2">
+      <div><label>Secondes par question</label><input id="f-temps" type="number" value="30" min="10" max="120"></div>
+      <div><label>Couleur dominante</label>
+        <select id="f-palette">
+          <option value="bleu">Bleu royal — Révolution française</option>
+          <option value="rouge">Rouge — Révolution russe</option>
+          <option value="ocre">Ocre — révoltes messianiques</option>
+          <option value="terre">Terre cuite — Rome antique</option>
+          <option value="vert">Vert — décolonisation</option>
+          <option value="violet">Violet — mouvements culturels</option>
+          <option value="acier">Acier — contre-révolution</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Questions</h2>
+    <p class="hint">Coche le cercle vert à gauche de la bonne réponse. L'ordre des choix est mélangé automatiquement à chaque partie : aucun risque que la bonne réponse soit toujours au même endroit.</p>
+    <div id="questions"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn btn-accent" onclick="ajouterQuestion()">＋ Ajouter une question</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+</div>
+
+<script>
+const PALETTES = {
+  bleu:   {accent:"#3f6fd8",accentSombre:"#24407e",corail:"#a81f34",corailClair:"#d4283f",fond:"#05070f",fondMi:"#0a0e1c",carte:"#101528",carte2:"#161d33",bordure:"#1e2846",bordure2:"#2c3a63",texte:"#e2e8f5",sourdine:"#5f6f95"},
+  rouge:  {accent:"#d13a3a",accentSombre:"#7d1d1d",corail:"#b8860b",corailClair:"#e0a422",fond:"#0c0505",fondMi:"#150808",carte:"#1d0d0d",carte2:"#261212",bordure:"#3a1a1a",bordure2:"#4e2424",texte:"#f2e2e2",sourdine:"#9a6060"},
+  ocre:   {accent:"#c9922f",accentSombre:"#7d5a15",corail:"#9a4a20",corailClair:"#c25f28",fond:"#0b0805",fondMi:"#140f08",carte:"#1c150c",carte2:"#251c11",bordure:"#3a2b1a",bordure2:"#4e3a24",texte:"#f0e6d4",sourdine:"#8f7a55"},
+  terre:  {accent:"#b5602f",accentSombre:"#6e3617",corail:"#8a2f2f",corailClair:"#b03d3d",fond:"#0a0706",fondMi:"#120d0a",carte:"#1a120e",carte2:"#231913",bordure:"#36261c",bordure2:"#4a3427",texte:"#f0e4da",sourdine:"#8d7160"},
+  vert:   {accent:"#3aa06a",accentSombre:"#1c5c3c",corail:"#b8863a",corailClair:"#d9a445",fond:"#040a07",fondMi:"#08130d",carte:"#0d1c14",carte2:"#12261a",bordure:"#1c3a28",bordure2:"#274e36",texte:"#dff0e6",sourdine:"#5f9078"},
+  violet: {accent:"#b04fc8",accentSombre:"#7a2a90",corail:"#b01878",corailClair:"#d8308e",fond:"#080510",fondMi:"#100818",carte:"#18101e",carte2:"#1e1428",bordure:"#2e1a40",bordure2:"#3e2858",texte:"#e8d8f0",sourdine:"#7a5a90"},
+  acier:  {accent:"#7d8ea8",accentSombre:"#41506a",corail:"#8a3030",corailClair:"#b03e3e",fond:"#07080a",fondMi:"#0d0f13",carte:"#13161c",carte2:"#1a1e26",bordure:"#252b36",bordure2:"#343c4c",texte:"#dfe4ec",sourdine:"#6b7686"}
+};
+
+let compteur=0;
+
+function ajouterQuestion(data){
+  compteur++;
+  const div=document.createElement('div');
+  div.className='q-block';
+  div.dataset.n=compteur;
+  const n=compteur;
+  div.innerHTML=`
+    <div class="q-head">
+      <div class="q-num">QUESTION <span class="numero"></span></div>
+      <button class="btn btn-danger" onclick="this.closest('.q-block').remove();renumeroter()">Supprimer</button>
+    </div>
+    <label>Énoncé</label>
+    <textarea class="q-texte" placeholder="Pourquoi…?"></textarea>
+    ${[0,1,2,3].map(i=>`
+      <div class="opt-row">
+        <div class="opt-radio">
+          <input type="radio" name="bonne-${n}" value="${i}" ${i===0?'checked':''}>
+          <span>bonne</span>
+        </div>
+        <textarea class="q-opt" placeholder="Choix ${'ABCD'[i]}"></textarea>
+      </div>`).join('')}
+  `;
+  document.getElementById('questions').appendChild(div);
+  if(data){
+    div.querySelector('.q-texte').value=data.q||'';
+    div.querySelectorAll('.q-opt').forEach((t,i)=> t.value=(data.opts||[])[i]||'');
+    const r=div.querySelector(`input[name="bonne-${n}"][value="${data.correct||0}"]`);
+    if(r) r.checked=true;
+  }
+  renumeroter();
+}
+
+function renumeroter(){
+  document.querySelectorAll('.q-block').forEach((b,i)=> b.querySelector('.numero').textContent=i+1);
+}
+
+function collecter(){
+  const erreurs=[];
+  const id=document.getElementById('f-id').value.trim();
+  if(!/^[a-z0-9-]+$/.test(id)) erreurs.push("Le nom de fichier ne doit contenir que des minuscules, des chiffres et des tirets.");
+  const titre=document.getElementById('f-titre').value.trim();
+  if(!titre) erreurs.push("Le titre est vide.");
+
+  const questions=[];
+  document.querySelectorAll('.q-block').forEach((b,i)=>{
+    const q=b.querySelector('.q-texte').value.trim();
+    const opts=[...b.querySelectorAll('.q-opt')].map(t=>t.value.trim());
+    const n=b.dataset.n;
+    const sel=b.querySelector(`input[name="bonne-${n}"]:checked`);
+    if(!q) erreurs.push(`Question ${i+1} : l'énoncé est vide.`);
+    if(opts.some(o=>!o)) erreurs.push(`Question ${i+1} : un choix de réponse est vide.`);
+    questions.push({ q, opts, correct: sel?Number(sel.value):0 });
+  });
+  if(questions.length===0) erreurs.push("Aucune question.");
+
+  return { erreurs, id, data:{
+    titre,
+    sousTitre: document.getElementById('f-sous').value.trim(),
+    categorie: document.getElementById('f-cat').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    accroche: document.getElementById('f-accroche').value.trim(),
+    tempsParDefaut: Number(document.getElementById('f-temps').value)||30,
+    palette: PALETTES[document.getElementById('f-palette').value],
+    questions
+  }};
+}
+
+function telecharger(){
+  const {erreurs,id,data}=collecter();
+  const msg=document.getElementById('msg');
+  if(erreurs.length){
+    msg.className='msg err';
+    msg.innerHTML='<b>À corriger avant de télécharger :</b><br>'+erreurs.join('<br>');
+    msg.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=id+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  msg.className='msg ok';
+  msg.innerHTML=`<b>${id}.json téléchargé.</b><br>Dépose-le dans le dossier <code>quiz/</code> de ton dépôt GitHub. Le quiz sera en ligne à l'adresse <code>moteur/prof.html?quiz=${id}</code>.`;
+}
+
+function ouvrir(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      document.getElementById('f-id').value=f.name.replace(/\.json$/,'');
+      document.getElementById('f-titre').value=d.titre||'';
+      document.getElementById('f-sous').value=d.sousTitre||'';
+      document.getElementById('f-cat').value=d.categorie||'';
+      document.getElementById('f-desc').value=d.description||'';
+      document.getElementById('f-accroche').value=d.accroche||'';
+      document.getElementById('f-temps').value=d.tempsParDefaut||30;
+      const nom=Object.entries(PALETTES).find(([k,v])=> d.palette && v.accent===d.palette.accent);
+      if(nom) document.getElementById('f-palette').value=nom[0];
+      document.getElementById('questions').innerHTML='';
+      (d.questions||[]).forEach(q=>ajouterQuestion(q));
+      const m=document.getElementById('msg');
+      m.className='msg ok'; m.textContent=`${f.name} chargé — ${(d.questions||[]).length} questions.`;
+    }catch(err){
+      const m=document.getElementById('msg');
+      m.className='msg err'; m.textContent="Ce fichier n'est pas lisible. Il contient probablement une virgule ou un guillemet en trop.";
+    }
+  };
+  r.readAsText(f);
+}
+
+for(let i=0;i<10;i++) ajouterQuestion();
+</script>
+</body>
+</html>
