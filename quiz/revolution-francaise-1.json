@@ -21,103 +21,53 @@
   },
   "questions": [
     {
-      "q": "Pourquoi Louis XVI convoque-t-il les États généraux en 1789, après 175 ans sans réunion?",
-      "opts": [
-        "La monarchie est financièrement asphyxiée et les parlements bloquent toute réforme fiscale : le roi n'a plus d'autre issue institutionnelle",
-        "Le roi souhaite sincèrement moderniser le royaume selon les principes des Lumières qu'il a lui-même adoptés",
-        "Les émeutes de la faim dans les campagnes menacent directement Versailles et forcent une réponse politique immédiate",
-        "Les puissances étrangères exigent une réforme constitutionnelle en échange de nouveaux prêts à la France"
-      ],
+      "q": "En quelle année la Révolution française débute-t-elle avec la prise de la Bastille?",
+      "opts": ["1789", "1799", "1804", "1815"],
       "correct": 0
     },
     {
-      "q": "Qu'est-ce qui rend la société d'ordres explosive à la veille de 1789?",
-      "opts": [
-        "Les paysans, qui forment l'essentiel de la population, réclament l'abolition immédiate de la monarchie",
-        "Le clergé et la noblesse se sont appauvris au point de ne plus pouvoir remplir leurs fonctions traditionnelles",
-        "L'écart entre le poids réel du tiers état — démographique, économique, intellectuel — et sa place symbolique dans un ordre juridique fondé sur le privilège",
-        "La bourgeoisie a déjà conquis le pouvoir politique et cherche seulement à le faire reconnaître officiellement"
-      ],
-      "correct": 2
-    },
-    {
-      "q": "Dans la grille motivation / moyens / opportunité, que représente précisément l'année 1788-1789 pour les révolutionnaires?",
-      "opts": [
-        "La motivation : les cahiers de doléances révèlent pour la première fois un mécontentement populaire jusque-là inexistant",
-        "L'opportunité : la faillite de l'État et la convocation des États généraux ouvrent une brèche dans un pouvoir jusque-là inattaquable",
-        "Les moyens : la création de la Garde nationale donne au tiers état une force armée dont il ne disposait pas",
-        "Les trois à la fois, ce qui explique pourquoi la Révolution était devenue inévitable dès 1788"
-      ],
-      "correct": 1
-    },
-    {
-      "q": "Quelle est la portée du serment du Jeu de paume (20 juin 1789)?",
-      "opts": [
-        "Les députés du tiers état jurent de renverser la monarchie et de proclamer la république française",
-        "Les trois ordres s'engagent ensemble à voter désormais par tête plutôt que par ordre",
-        "Le roi accepte publiquement de partager sa souveraineté avec une assemblée élue",
-        "Une assemblée s'autoproclame détentrice de la souveraineté nationale et refuse de se dissoudre : la légitimité change de source"
-      ],
-      "correct": 3
-    },
-    {
-      "q": "Pourquoi la prise de la Bastille, le 14 juillet 1789, a-t-elle un effet politique disproportionné par rapport à sa portée militaire?",
-      "opts": [
-        "La forteresse abritait les archives secrètes de la monarchie, dont la divulgation discrédite définitivement Louis XVI",
-        "Elle libère des centaines de prisonniers politiques qui deviennent aussitôt les cadres du mouvement révolutionnaire",
-        "Le peuple parisien démontre qu'il peut vaincre l'armée royale et devient un acteur politique autonome que l'Assemblée devra désormais compter",
-        "Elle provoque la fuite immédiate de la cour à Versailles et l'effondrement de l'administration royale"
-      ],
-      "correct": 2
-    },
-    {
-      "q": "Quel enchaînement mène à la nuit du 4 août 1789 et à l'abolition des privilèges?",
-      "opts": [
-        "La Grande Peur soulève les campagnes contre les châteaux; l'Assemblée cède devant une violence qu'elle ne contrôle pas et transforme la panique en réforme",
-        "Les députés de la noblesse, gagnés aux idées des Lumières, renoncent spontanément et sans pression extérieure à leurs droits",
-        "Le roi impose l'abolition des privilèges pour reprendre l'initiative politique après l'humiliation du 14 juillet",
-        "Les cahiers de doléances réclamaient unanimement cette abolition, que l'Assemblée se contente d'entériner"
-      ],
+      "q": "Quel roi règne sur la France au début de la Révolution?",
+      "opts": ["Louis XVI", "Louis XV", "Napoléon Bonaparte", "Louis XVIII"],
       "correct": 0
     },
     {
-      "q": "Comment faut-il lire la Déclaration des droits de l'homme et du citoyen d'août 1789?",
-      "opts": [
-        "Comme l'aboutissement du projet des Lumières, appliqué intégralement dès sa proclamation",
-        "Comme un texte purement symbolique, sans effet réel sur le droit ou la politique de l'époque",
-        "Comme un texte de rupture qui fonde le droit sur l'individu et la nation, mais dont l'universalité proclamée exclut dans les faits les femmes, les esclaves et les citoyens passifs",
-        "Comme une négociation de compromis entre le roi et l'Assemblée, destinée à préserver l'essentiel des prérogatives royales"
-      ],
-      "correct": 2
+      "q": "Qu'est-ce que la Bastille, prise le 14 juillet 1789?",
+      "opts": ["Une prison-forteresse, symbole de l'autorité royale à Paris", "Le palais principal du roi à Paris", "Une cathédrale au centre de Paris", "L'hôtel de ville de Paris"],
+      "correct": 0
     },
     {
-      "q": "Quelle est la conséquence politique majeure des journées d'octobre 1789, quand les Parisiennes ramènent la famille royale à Paris?",
-      "opts": [
-        "Le roi abdique en faveur de son fils et un conseil de régence révolutionnaire prend le pouvoir",
-        "Le roi et l'Assemblée passent sous la surveillance directe du peuple parisien, qui devient un arbitre permanent du processus révolutionnaire",
-        "Versailles est pillé puis incendié, marquant la fin symbolique de l'Ancien Régime",
-        "Les femmes obtiennent le droit de vote et de siéger dans les assemblées de section"
-      ],
+      "q": "Quel texte, adopté en août 1789, proclame l'égalité des droits et la liberté comme principes fondamentaux?",
+      "opts": ["La Déclaration des droits de l'homme et du citoyen", "La Constitution de 1791", "Le Code civil", "Le serment du Jeu de paume"],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi Louis XVI convoque-t-il les États généraux en 1789?",
+      "opts": ["Parce que la monarchie traverse une grave crise financière et cherche de nouveaux impôts", "Parce qu'il veut abolir la monarchie de lui-même", "Parce que la noblesse exige une nouvelle constitution", "Parce que le peuple a déjà pris le pouvoir à Paris"],
+      "correct": 0
+    },
+    {
+      "q": "Que se passe-t-il lors du serment du Jeu de paume, le 20 juin 1789?",
+      "opts": ["Les députés du tiers état jurent de ne pas se séparer avant d'avoir donné une constitution à la France", "Le roi accepte immédiatement de partager son pouvoir", "L'Assemblée est dissoute par la force", "La noblesse se joint à une insurrection armée"],
+      "correct": 0
+    },
+    {
+      "q": "Qu'abolit l'Assemblée dans la nuit du 4 août 1789?",
+      "opts": ["Les privilèges féodaux et les droits seigneuriaux", "La monarchie elle-même", "L'armée royale", "Le droit de propriété privée"],
+      "correct": 0
+    },
+    {
+      "q": "Que se passe-t-il en octobre 1789 lorsque des Parisiennes marchent sur Versailles?",
+      "opts": ["Elles forcent le roi et sa famille à s'installer à Paris, sous la surveillance du peuple", "Elles obtiennent le droit de vote pour toutes les femmes", "Elles brûlent le château de Versailles", "Elles proclament la République"],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi la prise de la Bastille a-t-elle un impact politique plus grand que son importance militaire réelle?",
+      "opts": ["Parce qu'elle libère des centaines de prisonniers politiques qui deviennent les chefs de la Révolution", "Parce que le peuple parisien y démontre qu'il peut affronter l'autorité royale et devient un acteur politique qu'on ne peut plus ignorer", "Parce qu'elle marque la fuite immédiate du roi à l'étranger", "Parce qu'elle détruit les archives financières de la monarchie"],
       "correct": 1
     },
     {
-      "q": "Pourquoi la Constitution civile du clergé (1790) constitue-t-elle un tournant dans la Révolution?",
-      "opts": [
-        "Elle interdit le culte catholique et impose une religion révolutionnaire de substitution",
-        "Elle confisque les biens du clergé, ce qui règle définitivement la crise financière de l'État",
-        "Elle place l'Église sous l'autorité de la nation et fracture le pays en deux : pour la première fois, la Révolution se fabrique une opposition populaire de masse",
-        "Elle provoque l'excommunication de l'Assemblée par le pape, déclenchant aussitôt la guerre avec l'Autriche"
-      ],
-      "correct": 2
-    },
-    {
-      "q": "En quoi la fuite à Varennes (juin 1791) est-elle fatale à la monarchie constitutionnelle?",
-      "opts": [
-        "Le roi révèle qu'il désavoue le régime dont il est la clé de voûte : la fiction d'un monarque rallié à la Révolution s'effondre",
-        "Le roi rejoint effectivement les armées étrangères et déclare la guerre à sa propre Assemblée",
-        "L'Assemblée le destitue immédiatement et proclame la Première République dans les jours qui suivent",
-        "La reine est arrêtée seule, ce qui prive Louis XVI de son principal soutien politique"
-      ],
+      "q": "En quoi la fuite du roi à Varennes, en juin 1791, fragilise-t-elle la monarchie constitutionnelle?",
+      "opts": ["Elle prouve que le roi lui-même ne croit plus au régime qu'il est censé incarner", "Elle est sans conséquence, le roi étant rapidement pardonné", "Elle mène directement à son exécution", "Elle pousse l'Assemblée à proclamer aussitôt la République"],
       "correct": 0
     }
   ]

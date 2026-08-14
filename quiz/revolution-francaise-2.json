@@ -21,104 +21,54 @@
   },
   "questions": [
     {
-      "q": "Pourquoi l'Assemblée législative déclare-t-elle la guerre à l'Autriche en avril 1792?",
-      "opts": [
-        "Les Girondins veulent exporter la Révolution et démasquer les ennemis intérieurs, pendant que le roi espère secrètement une défaite qui restaurerait son autorité : la guerre sert des calculs politiques internes opposés",
-        "La France répond à une invasion autrichienne déjà commencée sur le territoire national",
-        "L'Assemblée cède à une pression populaire unanime réclamant la guerre depuis la prise de la Bastille",
-        "Louis XVI impose la guerre à une Assemblée qui s'y oppose fermement"
-      ],
+      "q": "En quelle année la France devient-elle officiellement une République?",
+      "opts": ["1792", "1789", "1799", "1804"],
       "correct": 0
     },
     {
-      "q": "Que se passe-t-il politiquement le 10 août 1792?",
-      "opts": [
-        "Le roi abdique volontairement en faveur de l'Assemblée pour éviter un bain de sang",
-        "Une insurrection populaire et les fédérés de province prennent les Tuileries : la monarchie est suspendue de fait, avant même d'être abolie par un vote",
-        "L'Autriche envahit Paris et impose la fin de la monarchie constitutionnelle",
-        "L'Assemblée vote paisiblement l'abolition de la royauté sans intervention populaire"
-      ],
-      "correct": 1
+      "q": "Qui est exécuté en janvier 1793?",
+      "opts": ["Le roi Louis XVI", "Robespierre", "Napoléon Bonaparte", "Danton"],
+      "correct": 0
     },
     {
-      "q": "Comment expliquer les massacres de septembre 1792 dans les prisons parisiennes?",
-      "opts": [
-        "Un tribunal révolutionnaire légal condamne méthodiquement les prisonniers après procès",
-        "Le gouvernement organise froidement les massacres depuis plusieurs semaines pour éliminer l'opposition",
-        "La panique devant l'avancée prussienne et la rumeur d'un complot carcéral déclenchent une violence de foule, que le pouvoir en place laisse faire puis récupère politiquement",
-        "Les massacres visent exclusivement les prêtres réfractaires et n'ont aucun lien avec le contexte militaire"
-      ],
-      "correct": 2
+      "q": "Comment appelle-t-on la période de répression intense dirigée par le Comité de salut public (1793-1794)?",
+      "opts": ["La Terreur", "Le Directoire", "La Restauration", "Le Consulat"],
+      "correct": 0
     },
     {
-      "q": "Quelle est la portée de la proclamation de la République le 21 septembre 1792?",
-      "opts": [
-        "Elle maintient formellement le titre de roi tout en vidant la fonction de ses pouvoirs",
-        "La Convention nationale rompt juridiquement avec la monarchie : la souveraineté ne dérive plus d'aucune couronne, même symbolique",
-        "Elle résulte d'un compromis négocié entre Louis XVI et l'Assemblée",
-        "Elle ne change rien de concret, la République n'étant proclamée que plusieurs années plus tard"
-      ],
-      "correct": 1
+      "q": "Qui prend le pouvoir par un coup d'État en novembre 1799, marquant la fin de la Révolution?",
+      "opts": ["Napoléon Bonaparte", "Robespierre", "Louis XVI", "Danton"],
+      "correct": 0
     },
     {
-      "q": "Pourquoi le procès de Louis XVI, jugé comme le citoyen Louis Capet, marque-t-il une rupture irréversible?",
-      "opts": [
-        "Parce que le roi est acquitté, ce qui humilie durablement la Convention",
-        "Parce qu'il s'agit d'une simple formalité sans enjeu, le sort du roi étant déjà scellé depuis 1789",
-        "Parce que juger le roi comme un citoyen ordinaire nie toute légitimité résiduelle à la monarchie, et le vote serré montre que cette rupture n'avait rien d'évident ni d'inévitable",
-        "Parce que la Convention vote à l'unanimité, prouvant un consensus total sur le sort du roi"
-      ],
-      "correct": 2
+      "q": "Pourquoi la France entre-t-elle en guerre contre l'Autriche en 1792?",
+      "opts": ["Les Girondins veulent répandre la Révolution, pendant que le roi espère secrètement une défaite qui le renforcerait", "La France est directement envahie sans avertissement", "Une majorité pacifiste au pouvoir choisit la guerre par erreur", "L'Autriche est déjà vaincue avant le début du conflit"],
+      "correct": 0
     },
     {
-      "q": "La Terreur (1793-1794) doit-elle être comprise comme un débordement incontrôlé ou un choix politique?",
-      "opts": [
-        "Comme un simple débordement de la foule parisienne que le gouvernement subit sans pouvoir l'encadrer",
-        "Comme une politique organisée par l'État — Comité de salut public, loi des suspects, tribunal révolutionnaire — construite en réponse à la guerre extérieure et à l'insurrection vendéenne : la violence y est un instrument de gouvernement délibéré",
-        "Comme une invention historiographique postérieure, la Terreur n'ayant jamais existé comme politique cohérente",
-        "Comme la continuation directe et sans rupture de la violence spontanée d'août 1792"
-      ],
-      "correct": 1
+      "q": "Que se passe-t-il le 10 août 1792?",
+      "opts": ["Une insurrection populaire prend les Tuileries et suspend la monarchie", "Le roi abdique volontairement", "La Convention proclame immédiatement la République", "L'Autriche occupe Paris"],
+      "correct": 0
     },
     {
-      "q": "Pourquoi la Convention se retourne-t-elle contre Robespierre en Thermidor (juillet 1794)?",
-      "opts": [
-        "Parce que Robespierre annonce lui-même vouloir mettre fin à la Terreur et démissionner",
-        "Parce que les puissances étrangères négocient secrètement sa chute avec la Convention",
-        "Parce que le peuple parisien, épuisé par la Terreur, se soulève directement contre lui",
-        "Parce que plusieurs conventionnels, craignant d'être eux-mêmes visés par de nouvelles épurations, s'unissent par calcul de survie autant que par lassitude de la Terreur"
-      ],
-      "correct": 3
+      "q": "Pourquoi Robespierre est-il renversé en juillet 1794 (Thermidor)?",
+      "opts": ["Plusieurs membres de la Convention, craignant d'être eux-mêmes les prochaines victimes de la Terreur, s'unissent contre lui", "Il démissionne volontairement", "Il est vaincu militairement par l'Autriche", "Le peuple parisien l'acclame comme un héros jusqu'à sa mort naturelle"],
+      "correct": 0
     },
     {
-      "q": "En quoi le Directoire (1795-1799) illustre-t-il l'idée qu'une révolution peut mourir par confiscation plutôt que par un événement unique?",
-      "opts": [
-        "Il élargit continuellement le droit de vote jusqu'à inclure l'ensemble des sans-culottes",
-        "Il gouverne par une série de coups d'État internes et un suffrage censitaire qui excluent à la fois les sans-culottes et les royalistes : le pouvoir se resserre progressivement entre les mains d'une élite restreinte",
-        "Il restaure discrètement la monarchie sous une autre appellation",
-        "Il applique fidèlement la Constitution de 1793, la plus démocratique de la période"
-      ],
-      "correct": 1
+      "q": "Qu'est-ce que le Directoire (1795-1799)?",
+      "opts": ["Un régime qui gouverne par une série de coups d'État et exclut à la fois les sans-culottes et les royalistes", "Un retour pur et simple à la monarchie absolue", "Une démocratie directe où tous votent sur chaque loi", "La dictature personnelle de Robespierre"],
+      "correct": 0
     },
     {
-      "q": "Que signifie le coup d'État du 18 Brumaire (novembre 1799) dans la périodisation du cours?",
-      "opts": [
-        "Une simple crise ministérielle sans conséquence sur le régime en place",
-        "Le triomphe final des idéaux de 1789, portés désormais par un chef militaire légitime",
-        "La marque conventionnelle de fin de la Révolution française : Bonaparte, avec l'appui de Sieyès, prend le pouvoir par la force, achevant le glissement du pouvoir populaire vers une autorité personnelle",
-        "Le retour pur et simple à la monarchie absolue d'avant 1789"
-      ],
-      "correct": 2
+      "q": "En quoi peut-on dire que la Terreur est un choix politique organisé plutôt qu'un simple débordement de violence populaire?",
+      "opts": ["Parce qu'elle est mise en place par l'État — Comité de salut public, loi des suspects — en réponse à la guerre et à la guerre civile intérieure", "Parce qu'elle résulte uniquement de la colère spontanée de la foule parisienne", "Parce qu'elle n'a jamais vraiment existé comme politique organisée", "Parce qu'elle est imposée de l'extérieur par les puissances étrangères"],
+      "correct": 0
     },
     {
-      "q": "En reliant Varennes (1791) à Brumaire (1799), quel enchaînement illustre le mieux la thèse du cours sur les révolutions qui meurent par confiscation?",
-      "opts": [
-        "La radicalisation de la Révolution est linéaire et continue de 1791 à 1799, sans jamais se resserrer ni se retourner sur elle-même",
-        "L'effondrement de la fiction monarchique pousse à la guerre et à la République; la Terreur centralise le pouvoir pour survivre à cette guerre; le Directoire restreint ensuite qui peut légitimement gouverner; Brumaire achève ce resserrement en le concentrant dans une seule main",
-        "Chaque étape entre 1791 et 1799 redistribue davantage le pouvoir vers le peuple, jusqu'à l'aboutissement démocratique de 1799",
-        "Aucun lien de cause à effet ne relie ces événements, qui se succèdent par pur hasard historique"
-      ],
-      "correct": 1
+      "q": "Comment le Directoire et le coup d'État de Brumaire illustrent-ils l'idée qu'une révolution peut se terminer par une confiscation progressive du pouvoir plutôt que par un seul événement?",
+      "opts": ["Le pouvoir se resserre par étapes — exclusions électorales, coups d'État internes — jusqu'à se concentrer dans les mains d'un seul homme, Bonaparte", "Le pouvoir s'élargit continuellement jusqu'en 1799 pour inclure tout le peuple", "Aucun lien ne relie le Directoire à l'arrivée de Bonaparte", "Le roi reprend le pouvoir en 1799"],
+      "correct": 0
     }
   ]
 }

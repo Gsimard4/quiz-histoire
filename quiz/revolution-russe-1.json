@@ -21,104 +21,54 @@
   },
   "questions": [
     {
-      "q": "Pourquoi le régime tsariste s'effondre-t-il aussi rapidement en février 1917, alors qu'il avait survécu à la révolution de 1905?",
-      "opts": [
-        "La guerre de 1914-1917 épuise l'armée et l'arrière, transformant des griefs sociaux anciens en crise aiguë et simultanée que le régime ne peut plus contenir",
-        "Le tsar abdique spontanément, converti aux idées libérales occidentales après des années de réflexion",
-        "Une invasion allemande directe sur Petrograd renverse le régime par la force militaire",
-        "Les bolcheviks organisent et dirigent l'insurrection de février depuis le tout début"
-      ],
+      "q": "En quelle année a lieu la Révolution russe qui renverse le tsar?",
+      "opts": ["1917", "1905", "1921", "1924"],
       "correct": 0
     },
     {
-      "q": "Quel rôle joue la révolution de 1905 dans la trajectoire menant à 1917?",
-      "opts": [
-        "Elle règle durablement les tensions sociales, rendant improbable toute nouvelle révolution",
-        "Elle agit comme répétition générale : soviets, grève générale et limites d'un tsarisme à peine réformé y sont testés et mémorisés, sans que 1917 en devienne pour autant inévitable",
-        "Elle provoque l'abdication immédiate du tsar dès 1905",
-        "Elle n'a aucun lien avec les événements de 1917, séparés par une rupture totale"
-      ],
-      "correct": 1
+      "q": "Qui est le tsar renversé en février 1917?",
+      "opts": ["Nicolas II", "Alexandre III", "Pierre le Grand", "Ivan le Terrible"],
+      "correct": 0
     },
     {
-      "q": "Qu'est-ce que le \"double pouvoir\" (dvoevlastie) instauré après février 1917?",
-      "opts": [
-        "Le tsar et Lénine se partagent formellement l'autorité législative",
-        "Le Gouvernement provisoire, autorité officielle, coexiste avec le Soviet de Petrograd, qui détient l'autorité réelle sur soldats et ouvriers : une rivalité de légitimité sans réelle solution institutionnelle",
-        "Deux tsars règnent simultanément sur des territoires distincts de l'empire",
-        "L'armée et l'Église orthodoxe se partagent le pouvoir après l'abdication"
-      ],
-      "correct": 1
+      "q": "Qui dirige le parti bolchévique en 1917?",
+      "opts": ["Lénine", "Staline", "Trotsky", "Kerensky"],
+      "correct": 0
     },
     {
-      "q": "En quoi les Thèses d'avril de Lénine (avril 1917) marquent-elles une rupture stratégique?",
-      "opts": [
-        "Elles appellent à soutenir pleinement le Gouvernement provisoire pour poursuivre l'effort de guerre",
-        "Elles proposent une monarchie constitutionnelle comme compromis politique durable",
-        "Elles rejettent toute collaboration avec le Gouvernement provisoire et posent \"tout le pouvoir aux soviets\", radicalisant une ligne bolchévique jusque-là plus prudente",
-        "Elles n'ont aucune influence réelle sur la stratégie du parti bolchévique"
-      ],
-      "correct": 2
+      "q": "Quel événement d'octobre 1917 marque la prise du pouvoir par les bolcheviks?",
+      "opts": ["La prise du Palais d'Hiver à Petrograd", "La bataille de Stalingrad", "La chute du mur de Berlin", "L'exécution du tsar"],
+      "correct": 0
     },
     {
-      "q": "Comment l'affaire Kornilov (août 1917) profite-t-elle paradoxalement aux bolcheviks?",
-      "opts": [
-        "Kornilov bat militairement les bolcheviks et les affaiblit durablement",
-        "L'affaire n'a aucun effet sur le rapport de force entre les factions révolutionnaires",
-        "Elle pousse le Soviet de Petrograd à se dissoudre volontairement",
-        "Kerensky doit armer les gardes rouges bolcheviks pour repousser la tentative de coup de Kornilov, leur donnant enfin les moyens militaires qui leur manquaient jusque-là"
-      ],
-      "correct": 3
+      "q": "Qu'est-ce que le \"double pouvoir\" instauré après février 1917?",
+      "opts": ["Le Gouvernement provisoire et le Soviet de Petrograd coexistent, chacun avec une autorité réelle mais rivale", "Le tsar et Lénine gouvernent ensemble", "Deux tsars règnent sur des territoires séparés", "L'armée et l'Église se partagent le pouvoir"],
+      "correct": 0
     },
     {
-      "q": "Dans la grille motivation / moyens / opportunité, que représente précisément l'automne 1917 pour les bolcheviks?",
-      "opts": [
-        "Seulement la motivation : les moyens et l'opportunité restant absents jusqu'en 1918",
-        "La convergence des trois facteurs : motivation idéologique constante depuis avril, moyens militaires obtenus via l'affaire Kornilov, et opportunité d'un Gouvernement provisoire discrédité et isolé",
-        "Uniquement l'opportunité, les bolcheviks ne disposant ni de motivation claire ni de moyens militaires",
-        "Un pur hasard sans convergence identifiable de facteurs"
-      ],
-      "correct": 1
+      "q": "Que réclament les Thèses d'avril de Lénine (avril 1917)?",
+      "opts": ["\"Tout le pouvoir aux soviets\", rejetant toute collaboration avec le Gouvernement provisoire", "Le maintien du tsar comme figure symbolique", "La poursuite de la guerre aux côtés des Alliés", "Une monarchie constitutionnelle"],
+      "correct": 0
     },
     {
-      "q": "Comment qualifier la prise du Palais d'Hiver en octobre 1917?",
-      "opts": [
-        "Une insurrection de masse sanglante mobilisant des centaines de milliers de combattants",
-        "Un vote démocratique organisé formellement par le Soviet de Petrograd",
-        "Une opération relativement rapide et peu coûteuse en vies, menée par des détachements armés ciblés, pendant que la ville continue de fonctionner presque normalement",
-        "Une intervention militaire étrangère décisive dans les affaires russes"
-      ],
-      "correct": 2
+      "q": "Comment l'affaire Kornilov (août 1917) aide-t-elle les bolcheviks?",
+      "opts": ["Kerensky doit armer les gardes rouges bolcheviks pour repousser la tentative de coup de Kornilov", "Kornilov bat les bolcheviks et les affaiblit", "L'affaire n'a aucun effet sur les bolcheviks", "Elle pousse le Soviet à se dissoudre"],
+      "correct": 0
     },
     {
-      "q": "Que décrète immédiatement le Sovnarkom formé après octobre 1917?",
-      "opts": [
-        "Le maintien de la guerre aux côtés des Alliés et le statu quo agraire",
-        "L'abolition immédiate et sans exception de toute propriété privée",
-        "Le rétablissement de l'Assemblée constituante comme autorité suprême du pays",
-        "La paix immédiate sans annexions ni indemnités et la redistribution des terres aux paysans : deux décrets qui captent des revendications populaires déjà largement formulées avant même la prise du pouvoir"
-      ],
-      "correct": 3
+      "q": "Que décrète le nouveau gouvernement (Sovnarkom) immédiatement après octobre 1917?",
+      "opts": ["La paix immédiate et la redistribution des terres aux paysans", "Le maintien de la guerre et du système agraire existant", "Le rétablissement du tsar", "L'abolition de tout gouvernement"],
+      "correct": 0
     },
     {
-      "q": "Pourquoi est-il trompeur de présenter la révolution d'Octobre comme le simple aboutissement inévitable de février?",
-      "opts": [
-        "Parce que les deux révolutions sont en réalité un seul et même événement continu",
-        "Parce qu'entre février et octobre, plusieurs issues restaient ouvertes — succès durable du Gouvernement provisoire, victoire d'une autre faction socialiste — et la victoire bolchévique dépend de choix et de conjonctures précis, non d'une trajectoire écrite d'avance",
-        "Parce que la révolution d'Octobre a en réalité eu lieu avant celle de février",
-        "Parce qu'aucun lien de causalité ne relie les deux révolutions"
-      ],
-      "correct": 1
+      "q": "Pourquoi le régime tsariste s'effondre-t-il si rapidement en 1917, après avoir survécu à la révolution de 1905?",
+      "opts": ["La Première Guerre mondiale épuise l'armée et la population, transformant des tensions anciennes en crise aiguë", "Le tsar abdique de son plein gré après avoir lu les idées des Lumières", "Une invasion allemande directe renverse le régime", "Les bolcheviks dirigent l'insurrection depuis le début"],
+      "correct": 0
     },
     {
-      "q": "Quel est l'enjeu à traiter la Révolution russe comme une révolution \"phare\" au même titre que la française, sans les assimiler?",
-      "opts": [
-        "Aucun parallèle n'existe entre les deux cas, ce qui rend la comparaison stérile",
-        "Les deux partagent une dynamique de radicalisation progressive et une question de légitimité de la souveraineté, mais comparer permet surtout de mesurer où les trajectoires divergent, plutôt que de plaquer un même modèle sur des contextes différents",
-        "La comparaison sert uniquement à démontrer la supériorité d'un modèle révolutionnaire sur l'autre",
-        "Comparer les deux revient nécessairement à nier leurs particularités nationales respectives"
-      ],
-      "correct": 1
+      "q": "Pourquoi est-il trompeur de voir la révolution d'Octobre comme la suite automatique et inévitable de février?",
+      "opts": ["Parce qu'entre les deux, plusieurs issues restaient possibles, et la victoire bolchévique dépend de choix et de circonstances précises, pas d'une trajectoire écrite d'avance", "Parce que les deux révolutions sont en fait un seul événement", "Parce qu'Octobre précède réellement Février", "Parce qu'il n'existe aucun lien entre les deux"],
+      "correct": 0
     }
   ]
 }

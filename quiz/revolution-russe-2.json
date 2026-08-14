@@ -21,104 +21,54 @@
   },
   "questions": [
     {
-      "q": "Pourquoi les bolcheviks dissolvent-ils l'Assemblée constituante en janvier 1918, après l'avoir eux-mêmes convoquée?",
-      "opts": [
-        "Parce que la participation électorale est jugée trop faible pour légitimer l'Assemblée",
-        "Parce qu'ils perdent les élections face aux socialistes-révolutionnaires et choisissent de confisquer par la force un pouvoir que le vote populaire ne leur accorde pas",
-        "Parce que le tsar, depuis son exil, exige personnellement sa dissolution",
-        "Parce que l'Assemblée constituante vote elle-même sa propre dissolution"
-      ],
-      "correct": 1
+      "q": "Qui dirige la Russie soviétique de 1917 jusqu'à sa mort en 1924?",
+      "opts": ["Lénine", "Staline", "Trotsky", "Nicolas II"],
+      "correct": 0
     },
     {
-      "q": "Que sacrifie la Russie soviétique par le traité de Brest-Litovsk (mars 1918)?",
-      "opts": [
-        "Aucun territoire, le traité étant purement symbolique et sans effet réel",
-        "D'immenses territoires à l'ouest — Ukraine, Pologne, pays baltes — en échange d'une sortie immédiate de la guerre, un prix jugé nécessaire pour consolider le pouvoir bolchévique à l'intérieur",
-        "La totalité de la Sibérie, cédée entièrement à l'Allemagne",
-        "Le contrôle total de l'Armée rouge, dissoute par les termes du traité"
-      ],
-      "correct": 1
+      "q": "Comment appelle-t-on la guerre opposant les \"rouges\" (bolcheviks) aux \"blancs\" de 1918 à 1921?",
+      "opts": ["La guerre civile russe", "La Grande Guerre", "La guerre froide", "La guerre d'indépendance"],
+      "correct": 0
     },
     {
-      "q": "Qui s'oppose aux bolcheviks (rouges) pendant la guerre civile (1918-1921)?",
-      "opts": [
-        "Uniquement l'armée allemande, seule force étrangère réellement impliquée",
-        "Seulement les paysans, unis spontanément contre toute forme de gouvernement central",
-        "Une coalition hétérogène de \"blancs\" — monarchistes, libéraux, socialistes modérés — et de puissances étrangères intervenant par intérêt géopolitique, sans projet politique commun entre eux",
-        "Aucune opposition militaire organisée, la guerre civile étant surtout diplomatique"
-      ],
-      "correct": 2
+      "q": "Quelle politique économique, adoptée en 1921, réintroduit un marché limité?",
+      "opts": ["La Nouvelle politique économique (NEP)", "Le communisme de guerre", "Le plan quinquennal", "La collectivisation forcée"],
+      "correct": 0
+    },
+    {
+      "q": "Qui succède à Lénine à la tête du pouvoir soviétique après une lutte interne?",
+      "opts": ["Staline", "Trotsky", "Kerensky", "Nicolas II"],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi les bolcheviks dissolvent-ils l'Assemblée constituante en janvier 1918?",
+      "opts": ["Parce qu'ils perdent les élections face aux socialistes-révolutionnaires et refusent de céder le pouvoir", "Parce que l'Assemblée vote elle-même sa dissolution", "Parce que le tsar l'exige depuis son exil", "Parce que la participation est jugée trop faible"],
+      "correct": 0
+    },
+    {
+      "q": "Que sacrifie la Russie soviétique par le traité de Brest-Litovsk (1918)?",
+      "opts": ["D'immenses territoires à l'ouest, en échange d'une sortie immédiate de la guerre", "Aucun territoire, le traité étant symbolique", "La totalité de la Sibérie", "Le contrôle de l'Armée rouge"],
+      "correct": 0
     },
     {
       "q": "Qu'est-ce que le \"communisme de guerre\" (1918-1921)?",
-      "opts": [
-        "Une politique de libre marché total instaurée pour financer l'effort militaire",
-        "Un accord de paix négocié directement avec les puissances blanches",
-        "Un ensemble de mesures de réquisition forcée des grains et de nationalisation économique, justifiées par l'urgence militaire mais provoquant famine et effondrement de la production",
-        "Une politique purement symbolique, sans effet réel sur l'économie soviétique"
-      ],
-      "correct": 2
+      "opts": ["Des réquisitions forcées de grain et la nationalisation de l'économie, justifiées par l'urgence militaire", "Une politique de libre marché total", "Un accord de paix avec les blancs", "Une mesure purement symbolique"],
+      "correct": 0
     },
     {
-      "q": "Pourquoi la révolte de Kronstadt (mars 1921) est-elle particulièrement significative pour le régime bolchévique?",
-      "opts": [
-        "Parce qu'elle est menée par des officiers tsaristes cherchant à restaurer la monarchie",
-        "Parce que les marins insurgés, autrefois piliers de la révolution d'Octobre, réclament désormais \"les soviets sans les bolcheviks\" : la contestation vient de l'intérieur même de la base sociale révolutionnaire",
-        "Parce qu'elle constitue la toute première révolte armée du régime, aucune autre n'ayant eu lieu avant",
-        "Parce qu'elle réussit à renverser durablement le pouvoir bolchévique"
-      ],
-      "correct": 1
+      "q": "Pourquoi la révolte de Kronstadt (1921) inquiète-t-elle particulièrement les bolcheviks?",
+      "opts": ["Parce qu'elle vient de marins autrefois favorables à la révolution, qui réclament désormais \"les soviets sans les bolcheviks\"", "Parce qu'elle est menée par des officiers tsaristes", "Parce que c'est la première révolte armée du régime", "Parce qu'elle renverse durablement le pouvoir bolchévique"],
+      "correct": 0
     },
     {
-      "q": "Quel changement stratégique la Nouvelle Politique économique (NEP, 1921) introduit-elle?",
-      "opts": [
-        "Elle abolit totalement le Parti communiste au profit d'élections libres",
-        "Elle réintroduit un marché limité et la petite propriété paysanne tout en maintenant le contrôle politique du parti sur l'État : un recul économique tactique sans recul politique",
-        "Elle collectivise immédiatement l'ensemble des terres agricoles du pays",
-        "Elle rétablit la monarchie sous contrôle bolchévique"
-      ],
-      "correct": 1
+      "q": "Comment lire l'adoption de la NEP dans la logique motivation / moyens / opportunité?",
+      "opts": ["Comme une réponse pragmatique à un manque criant de moyens — économie ruinée, famine, révoltes — sans renoncer aux fins politiques du régime", "Comme un changement d'idéologie complet, les bolcheviks renonçant au communisme", "Comme une opportunité imposée par des puissances étrangères", "Comme un pur hasard sans lien avec 1921"],
+      "correct": 0
     },
     {
-      "q": "Dans la grille motivation / moyens / opportunité, comment lire l'adoption de la NEP?",
-      "opts": [
-        "Comme une motivation idéologique nouvelle, les bolcheviks ayant renoncé au communisme",
-        "Comme une opportunité extérieure imposée par des puissances étrangères",
-        "Comme une réponse pragmatique à un manque de moyens — économie exsangue, famine, révoltes — qui contraint le pouvoir à ajuster ses méthodes sans renoncer à ses fins politiques",
-        "Comme un pur hasard, sans lien identifiable avec la situation de 1921"
-      ],
-      "correct": 2
-    },
-    {
-      "q": "Que révèle la lutte de succession après la mort de Lénine (1924) sur la nature du régime soviétique?",
-      "opts": [
-        "Une transition pacifique et immédiate vers un système collégial stable",
-        "Un retour immédiat au multipartisme à l'intérieur du parti",
-        "L'abolition du poste de secrétaire général par consensus général",
-        "Que le pouvoir, déjà concentré dans l'appareil du parti plutôt que dans des institutions représentatives, se joue désormais entre quelques dirigeants — dont Staline — plutôt que par un processus ouvert : la confiscation amorcée dès 1917-1918 se poursuit"
-      ],
-      "correct": 3
-    },
-    {
-      "q": "En quoi la trajectoire 1917-1924 illustre-t-elle la thèse des révolutions qui \"meurent par confiscation\"?",
-      "opts": [
-        "Le pouvoir se démocratise continuellement, de la chute du tsar jusqu'à la mort de Lénine",
-        "La dissolution de la Constituante, la centralisation du communisme de guerre, la répression de Kronstadt et la lutte de succession dessinent un même mouvement : la souveraineté populaire invoquée en 1917 se retrouve progressivement concentrée dans l'appareil du parti",
-        "Aucune concentration du pouvoir n'est observable sur l'ensemble de cette période",
-        "Le processus est identique en tout point à celui de la Révolution française"
-      ],
-      "correct": 1
-    },
-    {
-      "q": "Pourquoi est-il utile de comparer la trajectoire russe (1917-1924) à la trajectoire française (1789-1799) sans les assimiler?",
-      "opts": [
-        "Parce que les deux révolutions sont interchangeables et suivent un scénario identique",
-        "Parce qu'aucune comparaison n'est possible entre deux contextes nationaux aussi différents",
-        "Parce que la comparaison révèle un même schéma de resserrement progressif du pouvoir, tout en obligeant à préciser où et pourquoi les mécanismes diffèrent — guerre civile et parti unique en Russie, Directoire puis coup militaire en France",
-        "Parce que la comparaison sert uniquement à démontrer la supériorité d'un modèle sur l'autre"
-      ],
-      "correct": 2
+      "q": "En quoi la trajectoire de 1917 à 1924 illustre-t-elle l'idée d'une révolution qui se termine par une confiscation progressive du pouvoir?",
+      "opts": ["La dissolution de la Constituante, la centralisation du pouvoir pendant la guerre civile, puis la lutte de succession montrent un pouvoir de plus en plus concentré dans l'appareil du parti, loin de la souveraineté populaire promise en 1917", "Le pouvoir se démocratise sans interruption de 1917 à 1924", "Aucune concentration du pouvoir n'est observable durant cette période", "Le processus est identique à celui de la Révolution française en tout point"],
+      "correct": 0
     }
   ]
 }
