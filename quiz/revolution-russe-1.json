@@ -42,7 +42,7 @@
     },
     {
       "q": "Qu'est-ce que le \"double pouvoir\" instauré après février 1917?",
-      "opts": ["Le Gouvernement provisoire et le Soviet de Petrograd coexistent, chacun avec une autorité réelle mais rivale", "Le tsar et Lénine gouvernent ensemble", "Deux tsars règnent sur des territoires séparés", "L'armée et l'Église se partagent le pouvoir"],
+      "opts": ["Le Gouvernement provisoire et le Soviet de Petrograd coexistent", "Le tsar et Comité provisoire", "Le Gouvernement provisoire et l'Armée", "L'armée et le Soviet"],
       "correct": 0
     },
     {
