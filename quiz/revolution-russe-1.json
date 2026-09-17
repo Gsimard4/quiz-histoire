@@ -52,7 +52,7 @@
     },
     {
       "q": "Comment l'affaire Kornilov (août 1917) aide-t-elle les bolcheviks?",
-      "opts": ["Kerensky doit armer les gardes rouges bolcheviks pour repousser la tentative de coup de Kornilov", "Kornilov bat les bolcheviks et les affaiblit", "L'affaire n'a aucun effet sur les bolcheviks", "Elle pousse le Soviet à se dissoudre"],
+      "opts": ["Kerensky doit armer les gardes rouges bolcheviks pour repousser la tentative de coup de Kornilov", "Kornilov bat les bolcheviks et les affaiblit", "L'affaire n'a aucun effet sur les bolcheviks", "Elle pousse le Soviet à renverser le Gouvernement provisoire"],
       "correct": 0
     },
     {
@@ -62,7 +62,7 @@
     },
     {
       "q": "Pourquoi le régime tsariste s'effondre-t-il si rapidement en 1917, après avoir survécu à la révolution de 1905?",
-      "opts": ["La Première Guerre mondiale épuise l'armée et la population, transformant des tensions anciennes en crise aiguë", "Le tsar abdique de son plein gré après avoir lu les idées des Lumières", "Une invasion allemande directe renverse le régime", "Les bolcheviks dirigent l'insurrection depuis le début"],
+      "opts": ["La Première Guerre mondiale épuise l'armée et la population", "Le tsar abdique de son plein gré après avoir constaté que la Russie perdait la guerre", "Une invasion allemande directe renverse le régime", "Les bolcheviks dirigent l'insurrection depuis le début"],
       "correct": 0
     },
     {
