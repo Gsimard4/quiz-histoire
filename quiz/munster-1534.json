@@ -1,0 +1,124 @@
+{
+  "titre": "Les Anabaptistes de Münster",
+  "sousTitre": "1534-1535 — la Nouvelle Jérusalem",
+  "categorie": "XVIe siècle · Révolte messianique",
+  "description": "Une ville allemande prise par des anabaptistes millénaristes qui y instaurent une théocratie radicale, avant sa chute dans le sang.",
+  "accroche": "PROPHÉTIE · THÉOCRATIE · SIÈGE",
+  "tempsParDefaut": 30,
+  "palette": {
+    "accent": "#c9922f",
+    "accentSombre": "#7d5a15",
+    "corail": "#9a4a20",
+    "corailClair": "#c25f28",
+    "fond": "#0b0805",
+    "fondMi": "#140f08",
+    "carte": "#1c150c",
+    "carte2": "#251c11",
+    "bordure": "#3a2b1a",
+    "bordure2": "#4e3a24",
+    "texte": "#f0e6d4",
+    "sourdine": "#8f7a55"
+  },
+  "questions": [
+    {
+      "q": "Quel groupe religieux prend le contrôle de la ville de Münster en 1534-1535?",
+      "opts": [
+        "Les anabaptistes, qui y proclament une théocratie millénariste",
+        "Les calvinistes, qui y instaurent une république presbytérienne",
+        "Les luthériens orthodoxes, fidèles aux thèses de Wittenberg",
+        "Les catholiques réformés, proches du concile de Trente"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Qui devient le chef incontesté de Münster après la mort de Jan Matthys, allant jusqu'à se proclamer « roi » de la Nouvelle Jérusalem?",
+      "opts": [
+        "Bernhard Rothmann",
+        "Bernt Knipperdolling",
+        "Jan de Leyde (Jan von Leyden)",
+        "Franz von Waldeck"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Quelle pratique controversée est instaurée à Münster pendant le siège, justifiée par référence aux patriarches bibliques comme Abraham et David?",
+      "opts": [
+        "Le communisme intégral des terres agricoles",
+        "La polygamie, chaque homme pouvant prendre plusieurs épouses",
+        "Le célibat obligatoire pour tous les adultes",
+        "L'abolition complète du mariage"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Comment se termine l'épisode anabaptiste de Münster, à l'été 1535?",
+      "opts": [
+        "La ville négocie son autonomie religieuse et garde son régime anabaptiste",
+        "Les habitants se révoltent eux-mêmes contre Jan de Leyde et rouvrent les portes à l'évêque",
+        "La ville est reprise par les troupes du prince-évêque grâce à une trahison, et ses chefs sont exécutés puis exposés",
+        "Un traité impérial accorde à Münster le statut de ville libre protestante"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Quel enchaînement de facteurs rend la population de Münster particulièrement réceptive aux idées radicales à la veille de 1534?",
+      "opts": [
+        "Une prospérité soudaine qui pousse les bourgeois à réclamer plus de pouvoir politique",
+        "Le déclin économique, les mauvaises récoltes, les épidémies et même une comète, qui s'ajoutent au ressentiment envers un clergé exempté de taxes",
+        "Une invasion militaire française qui déstabilise l'administration épiscopale",
+        "La décision du prince-évêque d'imposer lui-même le baptême des adultes"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Que prêche Jan Matthys en reprenant, tout en la modifiant, la prophétie de Melchior Hoffmann?",
+      "opts": [
+        "Que la fin du monde est déjà survenue et qu'il faut désormais vivre dans le repentir",
+        "Que c'est Strasbourg, et non Münster, qui doit être « nettoyée » avant le retour du Christ",
+        "Que c'est Münster, et non Strasbourg, qui doit être « nettoyée » pour devenir la Nouvelle Jérusalem avant la venue du Christ",
+        "Que la prophétie était fausse et qu'il faut abandonner tout millénarisme"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Comment meurt Jan Matthys en avril 1534?",
+      "opts": [
+        "Il est empoisonné lors d'un banquet par des conseillers rivaux",
+        "Il sort seul affronter les troupes épiscopales, croyant à une protection divine, et est tué puis démembré",
+        "Il meurt de la peste pendant le siège de la ville",
+        "Il est exécuté publiquement par l'évêque après sa capture"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Comment les troupes du prince-évêque parviennent-elles finalement à reprendre Münster, après plusieurs assauts ratés?",
+      "opts": [
+        "Par un bombardement d'artillerie qui détruit les remparts",
+        "Par la famine seule, qui force les assiégés à se rendre sans combat",
+        "Grâce à des transfuges qui révèlent un point d'accès à la ville, permettant une infiltration nocturne",
+        "Grâce à l'intervention de l'empereur Charles Quint, qui envoie une armée impériale"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Le meurtre de Hubert Ruescher, tué par Jan de Leyde après avoir traité Jan Matthys de menteur, marque un tournant important dans le régime anabaptiste. Lequel?",
+      "opts": [
+        "Il provoque un schisme théologique entre anabaptistes pacifistes et anabaptistes armés",
+        "Il pousse Matthys à quitter le pouvoir et à confier la ville à un conseil élu",
+        "Il installe la violence comme outil pour faire taire toute dissidence interne, et consacre Matthys comme chef incontesté",
+        "Il convainc l'évêque de négocier une paix immédiate avec les anabaptistes"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Dans la grille motivation / moyens / opportunité utilisée en classe, qu'est-ce qui constitue précisément l'« opportunité » ayant permis aux anabaptistes de prendre le contrôle du conseil de Münster en 1534?",
+      "opts": [
+        "Une insurrection armée qui renverse par la force les autorités municipales en place",
+        "Des élections municipales légales, dans une ville déjà fragilisée, qui portent au conseil des sympathisants anabaptistes",
+        "Un décret impérial qui transfère directement le pouvoir aux prédicateurs anabaptistes",
+        "L'absence totale d'institutions municipales à Münster avant 1534"
+      ],
+      "correct": 1
+    }
+  ]
+}
