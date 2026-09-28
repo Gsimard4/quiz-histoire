@@ -63,9 +63,9 @@
     {
       "q": "Quel enchaînement de facteurs rend la population de Münster particulièrement réceptive aux idées radicales à la veille de 1534?",
       "opts": [
-        "Une prospérité soudaine qui pousse les bourgeois à réclamer plus de pouvoir politique",
-        "Le déclin économique, les mauvaises récoltes, les épidémies et même une comète, qui s'ajoutent au ressentiment envers un clergé exempté de taxes",
-        "Une invasion militaire française qui déstabilise l'administration épiscopale",
+        "Une prospérité soudaine qui renforce les bourgeois et les pousse à réclamer plus de pouvoir politique.",
+        "Le déclin économique, et des récoltes désastreuses, qui s'ajoutent au ressentiment envers un clergé exempté de taxes",
+        "Une invasion militaire française qui déstabilise l'administration épiscopale et qui permet à la population de la ville de se déclarer indépendante de l'évêque ; permettant au conseil de ville de saisir le pouvoir exécutif et législatif.",
         "La décision du prince-évêque d'imposer lui-même le baptême des adultes"
       ],
       "correct": 1
@@ -73,10 +73,10 @@
     {
       "q": "Que prêche Jan Matthys en reprenant, tout en la modifiant, la prophétie de Melchior Hoffmann?",
       "opts": [
-        "Que la fin du monde est déjà survenue et qu'il faut désormais vivre dans le repentir",
-        "Que c'est Strasbourg, et non Münster, qui doit être « nettoyée » avant le retour du Christ",
+        "Que la fin du monde est déjà survenue et qu'il faut désormais vivre dans le repentir pour être sauvé.",
+        "Que les nobles, dont l'empereur et l'évêque, sont au service de l'antéchrist et qu'il faut s'enfermer dans les villes pour leur résister.",
         "Que c'est Münster, et non Strasbourg, qui doit être « nettoyée » pour devenir la Nouvelle Jérusalem avant la venue du Christ",
-        "Que la prophétie était fausse et qu'il faut abandonner tout millénarisme"
+        "Que la prophétie était fausse et qu'il faut abandonner tout millénarisme et recrée la constitution de la ville pour permettre aux marchands de saisir la terre du clergé."
       ],
       "correct": 2
     },
@@ -86,37 +86,37 @@
         "Il est empoisonné lors d'un banquet par des conseillers rivaux",
         "Il sort seul affronter les troupes épiscopales, croyant à une protection divine, et est tué puis démembré",
         "Il meurt de la peste pendant le siège de la ville",
-        "Il est exécuté publiquement par l'évêque après sa capture"
+        "Jésus est redescendu sur Terre et l'a tiré dans tête avec un glock 9mm."
       ],
       "correct": 1
     },
     {
       "q": "Comment les troupes du prince-évêque parviennent-elles finalement à reprendre Münster, après plusieurs assauts ratés?",
       "opts": [
-        "Par un bombardement d'artillerie qui détruit les remparts",
-        "Par la famine seule, qui force les assiégés à se rendre sans combat",
+        "Par un bombardement d'artillerie qui détruit une partie des remparts que les lansquenets de l'évêque réussissent à prendre.",
+        "Par la famine seule, qui force les assiégés à se rendre sans combat.",
         "Grâce à des transfuges qui révèlent un point d'accès à la ville, permettant une infiltration nocturne",
-        "Grâce à l'intervention de l'empereur Charles Quint, qui envoie une armée impériale"
+        "Grâce à l'intervention de l'empereur Charles Quint, qui envoie une armée impériale. La ville se rend sans combattre après que les émissaires de l'empereur les aient menacé d'extermination totale."
       ],
       "correct": 2
     },
     {
-      "q": "Le meurtre de Hubert Ruescher, tué par Jan de Leyde après avoir traité Jan Matthys de menteur, marque un tournant important dans le régime anabaptiste. Lequel?",
+      "q": "Nous avons vu un épisode d'\"entropie de la victoire\" où les chef d'une rebéllion s'entre-déchirent. Qu'est-il arrivé?",
       "opts": [
-        "Il provoque un schisme théologique entre anabaptistes pacifistes et anabaptistes armés",
-        "Il pousse Matthys à quitter le pouvoir et à confier la ville à un conseil élu",
-        "Il installe la violence comme outil pour faire taire toute dissidence interne, et consacre Matthys comme chef incontesté",
-        "Il convainc l'évêque de négocier une paix immédiate avec les anabaptistes"
+        "Jan von Leyden doit répondre par les armes à une insulte qu'il a faite à Knipperdolling.  Le premier tue le second.",
+        "Jan Von Leyden répudie et expulse Rothmann après que celui-ci ait diffusé de nouvelles règles stipulant que nul ne peut prendre la place du Christ.",
+        "Knipperdolling et Rothmann se réclament comme les successeurs légitime de Matthys après avoir diffuser le \"Testament de la Nouvelle Jésuralem\" supposément  écrit par Matthys avant sa mort",
+        "Knipperdolling prétend être saisi par l'esprit sain, mais Von Leyden le bat à son propre jeu en prétendant à son tour que Dieu parle par sa bouche."
       ],
       "correct": 2
     },
     {
-      "q": "Dans la grille motivation / moyens / opportunité utilisée en classe, qu'est-ce qui constitue précisément l'« opportunité » ayant permis aux anabaptistes de prendre le contrôle du conseil de Münster en 1534?",
+      "q": "Qu'est-ce qui constitue précisément l'« opportunité » ayant permis aux anabaptistes de prendre le contrôle du conseil de Münster en 1534?",
       "opts": [
         "Une insurrection armée qui renverse par la force les autorités municipales en place",
-        "Des élections municipales légales, dans une ville déjà fragilisée, qui portent au conseil des sympathisants anabaptistes",
+        "Des élections municipales légales, dans une ville déjà fragilisée, qui portent au conseil des sympathisants anabaptistes.",
         "Un décret impérial qui transfère directement le pouvoir aux prédicateurs anabaptistes",
-        "L'absence totale d'institutions municipales à Münster avant 1534"
+        "Le laisser-aller de l'évêque, nouveau et inexpérimenté, qui mène à l'absence totale d'institution municipale à Münster avant 1534, permettant aux marchands de remplir la vacance du pouvoir."
       ],
       "correct": 1
     }
