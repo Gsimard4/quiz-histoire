@@ -1,0 +1,124 @@
+{
+  "titre": "La Révolution taiping",
+  "sousTitre": "1851-1864 — le Royaume céleste de la Grande Paix",
+  "categorie": "XIXe siècle · Révolte messianique",
+  "description": "Un candidat déçu aux examens impériaux se proclame frère cadet de Jésus et soulève la Chine dans la guerre civile la plus meurtrière du XIXe siècle.",
+  "accroche": "PROPHÉTIE · RÉVOLTE · EMPIRE",
+  "tempsParDefaut": 30,
+  "palette": {
+    "accent": "#c9922f",
+    "accentSombre": "#7d5a15",
+    "corail": "#9a4a20",
+    "corailClair": "#c25f28",
+    "fond": "#0b0805",
+    "fondMi": "#140f08",
+    "carte": "#1c150c",
+    "carte2": "#251c11",
+    "bordure": "#3a2b1a",
+    "bordure2": "#4e3a24",
+    "texte": "#f0e6d4",
+    "sourdine": "#8f7a55"
+  },
+  "questions": [
+    {
+      "q": "Quelle dynastie règne sur la Chine au moment de la révolte taiping?",
+      "opts": [
+        "La dynastie Ming",
+        "La dynastie Qing",
+        "La dynastie Tang",
+        "La dynastie Song"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Qui est le chef fondateur du mouvement taiping, qui se croit le frère cadet de Jésus?",
+      "opts": [
+        "Zeng Guofan",
+        "Yang Xiuqing",
+        "Hong Xiuquan",
+        "Feng Yunshan"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Quelle ville devient la « Capitale céleste » des Taiping à partir de 1853?",
+      "opts": [
+        "Canton",
+        "Pékin",
+        "Shanghai",
+        "Nankin"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Qui finit par écraser la révolte taiping, à la tête d'une armée régionale levée par la gentry?",
+      "opts": [
+        "Zeng Guofan",
+        "Wei Changhui",
+        "Shi Dakai",
+        "L'empereur lui-même, à la tête de l'armée impériale"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Qu'est-ce qui pousse Hong Xiuquan à se croire investi d'une mission divine?",
+      "opts": [
+        "Une vision reçue lors d'un pèlerinage dans un temple bouddhiste",
+        "Un effondrement psychologique après quatre échecs aux examens, suivi de la relecture d'un pamphlet protestant",
+        "Un songe prophétique partagé par toute sa famille",
+        "Une rencontre directe avec des missionnaires britanniques à Canton"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Pourquoi peut-on dire que Yang Xiuqing tient une autorité que Hong Xiuquan ne lui a pas donnée?",
+      "opts": [
+        "Parce que Yang prétend parler par la bouche de Dieu, un pouvoir que Hong n'a fait que reconnaître à son retour",
+        "Parce que Yang a été nommé officiellement par l'empereur Qing avant de rejoindre les Taiping",
+        "Parce que Yang a fondé le mouvement avant même la conversion de Hong",
+        "Parce que Yang contrôle le trésor commun et peut donc acheter les faveurs des autres chefs"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Quel événement précipite l'effondrement de la direction taiping en 1856?",
+      "opts": [
+        "Hong fait assassiner Yang, ce qui déclenche une série de règlements de comptes entre les autres rois",
+        "L'armée impériale capture Hong lors d'une bataille et force les autres rois à se rendre",
+        "Les Occidentaux imposent un traité qui retire aux Taiping le contrôle de Nankin",
+        "Une famine généralisée force les rois à fuir la capitale céleste"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi l'expédition taiping vers le nord échoue-t-elle à renverser la dynastie Qing malgré une occasion favorable?",
+      "opts": [
+        "Parce que l'armée, forte de 50 000 soldats, n'essaie pas de prendre Pékin pourtant vulnérable, et revient décimée",
+        "Parce que les Occidentaux interviennent militairement pour défendre la capitale",
+        "Parce que les soldats taiping désertent en masse avant d'atteindre Tianjin",
+        "Parce que l'empereur négocie directement avec Hong Xiuquan une paix séparée"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "En quoi la société taiping, une fois installée à Nankin, trahit-elle les promesses qui avaient attiré ses premiers adeptes?",
+      "opts": [
+        "Les rois s'accordent des privilèges, un harem et un luxe de cour, alors que l'égalité reste le mot d'ordre officiel",
+        "Les Taiping abolissent la mise en commun des ressources au profit d'une économie de marché favorisant les riches marchands",
+        "Les Taiping rétablissent le système des examens impériaux qu'ils avaient pourtant dénoncé",
+        "Les Taiping renoncent à toute discipline religieuse et tolèrent de nouveau le jeu, l'alcool et l'opium"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Dans quelle mesure les Occidentaux ont-ils contribué à la chute de la révolution taiping?",
+      "opts": [
+        "Après la Seconde guerre de l'opium, ils choisissent d'appuyer la dynastie Qing, avec qui ils ont un traité avantageux à préserver",
+        "Ils interviennent militairement dès 1851 pour écraser le mouvement avant qu'il ne prenne de l'ampleur",
+        "Ils financent directement l'armée du Hunan de Zeng Guofan depuis le début du conflit",
+        "Ils imposent un blocus naval qui prive Nankin de tout ravitaillement dès 1853"
+      ],
+      "correct": 0
+    }
+  ]
+}
