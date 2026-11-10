@@ -1,0 +1,124 @@
+{
+  "titre": "L'indépendance du Vietnam",
+  "sousTitre": "1945-1975 — trente ans de guerre pour l'indépendance",
+  "categorie": "XXe siècle · Révolution anticoloniale",
+  "description": "De la colonie française à la réunification : le Viet Minh, la guerre contre la France, la guerre contre les États-Unis et les lendemains de la victoire.",
+  "accroche": "COLONIE · GUÉRILLA · RÉUNIFICATION",
+  "tempsParDefaut": 30,
+  "palette": {
+    "accent": "#5fa86a",
+    "accentSombre": "#2f6b3a",
+    "corail": "#9a4a20",
+    "corailClair": "#c25f28",
+    "fond": "#060b07",
+    "fondMi": "#0b140d",
+    "carte": "#111c13",
+    "carte2": "#18261a",
+    "bordure": "#263a29",
+    "bordure2": "#344e38",
+    "texte": "#e8f0e6",
+    "sourdine": "#7f9a83"
+  },
+  "questions": [
+    {
+      "q": "Quelle puissance conquiert le Vietnam entre 1858 et 1887?",
+      "opts": [
+        "Le Royaume-Uni",
+        "La France",
+        "Le Japon",
+        "Les Pays-Bas"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Qui proclame l'indépendance du Vietnam le 2 septembre 1945?",
+      "opts": [
+        "Bao Daï",
+        "Ngô Dinh Diêm",
+        "Hô Chi Minh",
+        "Mao Zedong"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Quelle bataille de 1954 porte le coup de grâce à la France?",
+      "opts": [
+        "Diên Biên Phu",
+        "Haïphong",
+        "Huê",
+        "Golfe du Tonkin"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Que prévoient les accords de Genève en 1954?",
+      "opts": [
+        "L'indépendance immédiate d'un Vietnam unifié",
+        "Le retour de toute l'Indochine sous contrôle français",
+        "L'occupation du Sud par les troupes britanniques",
+        "Le partage provisoire du Vietnam au 17e parallèle"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Pourquoi la famine de 1944-1945 profite-t-elle au Viet Minh?",
+      "opts": [
+        "Le Viet Minh distribue aux paysans l'aide alimentaire américaine",
+        "Les Japonais confient au Viet Minh la gestion du ravitaillement",
+        "Les réquisitions françaises et japonaises attisent la colère",
+        "Bao Daï rejette la faute sur la France et se rallie au Viet Minh"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "De 1950 à 1954, quel rôle jouent les États-Unis dans la guerre d'Indochine?",
+      "opts": [
+        "Ils financent et équipent l'armée française",
+        "Ils envoient des soldats combattre avec la France",
+        "Ils restent neutres et poussent à négocier",
+        "Ils arment en secret le Viet Minh contre Paris"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi peut-on parler d'une indépendance « de façade » dans les accords Hô-Sainteny de 1946?",
+      "opts": [
+        "Le Vietnam est indépendant, mais seulement au nord du 17e parallèle",
+        "Le Vietnam devient un État libre, mais au sein de l'Union française",
+        "Le Vietnam est indépendant, mais Bao Daï reste empereur",
+        "Le Vietnam est indépendant, mais doit rembourser toute la dette coloniale"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Pourquoi le Sud refuse-t-il les élections de réunification prévues pour 1956?",
+      "opts": [
+        "La France s'oppose à toute réunification du pays",
+        "Le Nord refuse la présence d'observateurs étrangers",
+        "Les bouddhistes appellent au boycottage du scrutin",
+        "Le régime de Diêm craint de perdre face au Nord"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "L'offensive du Têt (1968) est souvent décrite comme une défaite militaire, mais une victoire morale. Pourquoi?",
+      "opts": [
+        "Le Viet Cong prend Saigon, mais doit la rendre aux accords de Paris",
+        "Le Nord perd du territoire, mais obtient l'appui officiel de l'URSS",
+        "Le Viet Cong est décimé, mais l'opinion américaine se retourne",
+        "Les Américains gagnent les combats, mais perdent l'appui de la France"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Après 1975, en quoi la victoire peut-elle être vue comme une révolution confisquée?",
+      "opts": [
+        "Les Américains imposent au Sud un gouvernement de coalition",
+        "Les dirigeants du Nord écartent ceux du Viet Cong, même communistes",
+        "Le Viet Cong prend le contrôle de Hanoï et en écarte les dirigeants du Nord",
+        "La Chine place ses propres dirigeants à la tête du Vietnam réunifié"
+      ],
+      "correct": 1
+    }
+  ]
+}
