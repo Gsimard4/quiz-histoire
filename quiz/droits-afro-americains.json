@@ -1,0 +1,124 @@
+{
+  "titre": "La lutte pour les droits civiques des Noirs",
+  "sousTitre": "1865-1968 — de la Reconstruction au rapport Kerner",
+  "categorie": "XIXe-XXe siècles · Révolution sociale",
+  "description": "De la Reconstruction confisquée aux lois Jim Crow, puis du boycott de Montgomery aux lois de 1964-1965 : gains, contre-révolution et radicalisation.",
+  "accroche": "SÉGRÉGATION · NON-VIOLENCE · ÉGALITÉ",
+  "tempsParDefaut": 30,
+  "palette": {
+    "accent": "#d49a3a",
+    "accentSombre": "#8a5f1c",
+    "corail": "#8f3b2a",
+    "corailClair": "#b84c36",
+    "fond": "#0b0805",
+    "fondMi": "#140f09",
+    "carte": "#1d160e",
+    "carte2": "#261d13",
+    "bordure": "#3a2c1c",
+    "bordure2": "#523e27",
+    "texte": "#f2ead9",
+    "sourdine": "#a08d70"
+  },
+  "questions": [
+    {
+      "q": "Quel amendement abolit l'esclavage aux États-Unis en 1865?",
+      "opts": [
+        "Le 13e amendement",
+        "Le 14e amendement",
+        "Le 15e amendement",
+        "Le 24e amendement"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Quel arrêt de la Cour suprême autorise, en 1896, le principe « séparés, mais égaux »?",
+      "opts": [
+        "Brown",
+        "Loving c. Virginie",
+        "Plessy c. Ferguson",
+        "Cooper c. Aaron"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Qui est arrêtée en 1955 pour avoir refusé de céder son siège à un Blanc dans un autobus?",
+      "opts": [
+        "Mildred Loving",
+        "Rosa Parks",
+        "Coretta Scott King",
+        "Elizabeth Eckford"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Quel président fait intervenir l'armée à Little Rock en 1957?",
+      "opts": [
+        "John F. Kennedy",
+        "Harry Truman",
+        "Lyndon B. Johnson",
+        "Dwight Eisenhower"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Qu'est-ce que le péonage?",
+      "opts": [
+        "La location de prisonniers à des planteurs",
+        "Une taxe exigée pour avoir le droit de voter",
+        "Un métayer endetté qui ne peut pas quitter son employeur",
+        "Le partage des récoltes entre planteur et métayer"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "En 1877, que reçoit le Sud en échange de la présidence du républicain Hayes?",
+      "opts": [
+        "La fin de l'occupation armée et l'autonomie locale",
+        "L'annulation du 14e amendement dans les États du Sud",
+        "Une compensation pour les esclaves libérés en 1865",
+        "Le droit de nommer les juges de la Cour suprême"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Pourquoi la guerre froide aide-t-elle la cause des Noirs américains?",
+      "opts": [
+        "L'URSS finance en secret les procès de la NAACP",
+        "Les Noirs refusent de servir en Corée sans égalité",
+        "Le FBI cesse de surveiller les militants noirs",
+        "L'URSS exploite le racisme américain dans sa propagande"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Quels événements mènent directement au Voting Rights Act de 1965?",
+      "opts": [
+        "La campagne de Birmingham",
+        "Les marches de Selma",
+        "La marche sur Washington",
+        "Le boycott de Montgomery"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Pourquoi le 24e amendement (1964) ne suffit-il pas à garantir le vote des Noirs?",
+      "opts": [
+        "Il ne s'applique qu'aux États du Nord",
+        "Les tests d'alphabétisation et l'intimidation demeurent",
+        "La Cour suprême le déclare inconstitutionnel",
+        "Le Sénat refuse de le ratifier avant 1968"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Que reconnaît le rapport Kerner (1968), et qu'en fait-on?",
+      "opts": [
+        "Un complot communiste; il mène à COINTELPRO",
+        "La faute des Black Panthers; il mène à leur interdiction",
+        "L'échec de la police; il mène à sa réforme fédérale",
+        "Le racisme structurel; il est tabletté"
+      ],
+      "correct": 3
+    }
+  ]
+}
