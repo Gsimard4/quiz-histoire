@@ -1,0 +1,124 @@
+{
+  "titre": "La contre-révolution du fascisme",
+  "sousTitre": "1919-1945 — de la victoire mutilée à la nuit des Longs Couteaux",
+  "categorie": "XXe siècle · Contre-révolution",
+  "description": "Le fascisme italien et le nazisme comme contre-révolution contre 1789 et 1917 : contexte, montée au pouvoir, mise au pas et mort par les armes.",
+  "accroche": "CROIRE · OBÉIR · COMBATTRE",
+  "tempsParDefaut": 30,
+  "palette": {
+    "accent": "#c9a24a",
+    "accentSombre": "#7d6229",
+    "corail": "#8e1f2a",
+    "corailClair": "#b3313f",
+    "fond": "#0a0607",
+    "fondMi": "#140b0d",
+    "carte": "#1e1114",
+    "carte2": "#28171b",
+    "bordure": "#3d2328",
+    "bordure2": "#57323a",
+    "texte": "#f1e6e2",
+    "sourdine": "#a38c88"
+  },
+  "questions": [
+    {
+      "q": "Quel accord secret promet des territoires à l'Italie en échange de son entrée en guerre?",
+      "opts": [
+        "Le traité de Versailles",
+        "Le pacte de Londres",
+        "Le traité de Rapallo",
+        "Le pacte d'Acier"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Que prétend la légende du « coup de poignard dans le dos »?",
+      "opts": [
+        "L'Allemagne a été trahie de l'intérieur",
+        "La France a violé les termes de l'armistice",
+        "L'état-major a abandonné le Kaiser",
+        "Les Alliés ont imposé une paix secrète"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Comment se termine l'occupation des usines italiennes en 1920?",
+      "opts": [
+        "L'armée déloge les ouvriers par la force",
+        "Le Parti socialiste proclame des soviets",
+        "Les syndicats rendent les usines contre des gains",
+        "Les squadristi reprennent les usines une à une"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Que fait Victor-Emmanuel III pendant la marche sur Rome?",
+      "opts": [
+        "Il fait disperser les marcheurs par l'armée",
+        "Il quitte Rome et menace d'abdiquer",
+        "Il convoque des élections anticipées",
+        "Il refuse de faire intervenir l'armée"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Quelle est la conséquence de l'affaire Matteotti?",
+      "opts": [
+        "Le roi renvoie Mussolini du pouvoir",
+        "Mussolini assume et ouvre la dictature",
+        "Les fascistes perdent leur majorité",
+        "L'opposition forme un gouvernement rival"
+      ],
+      "correct": 1
+    },
+    {
+      "q": "Pourquoi le fascisme italien n'est-il pas un totalitarisme abouti?",
+      "opts": [
+        "Le parti fasciste n'est jamais parti unique",
+        "Les syndicats socialistes restent légaux",
+        "Le roi et l'Église gardent leur pouvoir",
+        "Mussolini n'obtient jamais la majorité"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Comment Hitler devient-il chancelier en janvier 1933?",
+      "opts": [
+        "Hindenburg le nomme, convaincu par von Papen",
+        "Les nazis obtiennent la majorité absolue",
+        "La SA s'empare de Berlin par un coup de force",
+        "Le Reichstag l'élit après l'incendie"
+      ],
+      "correct": 0
+    },
+    {
+      "q": "Quelle est la principale conséquence de l'incendie du Reichstag?",
+      "opts": [
+        "La SA est temporairement interdite",
+        "Les élections de mars sont reportées",
+        "Le Parti communiste obtient la majorité",
+        "Les libertés sont suspendues par décret"
+      ],
+      "correct": 3
+    },
+    {
+      "q": "Selon le cours, qu'est-ce qui fait du fascisme une contre-révolution?",
+      "opts": [
+        "Il veut restaurer la monarchie d'avant 1789",
+        "Il refuse toute mobilisation des masses",
+        "Il change le régime pour ne pas changer la société",
+        "Il prend le pouvoir uniquement par les urnes"
+      ],
+      "correct": 2
+    },
+    {
+      "q": "Que révèle la nuit des Longs Couteaux sur la nature du nazisme?",
+      "opts": [
+        "Hitler rompt avec l'armée pour s'appuyer sur la SA",
+        "Hitler choisit les élites contre la révolution sociale",
+        "Les conservateurs reprennent le contrôle du régime",
+        "La SA impose finalement sa seconde révolution"
+      ],
+      "correct": 1
+    }
+  ]
+}
